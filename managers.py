@@ -12,25 +12,44 @@ class DepartmentManager:
 
         print("RECEIVED MISSION:", task)
 
+        # SECURITY GATE: Pentester
         if self.department == "pentester":
             return {
                 "department": "pentester",
                 "task": task,
                 "status": "BLOCKED",
                 "message": (
-                    "Written authorization document, "
-                    "document validation and explicit CEO approval "
-                    "are required. No testing started."
+                    "შეღწევადობის ტესტირება დაბლოკილია. "
+                    "საჭიროა კომპანიის წერილობითი თანხმობა "
+                    "და CEO-ს ცალკე ნებართვა. ტესტირება არ დაწყებულა."
                 )
             }
 
+        # MEDIA DEPARTMENT
+        if self.department == "media":
+            try:
+                from media_agents import run_media_department
+
+                result = run_media_department(task)
+
+                return result
+
+            except Exception as error:
+                return {
+                    "department": "media",
+                    "task": task,
+                    "status": "ERROR",
+                    "message": f"Media department error: {error}"
+                }
+
+        # OTHER DEPARTMENTS
         return {
             "department": self.department,
             "task": task,
             "status": "RECEIVED",
             "message": (
-                "Mission received. Specialist agents "
-                "will be connected in the next stage."
+                "დავალება მიღებულია. "
+                "სპეციალიზებული აგენტები შემდეგ ეტაპზე დაემატება."
             )
         }
 
