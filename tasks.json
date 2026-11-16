@@ -1,5 +1,379 @@
 [
     {
+        "id": "7d92942a",
+        "created_at": "2026-11-16T19:54:43.505256+00:00",
+        "task": "CEO FINAL PERFORMANCE TEST — ROANOKE LOST COLONY  You are receiving one strict CEO assignment.  YOUR MISSION: Create exactly ONE English YouTube Shorts video, approximately 60 seconds long, about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. TOPIC LOCK - Roanoke Lost Colony is the ONLY topic. - Never change, replace, or expand the topic. - Create exactly ONE video concept and ONE final script.  2. RESEARCH DEPARTMENT - Research the Roanoke Lost Colony using relevant authoritative sources. - Collect at least 8 relevant source results if available. - Prefer National Park Service, government archives, museums, universities and established historical references. - Preserve source titles, URLs and actual supplied content. - Distinguish full-page extracts from search snippets. - Never claim a URL was independently verified unless it actually was. - Never invent sources or quotations. - Report honestly if fewer than 8 usable sources are found.  3. REQUIRED HISTORICAL SUBJECTS Investigate these subjects: - The 1587 Roanoke settlement. - John White's departure and delayed return. - His return in 1590. - The inscription CRO carved into a tree. - The inscription CROATOAN carved into the palisade. - The Croatoan people and Croatoan place associated with Hatteras Island. - Manteo's connection with the Croatoan people and the English colonists. - The possibility that colonists relocated to Croatoan, clearly identified as an unconfirmed theory.  Do not invent exact settler counts, DNA findings, disease explanations or other theories without direct supporting evidence.  4. CREATIVE STRATEGIST Produce one strong concept and an engaging opening hook. Do not write unsupported historical claims as facts.  5. SCRIPTWRITER - Write natural English narration. - Narration must contain 125–140 words. - Target approximately 132 words. - Create exactly 6 visual scenes. - Use these exact timestamps:   0:00-0:10   0:10-0:20   0:20-0:30   0:30-0:40   0:40-0:50   0:50-1:00 - Every visual must match the narration.  6. QUALITY EDITOR Check grammar, topic preservation, word count, scene count and historical accuracy. Do not invent facts to improve storytelling.  7. INDEPENDENT FACT-CHECKER Check every important historical claim against supplied research content. For every claim use one status: VERIFIED NEEDS SOURCE CONTRADICTED  Provide the supporting excerpt, source title and URL. Never mark a claim VERIFIED without direct supporting content.  8. EVIDENCE-BASED EDITOR Remove or correct unsupported and contradicted claims. Preserve the original topic. Do not sacrifice historical accuracy to meet the word count.  9. FINAL FACT-CHECK Check the final edited narration again. Report all remaining uncertainty honestly.  10. AUDIT AND CEO CONTROL - Audit must independently inspect the Media result. - Report failed checks honestly. - Distinguish technical failures from content-quality failures. - Never fabricate successful work. - Never approve publication automatically. - publication_approved MUST remain false. - Final decision must require CEO review.  11. ERROR HANDLING If any agent fails: - Report the exact failed stage. - Preserve completed work. - Do not pretend downstream stages completed. - Do not silently replace the topic. - Do not invent missing research.  FINAL SUCCESS CRITERIA: - Exactly one topic. - Exactly one concept. - Exactly one final script. - 125–140 narration words. - Exactly six visual scenes. - At least eight relevant source results if available. - Evidence-based fact-checking. - Honest audit. - Publication not approved without CEO authorization.  CEO'S FINAL INSTRUCTION: Work carefully. Follow the complete assignment. Do not skip stages. Do not invent success. Deliver the strongest evidence-based result possible.",
+        "analysis": "დავალება გაანალიზებულია. დეპარტამენტები შეირჩა დავალების შინაარსის მიხედვით.",
+        "departments": [
+            "media",
+            "audit",
+            "technical"
+        ],
+        "requires_ceo_approval": true,
+        "results": [
+            {
+                "department": "media",
+                "status": "ERROR",
+                "failed_stage": "Media production pipeline",
+                "message": "Media production pipeline failed: Groq daily quota has been exhausted. Wait for the quota reset or check your Groq plan.",
+                "original_ceo_topic": "CEO FINAL PERFORMANCE TEST — ROANOKE LOST COLONY  You are receiving one strict CEO assignment.  YOUR MISSION: Create exactly ONE English YouTube Shorts video, approximately 60 seconds long, about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. TOPIC LOCK - Roanoke Lost Colony is the ONLY topic. - Never change, replace, or expand the topic. - Create exactly ONE video concept and ONE final script.  2. RESEARCH DEPARTMENT - Research the Roanoke Lost Colony using relevant authoritative sources. - Collect at least 8 relevant source results if available. - Prefer National Park Service, government archives, museums, universities and established historical references. - Preserve source titles, URLs and actual supplied content. - Distinguish full-page extracts from search snippets. - Never claim a URL was independently verified unless it actually was. - Never invent sources or quotations. - Report honestly if fewer than 8 usable sources are found.  3. REQUIRED HISTORICAL SUBJECTS Investigate these subjects: - The 1587 Roanoke settlement. - John White's departure and delayed return. - His return in 1590. - The inscription CRO carved into a tree. - The inscription CROATOAN carved into the palisade. - The Croatoan people and Croatoan place associated with Hatteras Island. - Manteo's connection with the Croatoan people and the English colonists. - The possibility that colonists relocated to Croatoan, clearly identified as an unconfirmed theory.  Do not invent exact settler counts, DNA findings, disease explanations or other theories without direct supporting evidence.  4. CREATIVE STRATEGIST Produce one strong concept and an engaging opening hook. Do not write unsupported historical claims as facts.  5. SCRIPTWRITER - Write natural English narration. - Narration must contain 125–140 words. - Target approximately 132 words. - Create exactly 6 visual scenes. - Use these exact timestamps:   0:00-0:10   0:10-0:20   0:20-0:30   0:30-0:40   0:40-0:50   0:50-1:00 - Every visual must match the narration.  6. QUALITY EDITOR Check grammar, topic preservation, word count, scene count and historical accuracy. Do not invent facts to improve storytelling.  7. INDEPENDENT FACT-CHECKER Check every important historical claim against supplied research content. For every claim use one status: VERIFIED NEEDS SOURCE CONTRADICTED  Provide the supporting excerpt, source title and URL. Never mark a claim VERIFIED without direct supporting content.  8. EVIDENCE-BASED EDITOR Remove or correct unsupported and contradicted claims. Preserve the original topic. Do not sacrifice historical accuracy to meet the word count.  9. FINAL FACT-CHECK Check the final edited narration again. Report all remaining uncertainty honestly.  10. AUDIT AND CEO CONTROL - Audit must independently inspect the Media result. - Report failed checks honestly. - Distinguish technical failures from content-quality failures. - Never fabricate successful work. - Never approve publication automatically. - publication_approved MUST remain false. - Final decision must require CEO review.  11. ERROR HANDLING If any agent fails: - Report the exact failed stage. - Preserve completed work. - Do not pretend downstream stages completed. - Do not silently replace the topic. - Do not invent missing research.  FINAL SUCCESS CRITERIA: - Exactly one topic. - Exactly one concept. - Exactly one final script. - 125–140 narration words. - Exactly six visual scenes. - At least eight relevant source results if available. - Evidence-based fact-checking. - Honest audit. - Publication not approved without CEO authorization.  CEO'S FINAL INSTRUCTION: Work carefully. Follow the complete assignment. Do not skip stages. Do not invent success. Deliver the strongest evidence-based result possible.",
+                "concept": "",
+                "script": "",
+                "edited_script": "",
+                "initial_fact_check": "",
+                "fact_check": "",
+                "research": {
+                    "status": "COMPLETED",
+                    "original_ceo_topic": "CEO FINAL PERFORMANCE TEST — ROANOKE LOST COLONY  You are receiving one strict CEO assignment.  YOUR MISSION: Create exactly ONE English YouTube Shorts video, approximately 60 seconds long, about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. TOPIC LOCK - Roanoke Lost Colony is the ONLY topic. - Never change, replace, or expand the topic. - Create exactly ONE video concept and ONE final script.  2. RESEARCH DEPARTMENT - Research the Roanoke Lost Colony using relevant authoritative sources. - Collect at least 8 relevant source results if available. - Prefer National Park Service, government archives, museums, universities and established historical references. - Preserve source titles, URLs and actual supplied content. - Distinguish full-page extracts from search snippets. - Never claim a URL was independently verified unless it actually was. - Never invent sources or quotations. - Report honestly if fewer than 8 usable sources are found.  3. REQUIRED HISTORICAL SUBJECTS Investigate these subjects: - The 1587 Roanoke settlement. - John White's departure and delayed return. - His return in 1590. - The inscription CRO carved into a tree. - The inscription CROATOAN carved into the palisade. - The Croatoan people and Croatoan place associated with Hatteras Island. - Manteo's connection with the Croatoan people and the English colonists. - The possibility that colonists relocated to Croatoan, clearly identified as an unconfirmed theory.  Do not invent exact settler counts, DNA findings, disease explanations or other theories without direct supporting evidence.  4. CREATIVE STRATEGIST Produce one strong concept and an engaging opening hook. Do not write unsupported historical claims as facts.  5. SCRIPTWRITER - Write natural English narration. - Narration must contain 125–140 words. - Target approximately 132 words. - Create exactly 6 visual scenes. - Use these exact timestamps:   0:00-0:10   0:10-0:20   0:20-0:30   0:30-0:40   0:40-0:50   0:50-1:00 - Every visual must match the narration.  6. QUALITY EDITOR Check grammar, topic preservation, word count, scene count and historical accuracy. Do not invent facts to improve storytelling.  7. INDEPENDENT FACT-CHECKER Check every important historical claim against supplied research content. For every claim use one status: VERIFIED NEEDS SOURCE CONTRADICTED  Provide the supporting excerpt, source title and URL. Never mark a claim VERIFIED without direct supporting content.  8. EVIDENCE-BASED EDITOR Remove or correct unsupported and contradicted claims. Preserve the original topic. Do not sacrifice historical accuracy to meet the word count.  9. FINAL FACT-CHECK Check the final edited narration again. Report all remaining uncertainty honestly.  10. AUDIT AND CEO CONTROL - Audit must independently inspect the Media result. - Report failed checks honestly. - Distinguish technical failures from content-quality failures. - Never fabricate successful work. - Never approve publication automatically. - publication_approved MUST remain false. - Final decision must require CEO review.  11. ERROR HANDLING If any agent fails: - Report the exact failed stage. - Preserve completed work. - Do not pretend downstream stages completed. - Do not silently replace the topic. - Do not invent missing research.  FINAL SUCCESS CRITERIA: - Exactly one topic. - Exactly one concept. - Exactly one final script. - 125–140 narration words. - Exactly six visual scenes. - At least eight relevant source results if available. - Evidence-based fact-checking. - Honest audit. - Publication not approved without CEO authorization.  CEO'S FINAL INSTRUCTION: Work carefully. Follow the complete assignment. Do not skip stages. Do not invent success. Deliver the strongest evidence-based result possible.",
+                    "extracted_topic": "the Roanoke Lost Colony",
+                    "query": "the Roanoke Lost Colony reliable sources authoritative records official documentation primary evidence",
+                    "source_count": 15,
+                    "full_page_count": 12,
+                    "snippet_count": 3,
+                    "sources": [
+                        {
+                            "title": "Primary Sources - Jamestown and Roanoke Colonies: A Resource Guide - Research Guides at Library of Congress",
+                            "url": "https://guides.loc.gov/jamestown-roanoke-colonies/primary-sources",
+                            "domain": "guides.loc.gov",
+                            "content": "![](https://cdn.loc.gov/libguide/images/logo-loc-padded.svg)\n![](https://cdn.loc.gov/libguide/images/logo-research-guides.svg)\n\n# Jamestown and Roanoke Colonies: A Resource Guide\n\n# Primary Sources\n\nMost of the following titles link to fuller bibliographic information in the [Library of Congress Online Catalog](https://catalog.loc.gov). Although the Library of Congress holds many of the earliest editions of these works and makes them available to researchers in its [Rare Book & Special Collections Reading Room](https://www.loc.gov/rr/rarebook/), this selected list is generally limited to electronic versions of the originals and/or modern editions that are available in the Library's [Main Reading Room](https://www.loc.gov/rr/main/) and in many other libraries also. A few titles also document how the Jamestown site was experienced and its history memorialized in later centuries.\n\n**SIXTEENTH- AND SEVENTEENTH-CENTURY SOURCES**\n\n![](//s3.amazonaws.com/libapps/apps/common/images/gc-md.gif)\n![](//s3.amazonaws.com/libapps/apps/common/images/gc-md.gif)\n![](//syndetics.com/index.aspx?isbn=0807817783/LC.GIF&client=springshare)\n![](//syndetics.com/index.aspx?isbn=1598530011/LC.GIF&client=springshare)\n![](//s3.amazonaws.com/libapps/apps/common/images/gc-md.gif)\n![](//s3.amazonaws.com/libapps/apps/common/images/gc-md.gif)\n![](//s3.amazonaws.com/libapps/apps/common/images/gc-md.gif)\n![](//syndetics.com/index.aspx?isbn=0865261954/LC.GIF&client=springshare)\n![](//s3.amazonaws.com/libapps/app",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.7221353,
+                            "preferred_domain_candidate": true,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Roanoke Colonists' Appeal to John White; an excerpt from \"The voyage of Edward Stafford and John White\" by John White (1589) - Encyclopedia Virginia",
+                            "url": "https://encyclopediavirginia.org/primary-documents/roanoke-colonists-appeal-to-john-white-an-excerpt-from-the-voyage-of-edward-stafford-and-john-white-by-john-white-1589",
+                            "domain": "encyclopediavirginia.org",
+                            "content": "[Encyclopedia Virginia, Virginia Humanities](https://encyclopediavirginia.org/)\n\n![Facebook](https://encyclopediavirginia.org/wp-content/themes/ev/img/square-facebook.svg)\n![Instagram](https://encyclopediavirginia.org/wp-content/themes/ev/img/square-instagram.svg)\n\n# Roanoke Colonists’ Appeal to John White; an excerpt from “The voyage of Edward Stafford and John White” by John White (1589)\n\n![Roanoke Colonists' Appeal to John White; an excerpt from \"The voyage of Edward Stafford and John White\" by John White (1589)](https://encyclopediavirginia.org/wp-content/uploads/2020/11/6560_0ec825f33633c07-215x215.jpeg)\n\n[John White](https://encyclopediavirginia.org/entries/white-john-d-1593/), governor of the so-called Lost Colony at [Roanoke Island](https://encyclopediavirginia.org/entries/roanoke-colonies-the/), claimed that the settlers demanded he return to England to update their backer, [Sir Walter Raleigh](https://encyclopediavirginia.org/entries/raleigh-sir-walter-ca-1552-1618/), on the colony’s progress. At first he refused; then he required that the settler put the request in writing, which they did on August 25, 1587. According to the historian David Beers Quinn, “This testimonial is the first formal document to survive which originated in an English settlement on the mainland of North America.” White’s narrative, based on his journal, was published in [Richard Hakluyt (the younger)](https://encyclopediavirginia.org/entries/hakluyt-richard-1552-1616/)‘s *Principall Navigatio",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.63770795,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "How First Colony Foundation Found the Lost Colony of Roanoke",
+                            "url": "https://www.firstcolonyfoundation.org/news/lost-colony-is-found",
+                            "domain": "firstcolonyfoundation.org",
+                            "content": "[Skip to content](#content \"Skip to content\")\n\n\n[![First Colony Foundation](https://www.firstcolonyfoundation.org/wp-content/uploads/first-colony-foundation-logo-1x.png)](https://www.firstcolonyfoundation.org/)\n\n# The Lost Colony is Found! How We Did It.\n\n[Home](https://www.firstcolonyfoundation.org/) » [News](https://www.firstcolonyfoundation.org/news/) » The Lost Colony is Found! How We Did It.\n\n![Enhanced fort image showing location fifty miles west of Roanoke Island.](https://www.firstcolonyfoundation.org/wp-content/uploads/lost-colony-is-found.png)\n\nEnhanced fort image showing the location, fifty miles west of Roanoke Island.\n\nThis is *not* another hoax or false claim. The discovery was based on years of dedication and preparation by a research team of professional archaeologists and historians, the First Colony Foundation.\n\n## First Colony Foundation’s Search for Raleigh’s Lost Settlers\n\nHaving led excavations for Colonial Williamsburg in the past, they have an international reputation for their fieldwork on the earliest English colonial sites in Virginia, Ireland, and the Caribbean.\n\nWe of First Colony have focused on Sir Walter Raleigh’s colonial settlement on Roanoke Island, inland from North Carolina’s easterly, dangerous Cape Hatteras, called the Graveyard of the Atlantic for its rough seas and its far-reaching shoals.\n\n## Excavating Roanoke Island and Fort Raleigh\n\nThe site of that settlement is well-known to history, and one small piece of it is the earthwork For",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6304574,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Evidence Grows, the Lost Colony Split Up | PBS North Carolina",
+                            "url": "https://www.pbsnc.org/blogs/science/lost-colony-split",
+                            "domain": "pbsnc.org",
+                            "content": "# Evidence Grows, the Lost Colony Split Up\n\nby  Frank Graff •  Published on  • Last modified on\n\n![group excavating in woods with poured concrete](https://image.pbs.org/bento3-prod/pbsnc-redesign-phase-1/Blueridge%20Mountains%20Sunrise/1-from%20pbs%20nc/302a26e262_302a26e262_Lost_Colony_Split_NPS_banner.jpg)\n\nPhoto courtesy of NPS\n\n[Science & Nature](//www.pbsnc.org/blogs/science/)\n\n# **Where the Lost Colony Went**\n\nIt’s a line you hear in almost every movie or television show where there’s a chase scene, “Let’s split up, you go that way and I’ll go this way!”\n\nSome version of that action movie line may have been said on the North Carolina coast more than 400 years ago.\n\nThe results of two archaeological studies announced this year provide growing evidence that’s what the British settlers who arrived on North Carolina’s shores in 1587 did. The colony’s disappearance became America’s oldest unsolved mystery.\n\n## **First a quick trip back in time**\n\nYou know the story: 115 English settlers arrived on Roanoke Island to start a new life. They were not the first English explorers, but this group included women and children. Their goal was the creation of a permanent English settlement in the new world.\n\nThe expedition’s leader, Governor John White returned to England to get more supplies. His returned was delayed by a war between England and Spain, but when he made it back three years later, he found the colony deserted and the word “CROATOAN” carved into a wooden post.\n\nThere has",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.60853595,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Additional Online Resources - Jamestown and Roanoke Colonies: A Resource Guide - Research Guides at Library of Congress",
+                            "url": "https://guides.loc.gov/jamestown-roanoke-colonies/additional-online-resources",
+                            "domain": "guides.loc.gov",
+                            "content": "[Skip to Main Content](#s-lg-guide-main)\n\n[Library of Congress ![](https://cdn.loc.gov/libguide/images/logo-loc-padded.svg)](https://www.loc.gov/)   [Research Guides ![](https://cdn.loc.gov/libguide/images/logo-research-guides.svg)](/)\n\n1. [Library of Congress](https://www.loc.gov/)\n2. [Research Guides](https://guides.loc.gov/)\n3. [Main Reading Room](https://guides.loc.gov/main-reading-room)\n4. [Jamestown and Roanoke Colonies: A Resource Guide](https://guides.loc.gov/jamestown-roanoke-colonies)\n5. Additional Online Resources\n\n# Jamestown and Roanoke Colonies: A Resource Guide\n\n* [Introduction](https://guides.loc.gov/jamestown-roanoke-colonies/introduction)\n* [Primary Sources](https://guides.loc.gov/jamestown-roanoke-colonies/primary-sources)\n* [Secondary Sources: Selected Books](https://guides.loc.gov/jamestown-roanoke-colonies/secondary-books)\n* [Secondary Sources: Periodicals](https://guides.loc.gov/jamestown-roanoke-colonies/secondary-periodicals)\n* [Imaginative Works: A Selection](https://guides.loc.gov/jamestown-roanoke-colonies/imaginative-works)\n* [Especially for K-12 Students & Teachers](https://guides.loc.gov/jamestown-roanoke-colonies/students-teachers)\n* [Additional Online Resources](https://guides.loc.gov/jamestown-roanoke-colonies/additional-online-resources)\n\n# Additional Online Resources\n\n## Library of Congress\n\n* [Exhibition: American Treasures of the Library of Congress: Memory Gallery A This link opens in a new window](https://www.loc.gov/exhibits/treasures/",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.58942103,
+                            "preferred_domain_candidate": true,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Lost and Found: The Evidence for the Lost Colony – Popular Archeology",
+                            "url": "https://popular-archaeology.com/article/lost-and-found-the-evidence-for-the-lost-colony",
+                            "domain": "popular-archaeology.com",
+                            "content": "* [Discoveries](https://popular-archaeology.com/section/discoveries/)\n* [Digs](https://popular-archaeology.com/section/digs/)\n* [Daily News](https://popular-archaeology.com/section/archaeology-news-daily/)\n* [Promotion](https://popular-archaeology.com/section/promotion/)\n* [Reports](https://popular-archaeology.com/section/reports/)\n* [Viewpoints](https://popular-archaeology.com/section/viewpoints/)\n* [About Us](https://popular-archaeology.com/about-us/)\n* [Issues Archive](https://popular-archaeology.com/issues/)\n* [Advertise](https://popular-archaeology.com/advertise/)\n* [Log In](/log-in)\n\n* [Home](https://popular-archaeology.com/)\n* [About Us](https://popular-archaeology.com/about-us/)\n* [Adopt a Site](https://popular-archaeology.com/adopt-a-site/)\n  + [Discovering Ancient Tibet](https://popular-archaeology.com/adopt-a-site/discovering-ancient-tibet/)\n  + [Nojol Nah](https://popular-archaeology.com/adopt-a-site/nojol-nah/)\n* [Authors](https://popular-archaeology.com/authors/)\n* [Issues Archive](https://popular-archaeology.com/issues/)\n* [Advertise](https://popular-archaeology.com/advertise/)\n* [Join Popular Archaeology](https://popular-archaeology.com/register-3/)\n* [Log In](/log-in)\n\n[![Popular Archeology - exploring the past](https://popular-archaeology.com/wp-content/uploads/2018/01/newpoparchlogo2a.jpeg)](https://popular-archaeology.com \"Popular Archeology - exploring the past\")\n\n* [Discoveries](https://popular-archaeology.com/section/discoveries/)\n* [Digs](https://popul",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.57332015,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Roanoke Colony - Wikipedia",
+                            "url": "https://en.wikipedia.org/wiki/Roanoke_Colony",
+                            "domain": "en.wikipedia.org",
+                            "content": "[Jump to content](#bodyContent)\n\n[![](/static/images/icons/enwiki-25.svg)  ![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en-25.svg) ![The Free Encyclopedia](/static/images/mobile/copyright/wikipedia-tagline-en-25.svg)](/wiki/Main_Page)\n\n[Search](/wiki/Special:Search \"Search Wikipedia [f]\")\n\n## Contents\n\n* [1 Background](#Background)\n* [2 Amadas–Barlowe expedition](#Amadas–Barlowe_expedition)\n* [3 Lane colony](#Lane_colony)\n  + [3.1 Voyage](#Voyage)\n  + [3.2 Establishment of the colony](#Establishment_of_the_colony)\n  + [3.3 Exploration](#Exploration)\n  + [3.4 Hostilities and food shortages](#Hostilities_and_food_shortages)\n  + [3.5 Evacuation](#Evacuation)\n  + [3.6 Grenville's detachment](#Grenville's_detachment)\n* [4 Lost colony](#Lost_colony)\n  + [4.1 1588 relief mission](#1588_relief_mission)\n  + [4.2 Spanish reconnaissance](#Spanish_reconnaissance)\n  + [4.3 1590 relief mission](#1590_relief_mission)\n* [5 Investigations into Roanoke](#Investigations_into_Roanoke)\n  + [5.1 1595–1602: Walter Raleigh](#1595–1602:_Walter_Raleigh)\n  + [5.2 1603: Bartholomew Gilbert](#1603:_Bartholomew_Gilbert)\n  + [5.3 1607–1609: John Smith](#1607–1609:_John_Smith)\n  + [5.4 1610–1612: William Strachey](#1610–1612:_William_Strachey)\n  + [5.5 1625: Samuel Purchas](#1625:_Samuel_Purchas)\n  + [5.6 1701–1709: John Lawson](#1701–1709:_John_Lawson)\n* [6 Scientific research](#Scientific_research)\n  + [6.1 1800s–1950: Site preservation](#1800s–1950:_Site_preservation)\n  + [6.2 1998: Cl",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.5656586,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke Island likely never lost",
+                            "url": "https://www.youtube.com/watch?v=dvYBcI4BBlo",
+                            "domain": "youtube.com",
+                            "content": "# The Lost Colony of Roanoke Island likely never lost\n## Channel: WAVY TV 10 (verified)\n241K subscribers\n13K likes\n\n### Description\n675,352 views\nPosted: 2025-08-25\nMany in our region have heard about the Lost Colony, either through books or the well known play. It speaks of the first English colony to settle on Roanoke Island. A small group sailed back to England, then returned to find the colony had vanished — only leaving behind the word \"Croatoan\" scrawled on a tree. What happened to them is a mystery, according to legend. If you ask Scott Dawson, he would tell you the legend is fake.\n\nSubscribe to the WAVY YouTube Channel: https://bit.ly/3AL4Dnp\n-------------\nGet updates on local news, weather, sports and more impacting Hampton Roads and Northeastern North Carolina. Follow WAVY TV 10 on our website and social channels.\n\nhttps://www.wavy.com/\nhttps://www.wavy.com/news/local-news/\nhttps://www.wavy.com/living-local/\nhttps://www.wavy.com/weather/\nhttps://www.wavy.com/sports/local-spo...\n\n### Transcript\n[0:00] NEWS. 10 AT 6.  >> A BIG QUESTION TONIGHT WAS  THE LAST COLONY REALLY LOST \n[0:09] TALES OF THE FIRST ENGLISH  SETTLERS DISAPPEARING FROM  ROANOKE ISLAND HAVE BEEN  SHARED FOR NEARLY A CENTURY.  BUT NOW NEW TWIST IN VERY OLD \n[0:17] STORY IN 10 ON YOUR SIDE'S  MAKE BROADWAY TAKES US THROUGH  THE LATEST RESEARCH NECK AYSHA  AND TURNS OUT THE FABLED LOST \n[0:24] COLONY WAS NEVER LOST IT ALL  ARCHAEOLOGISTS BUT THE PAST  FEW YEARS DIGGING UP. NEW  EVIDENCE NOW BEING GIVEN ",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.5613351,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Primary Source: John White Searches for the Colonists",
+                            "url": "https://www.ncanchor.org/anchor/primary-source-john-white",
+                            "domain": "ncanchor.org",
+                            "content": "In this excerpt from the report of his voyage, John White explains how he and the crew of two ships searched for the lost colonists on Roanoke Island.",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.53940785,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony — An Outer Banks Mystery · National Parks Conservation Association",
+                            "url": "https://www.npca.org/articles/3604-the-lost-colony-an-outer-banks-mystery",
+                            "domain": "npca.org",
+                            "content": "* [Skip to navigation](#nav)\n* [Skip to footer](#GlobalFooter)\n\n[NPCA Home](/) \n\n* [About Us](/about/our-story)\n\n[Donate](https://support.npca.org/page/101063/action/1\n\n)  [Menu](#GlobalFooter)\n\n* + [All News](/articles)\n  + [All Resources](/resources)\n  + [Blog](/articles/advocate)\n  + [Magazine](/articles/magazine)\n  + [Podcast](https://www.npca.org/reports/npca-podcast)\n  + [Press Releases](/articles/press-releases)\n  + [Policy Updates](/articles/policy-updates)\n  + [For Media](https://www.npca.org/resources/3388-for-media)\n* + [Air](/issues/clearing-the-air)\n  + [Climate Change](/issues/parks-and-climate-change)\n  + [Energy](/issues/responsible-energy)\n  + [History & Culture](/issues/preserving-history-culture)\n  + [Landscapes](/issues/protecting-landscapes)\n  + [Park Funding](/issues/ensuring-park-funding)\n  + [Visitor Experience](/issues/enhancing-the-visitor-experience)\n  + [Water](/issues/protecting-restoring-water)\n  + [Wildlife](/issues/protecting-wildlife)\n* + [Find a park](/find-a-park)\n  + [Alaska](/regions/alaska)\n  + [Mid-Atlantic](/regions/mid-atlantic)\n  + [Midwest](/regions/midwest)\n  + [Northeast](/regions/northeast)\n  + [Northern Rockies](/regions/northern-rockies)\n  + [Northwest](/regions/northwest)\n  + [Pacific](/regions/pacific)\n  + [Southeast](/regions/southeast)\n  + [Southwest](/regions/southwest)\n  + [Sun Coast](/regions/sun-coast)\n  + [Texas and Oklahoma](/regions/texas-and-oklahoma)\n* + [A Century of Impact](/campaigns/a-century-of-impact)\n  + [Our",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.53767866,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Roanoke Colonies | First Colony Foundation",
+                            "url": "https://www.firstcolonyfoundation.org/history/the-roanoke-colonies",
+                            "domain": "firstcolonyfoundation.org",
+                            "content": "[Skip to content](#content \"Skip to content\")\n\n\n[![First Colony Foundation](https://www.firstcolonyfoundation.org/wp-content/uploads/first-colony-foundation-logo-1x.png)](https://www.firstcolonyfoundation.org/)\n\n# The Roanoke Colonies\n\nEuropean exploration of the Outer Banks of modern-day North Carolina began in the early decades of the sixteenth century. The Florentine Giovanni da Verrazzano in the service of the French king, Francis I, skirted the Outer Banks in 1524 and the following year the Spaniard Pedro de Quejo passed by on a voyage to the Chesapeake Bay.\n\nNeither the French nor Spanish made any effort to settle the region, however, and other than a brief visit by the Spanish in 1566 Europeans showed no interest in the Outer Banks until the Roanoke voyages sponsored by Sir Walter Raleigh nearly twenty years later.\n\n## Why Did Sir Walter Raleigh Establish the Roanoke Colonies?\n\nIn 1584, Raleigh, an enormously wealthy courtier and favorite of Elizabeth I, sought the queen’s permission to establish a colony in North America. Letters patent, the legal instrument for the venture, were issued in the spring and permitted him to “discover search find out and view such remote heathen and barbarous lands Countries and territories not actually possessed of any Christian Prince and inhabited by Christian people” and to “hold occupy and enjoy . . . forever all the soil of all such lands Countries and territories so to be discovered or possessed . . . ”\n\nIn effect, he was given exc",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.5200393,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke - Scholar Works at Harding",
+                            "url": "https://scholarworks.harding.edu/cgi/viewcontent.cgi?article=1249&context=tenor",
+                            "domain": "scholarworks.harding.edu",
+                            "content": "The only evidence left behind as to what could have possibly happened to the settlers of Roanoke was the word “CRO” and “CROATOAN” carved into.",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.5132568,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony - Fort Raleigh National Historic Site (U.S. National Park Service)",
+                            "url": "https://www.nps.gov/fora/learn/historyculture/the-lost-colony.htm",
+                            "domain": "nps.gov",
+                            "content": "![](/common/commonspot/templates/assets/icon/us_flag_small.png)\n\nAn official website of the United States government\n\nHere's how you know\n\n![](/common/commonspot/templates/assets/icon/icon-dot-gov.svg)\n\n**Official websites use .gov**  \nA **.gov** website belongs to an official government organization in the United States.\n\n![](/common/commonspot/templates/assets/icon/icon-https.svg)\n\n**Secure .gov websites use HTTPS**  \nA **lock** (  ) or **https://** means you've safely connected to the .gov website. Share sensitive information only on official, secure websites.\n\n* [Skip to global NPS navigation](#GlobalNav-toggle)\n* [Skip to this park navigation](#LocalNav-desktop-nav)\n* [Skip to the main content](#main)\n* [Skip to this park information section](#ParkFooter)\n* [Skip to the footer section](#GlobalFooter)\n\n[![](/theme/assets/dist/images/branding/logo.png)  National Park Service](/) \n\nFort Raleigh National Historic Site\n\n [Search](#GlobalFooterSearchInput)\n\n## Exiting nps.gov\n\n[Fort Raleigh  National Historic Site](/fora/index.htm) \n\n* [Info](/fora/planyourvisit/basicinfo.htm)\n* [Alerts](/fora/planyourvisit/conditions.htm)\n* [Maps](/fora/planyourvisit/maps.htm)\n* [Calendar](/fora/planyourvisit/calendar.htm)\n* [Fees](/fora/planyourvisit/fees.htm)\n\n#### Contact Us\n\n# The Lost Colony\n\n|  |\n| --- |\n| ***Discover the story of The Lost Colony on Roanoke Island and unearth a mystery that has baffled historians for centuries.***    Explore the Story  A path through the trees. The Engl",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.45441166,
+                            "preferred_domain_candidate": true,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke",
+                            "url": "https://www.outerbanks.org/things-to-do/museums-and-historic-sites/the-lost-colony-outdoor-drama",
+                            "domain": "outerbanks.org",
+                            "content": "![Outer Banks of North Carolina](/includes/public/assets/shared/logos/footer-logo.svg)\n\nYour browser is not supported for this experience.  \nWe recommend using Chrome, Firefox, Edge, or Safari.\n\n![Outer Banks of North Carolina](/includes/public/assets/shared/logos/header-logo.svg)\n![open menu](/includes/public/assets/shared/decorations/header/mobile-open.svg)\n![close menu](/includes/public/assets/shared/decorations/header/mobile-close.svg)\n![Lost Colony 2022](https://assets.simpleviewinc.com/simpleview/image/upload/c_fill,f_jpg,h_811,q_65,w_639/v1/clients/outerbanks/The_Lost_Colony_Show_06_21_665_f6f0d318-95be-476a-a348-676d24b6b2e2.jpg)\n\n# The Lost Colony of Roanoke\n\n#### The tale of Virginia Dare\n\nOver thirty years before the Pilgrims landed at Plymouth Rock, a group of 117 weary men, women and children waded ashore and made history on Roanoke Island in July 1587, establishing the first attempted settlement of its kind in the Americas.\n\nRecruited by Sir Walter Raleigh, among these settlers was John White, his pregnant daughter, Eleanor Dare, her husband Ananias Dare, and the Indian chief Manteo, who had become an English ally during a previous visit in Britain.\n\nThey unloaded their belongings and supplies and repaired an old fort previously erected on the island. On August 18, 1587, Eleanor Dare gave birth to a daughter she named Virginia, thus earning the distinction of being the first English child born on American soil. Ten days later, John White departed for England pro",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.40727448,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Where can i find sources on Roanoke colony?",
+                            "url": "https://www.reddit.com/r/AskHistorians/comments/1cqeset/where_can_i_find_sources_on_roanoke_colony",
+                            "domain": "reddit.com",
+                            "content": "Where can i find sources on Roanoke colony? My local library has nothing on it. Researchers say they know what 4.6K 458 The Lost Colony of",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.40433103,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        }
+                    ],
+                    "warning": "Research results are evidence candidates. A preferred domain does not prove a claim. URLs have not been independently verified. Fact-check every claim against supplied content."
+                },
+                "narration_word_count": 0,
+                "publication_approved": false,
+                "specialists": [
+                    "Research Agent"
+                ],
+                "warnings": [
+                    "The Media Department did not complete all stages.",
+                    "CEO review is required.",
+                    "Publication is not approved."
+                ]
+            },
+            {
+                "department": "audit",
+                "status": "REVIEW_REQUIRED",
+                "auditors": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "checks": [
+                            {
+                                "check": "Topic preservation",
+                                "passed": true,
+                                "details": "The original Roanoke Lost Colony topic must be preserved."
+                            },
+                            {
+                                "check": "Narration word count",
+                                "passed": false,
+                                "details": "Detected 0 words; required 125-140."
+                            },
+                            {
+                                "check": "Six visual scenes",
+                                "passed": false,
+                                "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                            },
+                            {
+                                "check": "Required content sections",
+                                "passed": false,
+                                "details": "Missing: video title, visual directions"
+                            },
+                            {
+                                "check": "Narration completeness",
+                                "passed": false,
+                                "details": "Final narration must be present."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "checks": [
+                            {
+                                "check": "Source verification",
+                                "passed": false,
+                                "details": "Sources: 15; valid URLs: 15; statuses: ['NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED']"
+                            },
+                            {
+                                "check": "Fact-check coverage",
+                                "passed": false,
+                                "details": "At least one explicitly VERIFIED claim is required."
+                            },
+                            {
+                                "check": "Unsupported claims",
+                                "passed": true,
+                                "details": "No unsupported claims were reported."
+                            },
+                            {
+                                "check": "Contradiction detection",
+                                "passed": true,
+                                "details": "No contradicted claims were reported."
+                            },
+                            {
+                                "check": "URL structure",
+                                "passed": true,
+                                "details": "No malformed URLs detected."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "checks": [
+                            {
+                                "check": "Department identity",
+                                "passed": true,
+                                "details": "Received department: media"
+                            },
+                            {
+                                "check": "Media review status",
+                                "passed": false,
+                                "details": "Received status: ERROR"
+                            },
+                            {
+                                "check": "Publication safety",
+                                "passed": true,
+                                "details": "Media must never approve its own publication."
+                            },
+                            {
+                                "check": "Result structure",
+                                "passed": true,
+                                "details": "Media result must be a dictionary."
+                            },
+                            {
+                                "check": "Research data structure",
+                                "passed": true,
+                                "details": "Research results must be present."
+                            },
+                            {
+                                "check": "Specialist output",
+                                "passed": true,
+                                "details": "Received 1 specialists."
+                            }
+                        ],
+                        "passed": false
+                    }
+                ],
+                "summary": {
+                    "total_checks": 16,
+                    "passed_checks": 9,
+                    "failed_checks": 7
+                },
+                "failed_checks": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration word count",
+                        "passed": false,
+                        "details": "Detected 0 words; required 125-140."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Six visual scenes",
+                        "passed": false,
+                        "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Required content sections",
+                        "passed": false,
+                        "details": "Missing: video title, visual directions"
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration completeness",
+                        "passed": false,
+                        "details": "Final narration must be present."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Source verification",
+                        "passed": false,
+                        "details": "Sources: 15; valid URLs: 15; statuses: ['NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED']"
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Fact-check coverage",
+                        "passed": false,
+                        "details": "At least one explicitly VERIFIED claim is required."
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "check": "Media review status",
+                        "passed": false,
+                        "details": "Received status: ERROR"
+                    }
+                ],
+                "publication_approved": false,
+                "final_decision": "CEO_APPROVAL_REQUIRED",
+                "message": "აუდიტმა აღმოაჩინა პრობლემები. მასალა საჭიროებს შესწორებას ან დამატებით მტკიცებულებებს."
+            },
+            {
+                "department": "technical",
+                "status": "RECEIVED",
+                "message": "დავალება მიღებულია. სპეციალიზებული აგენტები შემდეგ ეტაპზე დაემატება."
+            }
+        ]
+    },
+    {
         "id": "baa6c799",
         "created_at": "2026-11-16T19:41:44.215871+00:00",
         "task": "CEO PERFORMANCE STRESS TEST — ROANOKE LOST COLONY  Create ONE complete, accurate, English YouTube Shorts production package about the Roanoke Lost Colony.  STRICT CEO ORDERS:  1. The ONLY topic is the Roanoke Lost Colony. 2. Produce exactly ONE video concept. 3. Produce exactly ONE final narration of 125–140 English words. 4. Produce exactly SIX visual scenes, each covering exactly 10 seconds, from 0:00 to 1:00. 5. Never change the topic, create alternative concepts, or produce multiple scripts.  RESEARCH DEPARTMENT — WORK HARD:  6. Search for at least 8 relevant historical sources. 7. Prefer primary historical records and authoritative institutions, especially the National Park Service. 8. Open and inspect the actual source pages. Do not rely only on search-result snippets. 9. Extract meaningful source excerpts that directly support historical claims. 10. Record each source title, URL, relevant excerpt, and verification status. 11. Never invent a source, quotation, URL, or historical detail. 12. If a source cannot be opened, explicitly mark it NOT_VERIFIED.  FACT-CHECKER — VERIFY EVERY CLAIM:  13. Break the final narration into individual historical claims. 14. Compare every claim against the actual retrieved source excerpts. 15. Mark each claim VERIFIED, NEEDS SOURCE, or CONTRADICTED. 16. A URL alone is not evidence. 17. Do not mark a claim VERIFIED unless its supporting source text is actually available. 18. Do not mark directly supported claims NEEDS SOURCE. 19. Do not invent certainty where historical evidence is incomplete.  MANDATORY HISTORICAL DETAILS:  20. The 1587 English settlement on Roanoke Island. 21. John White's departure to England and delayed return. 22. His return in 1590. 23. The inscription \"CRO\" on a tree. 24. The inscription \"CROATOAN\" on the palisade. 25. Croatoan as both a people and a place, identified in the supplied NPS research as Hatteras Island. 26. Manteo's connection to the Croatoan people and the Roanoke colonists. 27. White's belief that the colonists may have moved to Croatoan, clearly identified as an unconfirmed theory.  Do not add DNA studies, exact settler counts, disease explanations, or other theories unless actual retrieved evidence directly supports them.  MEDIA DEPARTMENT:  28. Create a powerful opening hook. 29. Write a compelling but historically conservative narration. 30. Provide exactly six detailed visual scenes with timestamps, camera direction, atmosphere, and visual composition. 31. Ensure every visual scene illustrates Roanoke Lost Colony only. 32. The narration must match the visual timeline.  EDITOR:  33. Check grammar, clarity, pacing, historical consistency, and narration word count. 34. Correct mistakes without introducing unsupported facts. 35. Return one final edited version.  AUDIT DEPARTMENT:  36. Independently inspect the Media output. 37. Check topic preservation, exact narration word count, six scenes, research evidence, source verification, fact-check coverage, unsupported claims, contradictions, and structural integrity. 38. Do not simply trust the Media Manager's claims. 39. Report every failed check honestly. 40. If any required check fails, final status must be REVIEW_REQUIRED. 41. publication_approved MUST remain FALSE. 42. Only the CEO can authorize publication.  FAILURE HANDLING:  43. If any department fails because of an API error, rate limit, timeout, or missing output, report the actual technical failure. 44. Do not fabricate successful work to hide an error. 45. Do not allow Audit to treat a missing Media result as a successful production. 46. Preserve the original CEO task and report all department results separately.  FINAL OUTPUT:  - Video title. - One concept. - Final narration. - Six timestamped visual scenes. - Claim-by-claim fact-check. - Research source list with actual supporting excerpts. - Editor report. - Independent audit report with individual PASS/FAIL checks. - Final publication decision. - Clear explanation of any blockers.  CEO'S FINAL RULE:  Work carefully, verify everything, and never pretend to have completed work that was not actually performed.  Quality and truthfulness are more important than speed.",
