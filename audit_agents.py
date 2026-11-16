@@ -29,15 +29,16 @@ def is_truncated(value):
 
 
 def extract_timestamps(text):
-    pattern = (
-        r"^\s*(\d{1,2}:\d{2})"
-        r"\s*(?:[-–—|:]|$)"
-    )
+    """
+    Extracts both start and end timestamps.
+    Example: 0:50-1:00 -> {50, 60}
+    """
+
+    pattern = r"(?<!\d)(\d{1,2}:\d{2})(?!\d)"
 
     matches = re.findall(
         pattern,
-        str(text),
-        flags=re.MULTILINE
+        str(text)
     )
 
     seconds = set()
@@ -49,6 +50,27 @@ def extract_timestamps(text):
             seconds.add(minutes * 60 + secs)
 
     return seconds
+
+
+def extract_fact_check_statuses(report):
+    """
+    Reads only explicit STATUS lines.
+    Ignores headings and explanatory text.
+    """
+
+    pattern = re.compile(
+        r"^\s*(?:[-*]\s*)?(?:\*\*)?"
+        r"STATUS(?:\*\*)?\s*:\s*"
+        r"(VERIFIED|NEEDS\s+SOURCE|CONTRADICTED)\b",
+        re.IGNORECASE | re.MULTILINE
+    )
+
+    matches = pattern.findall(str(report))
+
+    return [
+        re.sub(r"\s+", " ", status).upper()
+        for status in matches
+    ]
 
 
 # ==================================================
@@ -66,10 +88,6 @@ def compliance_auditor(task, media):
     edited = str(media.get("edited_script", ""))
 
     original_task = str(task).lower()
-
-    combined = (
-        concept + "\n" + script + "\n" + edited
-    ).lower()
 
     # TOPIC LOCK
 
@@ -90,60 +108,60 @@ def compliance_auditor(task, media):
 
     # ONE CONCEPT AND ONE SCRIPT
 
-    concept_ok = bool(concept.strip())
-    script_ok = bool(script.strip())
-    edited_ok = bool(edited.strip())
-
     checks.append(check_result(
         "Exactly one concept field",
-        concept_ok,
+        bool(concept.strip()),
         "One non-empty concept is required."
     ))
 
     checks.append(check_result(
         "Exactly one original script field",
-        script_ok,
+        bool(script.strip()),
         "One non-empty original script is required."
     ))
 
     checks.append(check_result(
         "Edited script exists",
-        edited_ok
+        bool(edited.strip())
     ))
 
     # OUTPUT COMPLETENESS
 
-    original_complete = not is_truncated(script)
-    edited_complete = not is_truncated(edited)
-
     checks.append(check_result(
         "Original script completeness",
-        original_complete,
+        not is_truncated(script),
         "The original script may be incomplete."
     ))
 
     checks.append(check_result(
         "Edited script completeness",
-        edited_complete,
+        not is_truncated(edited),
         "The edited script may be incomplete."
     ))
 
-    # TIMELINE
+    # FULL 60-SECOND TIMELINE
 
     timestamps = extract_timestamps(
         script + "\n" + edited
     )
 
+    expected_timestamps = set(range(0, 61, 10))
+
+    missing_timestamps = sorted(
+        expected_timestamps - timestamps
+    )
+
     timeline_ok = (
-        0 in timestamps
-        and 60 in timestamps
-        and len(timestamps) >= 5
+        len(missing_timestamps) == 0
     )
 
     checks.append(check_result(
         "60-second timeline",
         timeline_ok,
-        f"Detected timestamps: {len(timestamps)}"
+        (
+            f"Detected: {sorted(timestamps)}; "
+            f"Missing: {missing_timestamps}"
+        )
     ))
 
     return {
@@ -244,32 +262,40 @@ def evidence_auditor(media):
 
     fact_check_exists = bool(fact_check.strip())
 
+    statuses = extract_fact_check_statuses(fact_check)
+
     checks.append(check_result(
         "Fact-check report exists",
         fact_check_exists
     ))
 
-    needs_source = len(re.findall(
-        r"NEEDS SOURCE",
-        fact_check,
-        re.IGNORECASE
+    checks.append(check_result(
+        "Structured claim statuses detected",
+        len(statuses) > 0,
+        f"Parsed claim statuses: {len(statuses)}"
     ))
 
-    contradicted = len(re.findall(
-        r"CONTRADICTED",
-        fact_check,
-        re.IGNORECASE
-    ))
+    needs_source = statuses.count("NEEDS SOURCE")
+
+    contradicted = statuses.count("CONTRADICTED")
 
     checks.append(check_result(
         "No unsupported claims",
-        fact_check_exists and needs_source == 0,
+        (
+            fact_check_exists
+            and len(statuses) > 0
+            and needs_source == 0
+        ),
         f"Claims needing sources: {needs_source}"
     ))
 
     checks.append(check_result(
         "No contradicted claims",
-        fact_check_exists and contradicted == 0,
+        (
+            fact_check_exists
+            and len(statuses) > 0
+            and contradicted == 0
+        ),
         f"Contradicted claims: {contradicted}"
     ))
 
@@ -284,6 +310,7 @@ def evidence_auditor(media):
         "source_count": len(valid_sources),
         "unverified_source_count": len(unverified),
         "invalid_source_count": len(invalid_sources),
+        "parsed_claim_status_count": len(statuses),
         "needs_source_count": needs_source,
         "contradicted_count": contradicted
     }
