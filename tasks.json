@@ -1,5 +1,22 @@
 [
     {
+        "id": "921b3ec2",
+        "created_at": "2026-11-16T18:44:27.589214+00:00",
+        "task": "Create ONE 60-second English YouTube Shorts video about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. The Roanoke Lost Colony is the ONLY topic. 2. Never change, replace, or expand the topic. 3. Create exactly ONE video concept and ONE complete script. 4. The script must be in English and last exactly 60 seconds. 5. Include timestamped visual directions from 0:00 to 1:00. 6. Do not invent historical facts, dates, names, quotations, or events. 7. Research using reliable sources, prioritizing the U.S. National Park Service, National Archives, Library of Congress, museums, and universities. 8. Provide source titles and direct URLs. 9. Fact-check every historical claim individually against the supplied research. 10. Mark unsupported claims as NEEDS SOURCE. 11. Never mark a claim VERIFIED without directly relevant supporting evidence. 12. The Quality Editor must preserve the original topic and complete script. 13. The Independent Audit Manager must inspect the actual Media Manager output, research, sources, and fact-check report.  AUDIT REQUIREMENTS:  The Audit Manager must verify: - The original CEO topic was preserved. - Exactly one concept and one script exist. - The script covers the full 60 seconds. - Visual timestamps are complete. - Research sources include titles and URLs. - Unsupported claims are identified. - Fact-check results are present. - No unrelated topic or invented source was introduced.  FINAL SECURITY RULES:  - Publication must NEVER be automatically approved. - Set publication_approved to false. - Final status must remain REVIEW_REQUIRED until the CEO personally approves publication. - If any department fails, report the failure honestly. - Do not pretend an incomplete audit was successful.  Return the complete results of every department.",
+        "analysis": "დავალება გადაეცემა ტექნიკურ დეპარტამენტს.",
+        "departments": [
+            "technical"
+        ],
+        "requires_ceo_approval": true,
+        "results": [
+            {
+                "department": "technical",
+                "status": "RECEIVED",
+                "message": "დავალება მიღებულია. სპეციალიზებული აგენტები შემდეგ ეტაპზე დაემატება."
+            }
+        ]
+    },
+    {
         "id": "5bdfa822",
         "created_at": "2026-11-16T18:40:06.512460+00:00",
         "task": "Create ONE 60-second English YouTube Shorts video about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. The Roanoke Lost Colony is the ONLY topic. 2. Never change, replace, or expand the topic. 3. Create exactly ONE video concept and ONE complete script. 4. The script must be in English and last exactly 60 seconds. 5. Include timestamped visual directions from 0:00 to 1:00. 6. Do not invent historical facts, dates, names, quotations, or events. 7. Research using reliable sources, prioritizing the U.S. National Park Service, National Archives, Library of Congress, museums, and universities. 8. Provide source titles and direct URLs. 9. Fact-check every historical claim individually against the supplied research. 10. Mark unsupported claims as NEEDS SOURCE. 11. Never mark a claim VERIFIED without directly relevant supporting evidence. 12. The Quality Editor must preserve the original topic and complete script. 13. The Independent Audit Manager must inspect the actual Media Manager output, research, sources, and fact-check report.  AUDIT REQUIREMENTS:  The Audit Manager must verify: - The original CEO topic was preserved. - Exactly one concept and one script exist. - The script covers the full 60 seconds. - Visual timestamps are complete. - Research sources include titles and URLs. - Unsupported claims are identified. - Fact-check results are present. - No unrelated topic or invented source was introduced.  FINAL SECURITY RULES:  - Publication must NEVER be automatically approved. - Set publication_approved to false. - Final status must remain REVIEW_REQUIRED until the CEO personally approves publication. - If any department fails, report the failure honestly. - Do not pretend an incomplete audit was successful.  Return the complete results of every department.",
