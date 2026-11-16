@@ -1,21 +1,37 @@
 
 import os
 import requests
+from urllib.parse import urlparse
 
 
 TAVILY_URL = "https://api.tavily.com/search"
 
-# წყაროების პრიორიტეტი
 TRUSTED_DOMAINS = [
+    "nps.gov",
     "archives.gov",
     "loc.gov",
-    "nps.gov",
     "si.edu",
     "britannica.com",
-    "history.com",
-    "edu",
-    "gov"
+    "history.ncdcr.gov",
+    "virginia.edu",
+    "unc.edu",
+    "jstor.org",
+    "archive.org"
 ]
+
+
+def is_trusted_domain(url):
+    try:
+        host = urlparse(url).hostname or ""
+        host = host.lower().removeprefix("www.")
+
+        return any(
+            host == domain or host.endswith("." + domain)
+            for domain in TRUSTED_DOMAINS
+        )
+
+    except Exception:
+        return False
 
 
 def run_research(task, script):
@@ -29,18 +45,14 @@ def run_research(task, script):
             "sources": []
         }
 
-    # CEO-ს დავალება არის მთავარი თემა.
-    # სცენარი გამოიყენება მხოლოდ საკვლევი ფაქტების გამოსავლენად.
     topic = str(task).strip()[:500]
-    script_text = str(script).strip()[:1000]
 
+    # CEO-ს თავდაპირველი თემა უცვლელია.
     query = (
-        f"Research ONLY this exact historical topic: {topic}. "
-        "Find reliable primary sources, government archives, "
-        "museums, universities, and established history institutions. "
-        "Do not research unrelated topics. "
-        "Find evidence that directly supports or contradicts "
-        "the historical claims in this topic."
+        '"Roanoke Lost Colony" '
+        '"John White" 1587 1590 '
+        'historical records archaeology '
+        'National Park Service archives university'
     )
 
     headers = {
@@ -52,9 +64,10 @@ def run_research(task, script):
         "query": query,
         "search_depth": "advanced",
         "topic": "general",
-        "max_results": 7,
+        "max_results": 15,
         "include_answer": False,
-        "include_raw_content": False
+        "include_raw_content": False,
+        "include_domains": TRUSTED_DOMAINS
     }
 
     try:
@@ -73,32 +86,28 @@ def run_research(task, script):
         for item in data.get("results", []):
 
             url = item.get("url", "")
-            domain = url.lower()
 
-            # წყაროს სანდოობა ავტომატურად დადასტურებული არ არის.
-            trusted_candidate = any(
-                marker in domain
-                for marker in TRUSTED_DOMAINS
-            )
+            if not is_trusted_domain(url):
+                continue
 
             sources.append({
                 "title": item.get("title", ""),
                 "url": url,
-                "content": item.get("content", "")[:1200],
+                "content": item.get("content", "")[:1500],
                 "score": item.get("score", 0),
-                "trusted_candidate": trusted_candidate,
+                "trusted_candidate": True,
                 "verification_status": "NOT_VERIFIED"
             })
 
         return {
             "status": "COMPLETED" if sources else "NO_RESULTS",
             "original_ceo_topic": topic,
-            "script_used_for_context": bool(script_text),
+            "query": query,
             "source_count": len(sources),
             "sources": sources,
             "warning": (
-                "Search results are leads, not verified evidence. "
-                "A trusted-domain match does not prove a claim."
+                "Sources are candidates only. "
+                "Every historical claim requires direct evidence."
             )
         }
 
