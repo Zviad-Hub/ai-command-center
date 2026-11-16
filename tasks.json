@@ -81,5 +81,23 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "76f7fadb",
+        "created_at": "2026-11-16T17:27:11.070313+00:00",
+        "task": "Create a 60-second YouTube Shorts video about the mysterious disappearance of the Roanoke Colony.  Requirements: 1. Create a powerful opening hook. 2. Write an engaging English narration script. 3. Provide detailed visual directions with timestamps. 4. Create an attractive YouTube Shorts title. 5. Have the Quality Editor independently review and improve the script. 6. Have the Fact-Checker independently examine every historical claim. 7. Clearly label unsupported claims as NEEDS SOURCE. 8. Never invent historical facts or pretend that facts have been verified without reliable source evidence. 9. Keep the final video script within 45–60 seconds.  Return all agent results separately.",
+        "analysis": "CEO‑ის მოთხოვნა იწვევს ვიდეო კონტენტის შექმნას და შემოწმებებს, რაც ეკუთვნის Media დეპარტამენტს.",
+        "departments": [
+            "media"
+        ],
+        "requires_ceo_approval": true,
+        "results": [
+            {
+                "department": "media",
+                "task": "1️⃣ შექმენით ძლიერი გახსნის ჰუკი, რომელიც 3-5 წამში დაიპყრობს აუდიტორიის ყურადღებას.\n2️⃣ დაწერეთ ინგლისურ ენაზე მიმდევრი ნარაციის სცენარი, რომელიც 45–60 წამის განმავლობაში გადამყვანია.\n3️⃣ მოაწოდეთ დეტალური ვიზუალური მიმართულებები დროის შტამპებით (00:00‑00:05, 00:05‑00:15, …) რათა ვიდეოთამშედგენელი ადვილად მიჰყევება.\n4️⃣ შექმნათ მიმზიდველი YouTube Shorts სათაური, რომელიც არ აღემატება 100 სიმბოლოს.\n5️⃣ დავამთავროთ პროცესი, მოწოდებით Quality Editor‑ს, რომ დამოუკიდებლად გადახედვას და გაუმჯობესებს სცენარს.\n6️⃣ Fact‑Checker‑ს დავალება – თითოეულ ისტორიულ განცხადებაზე საჭირო წყაროს გადამოწმება; თუ წყარო ვერ იპოვის, ნიშნავს “NEEDS SOURCE”.\n7️⃣ საბოლოო სცენარი უნდა იყოს 45‑60 წამში, ყველა ისტორიული ფაქტის დამოწმებით, უარყოფითი ინფორმაციის გარეშე.\n8️⃣ ყველა შედეგი (hook, script, visual plan, title, editor‑ის კომენტარები, fact‑checker‑ის რეპორტი) უნდა გადმოვიტანოთ ცალკე დოკუმენტებად.\n9️⃣ გასაგრძელებლად, ბიუჯეტის ან ფულადი ტრანზაქციების გარეშე, ვინაიდან დასაქმებული არ არის სხვა დეპარტამენტები.\n\nგთხოვთ, მასალების განთავსება, ტრანსლირაცია ან პუბლიკაციაზე გადმოიტანოთ CEO-ს დადასტურებით.",
+                "status": "ERROR",
+                "message": "Media department error: Groq API HTTP error: 429 {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jkt3ppepqbdze731vxn8y4` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6550, Requested 1604. Please try again in 1.155s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}\n"
+            }
+        ]
     }
 ]
