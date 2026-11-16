@@ -102,7 +102,12 @@ def submit_task(ceo_task):
         manager = get_manager(department)
 
         try:
-            result = manager.receive_task(ceo_task)
+            result = manager.receive_task(
+            ceo_task,
+            context={
+                "previous_results": results
+            }
+        )
 
         except Exception as error:
             result = {
