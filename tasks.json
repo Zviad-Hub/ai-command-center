@@ -1,5 +1,209 @@
 [
     {
+        "id": "baa6c799",
+        "created_at": "2026-11-16T19:41:44.215871+00:00",
+        "task": "CEO PERFORMANCE STRESS TEST — ROANOKE LOST COLONY  Create ONE complete, accurate, English YouTube Shorts production package about the Roanoke Lost Colony.  STRICT CEO ORDERS:  1. The ONLY topic is the Roanoke Lost Colony. 2. Produce exactly ONE video concept. 3. Produce exactly ONE final narration of 125–140 English words. 4. Produce exactly SIX visual scenes, each covering exactly 10 seconds, from 0:00 to 1:00. 5. Never change the topic, create alternative concepts, or produce multiple scripts.  RESEARCH DEPARTMENT — WORK HARD:  6. Search for at least 8 relevant historical sources. 7. Prefer primary historical records and authoritative institutions, especially the National Park Service. 8. Open and inspect the actual source pages. Do not rely only on search-result snippets. 9. Extract meaningful source excerpts that directly support historical claims. 10. Record each source title, URL, relevant excerpt, and verification status. 11. Never invent a source, quotation, URL, or historical detail. 12. If a source cannot be opened, explicitly mark it NOT_VERIFIED.  FACT-CHECKER — VERIFY EVERY CLAIM:  13. Break the final narration into individual historical claims. 14. Compare every claim against the actual retrieved source excerpts. 15. Mark each claim VERIFIED, NEEDS SOURCE, or CONTRADICTED. 16. A URL alone is not evidence. 17. Do not mark a claim VERIFIED unless its supporting source text is actually available. 18. Do not mark directly supported claims NEEDS SOURCE. 19. Do not invent certainty where historical evidence is incomplete.  MANDATORY HISTORICAL DETAILS:  20. The 1587 English settlement on Roanoke Island. 21. John White's departure to England and delayed return. 22. His return in 1590. 23. The inscription \"CRO\" on a tree. 24. The inscription \"CROATOAN\" on the palisade. 25. Croatoan as both a people and a place, identified in the supplied NPS research as Hatteras Island. 26. Manteo's connection to the Croatoan people and the Roanoke colonists. 27. White's belief that the colonists may have moved to Croatoan, clearly identified as an unconfirmed theory.  Do not add DNA studies, exact settler counts, disease explanations, or other theories unless actual retrieved evidence directly supports them.  MEDIA DEPARTMENT:  28. Create a powerful opening hook. 29. Write a compelling but historically conservative narration. 30. Provide exactly six detailed visual scenes with timestamps, camera direction, atmosphere, and visual composition. 31. Ensure every visual scene illustrates Roanoke Lost Colony only. 32. The narration must match the visual timeline.  EDITOR:  33. Check grammar, clarity, pacing, historical consistency, and narration word count. 34. Correct mistakes without introducing unsupported facts. 35. Return one final edited version.  AUDIT DEPARTMENT:  36. Independently inspect the Media output. 37. Check topic preservation, exact narration word count, six scenes, research evidence, source verification, fact-check coverage, unsupported claims, contradictions, and structural integrity. 38. Do not simply trust the Media Manager's claims. 39. Report every failed check honestly. 40. If any required check fails, final status must be REVIEW_REQUIRED. 41. publication_approved MUST remain FALSE. 42. Only the CEO can authorize publication.  FAILURE HANDLING:  43. If any department fails because of an API error, rate limit, timeout, or missing output, report the actual technical failure. 44. Do not fabricate successful work to hide an error. 45. Do not allow Audit to treat a missing Media result as a successful production. 46. Preserve the original CEO task and report all department results separately.  FINAL OUTPUT:  - Video title. - One concept. - Final narration. - Six timestamped visual scenes. - Claim-by-claim fact-check. - Research source list with actual supporting excerpts. - Editor report. - Independent audit report with individual PASS/FAIL checks. - Final publication decision. - Clear explanation of any blockers.  CEO'S FINAL RULE:  Work carefully, verify everything, and never pretend to have completed work that was not actually performed.  Quality and truthfulness are more important than speed.",
+        "analysis": "დავალება გაანალიზებულია. დეპარტამენტები შეირჩა დავალების შინაარსის მიხედვით.",
+        "departments": [
+            "media",
+            "audit",
+            "technical"
+        ],
+        "requires_ceo_approval": true,
+        "results": [
+            {
+                "department": "media",
+                "status": "ERROR",
+                "message": "Groq response was truncated. Token limit: 900"
+            },
+            {
+                "department": "audit",
+                "status": "REVIEW_REQUIRED",
+                "auditors": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "checks": [
+                            {
+                                "check": "Topic preservation",
+                                "passed": false,
+                                "details": "The original Roanoke Lost Colony topic must be preserved."
+                            },
+                            {
+                                "check": "Narration word count",
+                                "passed": false,
+                                "details": "Detected 0 words; required 125-140."
+                            },
+                            {
+                                "check": "Six visual scenes",
+                                "passed": false,
+                                "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                            },
+                            {
+                                "check": "Required content sections",
+                                "passed": false,
+                                "details": "Missing: video title, narration, visual directions"
+                            },
+                            {
+                                "check": "Narration completeness",
+                                "passed": false,
+                                "details": "Final narration must be present."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "checks": [
+                            {
+                                "check": "Source verification",
+                                "passed": false,
+                                "details": "Sources: 0; valid URLs: 0; statuses: []"
+                            },
+                            {
+                                "check": "Fact-check coverage",
+                                "passed": false,
+                                "details": "At least one explicitly VERIFIED claim is required."
+                            },
+                            {
+                                "check": "Unsupported claims",
+                                "passed": true,
+                                "details": "No unsupported claims were reported."
+                            },
+                            {
+                                "check": "Contradiction detection",
+                                "passed": true,
+                                "details": "No contradicted claims were reported."
+                            },
+                            {
+                                "check": "URL structure",
+                                "passed": true,
+                                "details": "No malformed URLs detected."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "checks": [
+                            {
+                                "check": "Department identity",
+                                "passed": true,
+                                "details": "Received department: media"
+                            },
+                            {
+                                "check": "Media review status",
+                                "passed": false,
+                                "details": "Received status: ERROR"
+                            },
+                            {
+                                "check": "Publication safety",
+                                "passed": false,
+                                "details": "Media must never approve its own publication."
+                            },
+                            {
+                                "check": "Result structure",
+                                "passed": true,
+                                "details": "Media result must be a dictionary."
+                            },
+                            {
+                                "check": "Research data structure",
+                                "passed": false,
+                                "details": "Research results must be present."
+                            },
+                            {
+                                "check": "Specialist output",
+                                "passed": false,
+                                "details": "Specialist output is missing or invalid."
+                            }
+                        ],
+                        "passed": false
+                    }
+                ],
+                "summary": {
+                    "total_checks": 16,
+                    "passed_checks": 5,
+                    "failed_checks": 11
+                },
+                "failed_checks": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Topic preservation",
+                        "passed": false,
+                        "details": "The original Roanoke Lost Colony topic must be preserved."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration word count",
+                        "passed": false,
+                        "details": "Detected 0 words; required 125-140."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Six visual scenes",
+                        "passed": false,
+                        "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Required content sections",
+                        "passed": false,
+                        "details": "Missing: video title, narration, visual directions"
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration completeness",
+                        "passed": false,
+                        "details": "Final narration must be present."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Source verification",
+                        "passed": false,
+                        "details": "Sources: 0; valid URLs: 0; statuses: []"
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Fact-check coverage",
+                        "passed": false,
+                        "details": "At least one explicitly VERIFIED claim is required."
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "check": "Media review status",
+                        "passed": false,
+                        "details": "Received status: ERROR"
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "check": "Publication safety",
+                        "passed": false,
+                        "details": "Media must never approve its own publication."
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "check": "Research data structure",
+                        "passed": false,
+                        "details": "Research results must be present."
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "check": "Specialist output",
+                        "passed": false,
+                        "details": "Specialist output is missing or invalid."
+                    }
+                ],
+                "publication_approved": false,
+                "final_decision": "CEO_APPROVAL_REQUIRED",
+                "message": "აუდიტმა აღმოაჩინა პრობლემები. მასალა საჭიროებს შესწორებას ან დამატებით მტკიცებულებებს."
+            },
+            {
+                "department": "technical",
+                "status": "RECEIVED",
+                "message": "დავალება მიღებულია. სპეციალიზებული აგენტები შემდეგ ეტაპზე დაემატება."
+            }
+        ]
+    },
+    {
         "id": "7b550476",
         "created_at": "2026-11-16T19:34:28.433934+00:00",
         "task": "Create ONE 60-second English YouTube Shorts video about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. Roanoke Lost Colony is the ONLY topic. Never change or replace it. 2. Create exactly ONE video concept and ONE final narration. 3. Final narration must contain 125–140 English words. 4. Create exactly SIX visual scenes, each 10 seconds:    0:00-0:10    0:10-0:20    0:20-0:30    0:30-0:40    0:40-0:50    0:50-1:00  HISTORICAL ACCURACY: 5. Use only facts directly supported by the supplied research content. 6. Do not invent historical facts, dates, numbers, quotations, or sources. 7. Do not include exact settler counts. 8. Preserve these inscription details exactly:    - \"CRO\" was carved into a tree.    - \"CROATOAN\" was carved into a palisade. 9. The supplied National Park Service research states that Croatoan was both a people and a place, identified as Hatteras Island. 10. The supplied research states that Manteo was a friendly Croatoan man who lived with the colonists on Roanoke Island. 11. John White believed the colonists may have relocated to Croatoan, but this was never confirmed. Present it only as an unproven theory. 12. Do not include DNA studies, modern descendant claims, disease, safe-harbor claims, or other theories unless supplied source text directly supports each claim.  FACT-CHECKING: 13. Fact-check every historical claim in the final narration against the actual supplied source excerpts. 14. Mark directly supported claims VERIFIED. 15. Mark unsupported claims NEEDS SOURCE. 16. Mark claims CONTRADICTED only when supplied evidence directly contradicts them. 17. Do not confuse a source URL with evidence. Use the supplied source content itself. 18. If the supplied source text supports a claim, do not incorrectly mark it NEEDS SOURCE.  AUDIT: 19. Independently check topic preservation, narration word count, exactly six visual scenes, evidence, unsupported claims, contradictions, and result structure. 20. Do not hide or downgrade failed checks. 21. If any required check fails, status must be REVIEW_REQUIRED. 22. publication_approved MUST remain FALSE. Only the CEO can authorize publication.  REQUIRED OUTPUT: - One video title. - One concept. - One final narration. - Exactly six timestamped visual scenes. - Fact-check results for every historical claim. - Research sources with supporting excerpts. - Individual audit PASS/FAIL checks. - Final status and explanation of blockers.  Accuracy is more important than drama. Do not invent details to fill the narration.",
