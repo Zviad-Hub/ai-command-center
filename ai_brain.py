@@ -38,7 +38,7 @@ def ask_ai(system_prompt, user_prompt):
                 "content": user_prompt
             }
         ],
-        "max_completion_tokens": 900
+        "max_completion_tokens": 1200
     }
 
     for attempt in range(MAX_RETRIES + 1):
@@ -55,13 +55,11 @@ def ask_ai(system_prompt, user_prompt):
 
                 if attempt == MAX_RETRIES:
                     raise RuntimeError(
-                        "Groq rate limit exceeded after retries. "
-                        "Please try again later."
+                        "Groq rate limit exceeded after retries."
                     )
 
                 wait_time = None
 
-                # Check Retry-After header
                 retry_header = response.headers.get("Retry-After")
 
                 if retry_header:
@@ -70,7 +68,6 @@ def ask_ai(system_prompt, user_prompt):
                     except ValueError:
                         pass
 
-                # Check Groq error message
                 if wait_time is None:
                     match = re.search(
                         r"try again in ([0-9.]+)s",
@@ -81,15 +78,14 @@ def ask_ai(system_prompt, user_prompt):
                     if match:
                         wait_time = float(match.group(1))
 
-                # Fallback exponential backoff
                 if wait_time is None:
-                    wait_time = min(5 * (2 ** attempt), 30)
+                    wait_time = 3 * (2 ** attempt)
 
-                wait_time = min(max(wait_time, 1), 60)
+                wait_time = min(max(wait_time, 2), 60)
 
                 print(
-                    f"[AI BRAIN] Rate limit reached. "
-                    f"Waiting {wait_time:.1f} seconds..."
+                    f"[AI BRAIN] Rate limit. "
+                    f"Retrying in {wait_time:.1f}s..."
                 )
 
                 time.sleep(wait_time)
@@ -99,20 +95,44 @@ def ask_ai(system_prompt, user_prompt):
 
             result = response.json()
 
-            content = result["choices"][0]["message"]["content"]
+            choices = result.get("choices", [])
 
-            if not content:
-                raise RuntimeError("Groq returned an empty response.")
+            content = ""
 
-            return content
+            if choices:
+                content = (
+                    choices[0]
+                    .get("message", {})
+                    .get("content", "")
+                )
+
+            if isinstance(content, str) and content.strip():
+                return content.strip()
+
+            if attempt == MAX_RETRIES:
+                raise RuntimeError(
+                    "Groq returned an empty response "
+                    "after all retries."
+                )
+
+            wait_time = min(2 * (attempt + 1), 15)
+
+            print(
+                f"[AI BRAIN] Empty response. "
+                f"Retrying in {wait_time}s..."
+            )
+
+            time.sleep(wait_time)
 
         except requests.exceptions.Timeout:
+
             if attempt == MAX_RETRIES:
                 raise RuntimeError("Groq API request timed out.")
 
             time.sleep(min(2 ** attempt, 15))
 
         except requests.exceptions.HTTPError as error:
+
             raise RuntimeError(
                 f"Groq API HTTP error: "
                 f"{error.response.status_code} "
@@ -120,8 +140,12 @@ def ask_ai(system_prompt, user_prompt):
             )
 
         except requests.exceptions.RequestException as error:
-            raise RuntimeError(
-                f"Groq connection error: {error}"
-            )
+
+            if attempt == MAX_RETRIES:
+                raise RuntimeError(
+                    f"Groq connection error: {error}"
+                )
+
+            time.sleep(min(2 ** attempt, 15))
 
     raise RuntimeError("Groq API failed after all retries.")
