@@ -39,5 +39,23 @@
                 "message": "Mission received. Specialist agents will be connected in the next stage."
             }
         ]
+    },
+    {
+        "id": "c6aba98a",
+        "created_at": "2026-11-16T17:17:42.943077+00:00",
+        "task": " Create an engaging 60-second YouTube Shorts video about the mysterious disappearance of the Roanoke Colony. Generate a powerful hook, an English narration script, visual directions, an engaging title, and a list of historical facts that require external verification. Do not invent facts.",
+        "analysis": "AI unavailable. Task requires review.",
+        "departments": [
+            "technical"
+        ],
+        "requires_ceo_approval": true,
+        "results": [
+            {
+                "department": "technical",
+                "task": " Create an engaging 60-second YouTube Shorts video about the mysterious disappearance of the Roanoke Colony. Generate a powerful hook, an English narration script, visual directions, an engaging title, and a list of historical facts that require external verification. Do not invent facts.",
+                "status": "RECEIVED",
+                "message": "დავალება მიღებულია. სპეციალიზებული აგენტები შემდეგ ეტაპზე დაემატება."
+            }
+        ]
     }
 ]
