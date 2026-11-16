@@ -13,8 +13,8 @@ GROQ_MODEL = os.getenv(
 )
 
 MAX_RETRIES = 5
+MAX_WAIT_SECONDS = 300
 
-# ინდივიდუალური ლიმიტები თითოეული ტიპის სამუშაოსთვის
 TOKEN_LIMITS = {
     "director": 700,
     "creative": 900,
@@ -51,12 +51,121 @@ def detect_token_limit(system_prompt):
     return TOKEN_LIMITS["default"]
 
 
+def is_daily_limit(message):
+
+    text = str(message).lower()
+
+    daily_patterns = [
+        "per day",
+        "per-day",
+        "daily limit",
+        "daily quota",
+        "tokens per day",
+        "requests per day",
+        "tpd",
+        "rpd"
+    ]
+
+    return any(
+        pattern in text
+        for pattern in daily_patterns
+    )
+
+
+def parse_wait_time(value):
+
+    if not value:
+        return None
+
+    value = str(value).strip().lower()
+
+    try:
+        return float(value)
+    except ValueError:
+        pass
+
+    minutes = re.search(
+        r"([0-9.]+)\s*m",
+        value
+    )
+
+    seconds = re.search(
+        r"([0-9.]+)\s*s",
+        value
+    )
+
+    total = 0
+
+    if minutes:
+        total += float(minutes.group(1)) * 60
+
+    if seconds:
+        total += float(seconds.group(1))
+
+    if total > 0:
+        return total
+
+    return None
+
+
+def get_retry_delay(response, attempt):
+
+    headers = response.headers
+
+    # 1. Retry-After header
+
+    retry_after = headers.get("Retry-After")
+
+    delay = parse_wait_time(retry_after)
+
+    if delay is not None:
+        return delay
+
+    # 2. Groq rate limit reset headers
+
+    reset_headers = [
+        "x-ratelimit-reset-requests",
+        "x-ratelimit-reset-tokens"
+    ]
+
+    for header in reset_headers:
+
+        value = headers.get(header)
+
+        delay = parse_wait_time(value)
+
+        if delay is not None:
+            return delay
+
+    # 3. Parse Groq error message
+
+    match = re.search(
+        r"try again in\s*([0-9.]+\s*(?:m|s)"
+        r"(?:\s*[0-9.]+\s*s)?)",
+        response.text,
+        re.IGNORECASE
+    )
+
+    if match:
+
+        delay = parse_wait_time(match.group(1))
+
+        if delay is not None:
+            return delay
+
+    # 4. Exponential fallback
+
+    return min(3 * (2 ** attempt), 60)
+
+
 def ask_ai(system_prompt, user_prompt):
 
     api_key = os.getenv("GROQ_API_KEY")
 
     if not api_key:
-        raise RuntimeError("GROQ_API_KEY is missing!")
+        raise RuntimeError(
+            "GROQ_API_KEY is missing!"
+        )
 
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -93,42 +202,46 @@ def ask_ai(system_prompt, user_prompt):
                 timeout=(10, 120)
             )
 
+            # RATE LIMIT HANDLING
+
             if response.status_code == 429:
 
-                if attempt == MAX_RETRIES:
+                error_text = response.text[:2000]
+
+                if is_daily_limit(error_text):
+
                     raise RuntimeError(
-                        "Groq rate limit exceeded after retries."
+                        "GROQ DAILY QUOTA EXCEEDED. "
+                        "Daily API limit reached. "
+                        "Check Groq usage and quota."
                     )
 
-                wait_time = None
+                if attempt == MAX_RETRIES:
 
-                retry_header = response.headers.get("Retry-After")
-
-                if retry_header:
-                    try:
-                        wait_time = float(retry_header)
-                    except ValueError:
-                        pass
-
-                if wait_time is None:
-
-                    match = re.search(
-                        r"try again in ([0-9.]+)s",
-                        response.text,
-                        re.IGNORECASE
+                    raise RuntimeError(
+                        "Groq rate limit exceeded "
+                        "after all retry attempts. "
+                        f"Details: {error_text}"
                     )
 
-                    if match:
-                        wait_time = float(match.group(1))
+                wait_time = get_retry_delay(
+                    response,
+                    attempt
+                )
 
-                if wait_time is None:
-                    wait_time = 3 * (2 ** attempt)
+                if wait_time > MAX_WAIT_SECONDS:
 
-                wait_time = min(max(wait_time, 2), 60)
+                    raise RuntimeError(
+                        "Groq requested a long waiting period: "
+                        f"{wait_time:.1f} seconds. "
+                        "Automatic retry stopped to avoid "
+                        "blocking the workflow."
+                    )
 
                 print(
-                    f"[AI BRAIN] Rate limit. "
-                    f"Retrying in {wait_time:.1f}s..."
+                    f"[AI BRAIN] RATE LIMIT DETECTED. "
+                    f"Attempt {attempt + 1}/{MAX_RETRIES + 1}. "
+                    f"Waiting {wait_time:.1f} seconds."
                 )
 
                 time.sleep(wait_time)
@@ -141,6 +254,7 @@ def ask_ai(system_prompt, user_prompt):
             choices = result.get("choices", [])
 
             if not choices:
+
                 raise RuntimeError(
                     "Groq returned no choices."
                 )
@@ -157,29 +271,29 @@ def ask_ai(system_prompt, user_prompt):
             if not isinstance(content, str) or not content.strip():
 
                 if attempt == MAX_RETRIES:
+
                     raise RuntimeError(
                         "Groq returned an empty response."
                     )
+
+                print(
+                    "[AI BRAIN] Empty response. Retrying..."
+                )
 
                 time.sleep(min(2 * (attempt + 1), 15))
                 continue
 
             if finish_reason == "length":
 
-                print(
-                    "[AI BRAIN] WARNING: Response reached "
-                    "the token limit and may be incomplete."
-                )
-
-                # Do not silently treat truncated output as complete.
                 raise RuntimeError(
-                    "Groq response was truncated by token limit. "
-                    f"Limit: {token_limit}"
+                    "Groq response was truncated. "
+                    f"Token limit: {token_limit}"
                 )
 
             print(
-                f"[AI BRAIN] Response received. "
-                f"Tokens limit: {token_limit}, "
+                f"[AI BRAIN] SUCCESS. "
+                f"Model: {GROQ_MODEL}. "
+                f"Token limit: {token_limit}. "
                 f"Finish reason: {finish_reason}"
             )
 
@@ -188,28 +302,55 @@ def ask_ai(system_prompt, user_prompt):
         except requests.exceptions.Timeout:
 
             if attempt == MAX_RETRIES:
+
                 raise RuntimeError(
-                    "Groq API request timed out."
+                    "Groq API request timed out "
+                    "after all retries."
                 )
 
-            time.sleep(min(2 ** attempt, 15))
+            wait_time = min(2 ** attempt, 30)
+
+            print(
+                f"[AI BRAIN] TIMEOUT. "
+                f"Retrying in {wait_time}s..."
+            )
+
+            time.sleep(wait_time)
 
         except requests.exceptions.HTTPError as error:
 
+            status = (
+                error.response.status_code
+                if error.response is not None
+                else "UNKNOWN"
+            )
+
+            details = (
+                error.response.text[:1000]
+                if error.response is not None
+                else str(error)
+            )
+
             raise RuntimeError(
-                f"Groq API HTTP error: "
-                f"{error.response.status_code} "
-                f"{error.response.text[:1000]}"
+                f"Groq API HTTP error {status}: {details}"
             )
 
         except requests.exceptions.RequestException as error:
 
             if attempt == MAX_RETRIES:
+
                 raise RuntimeError(
-                    f"Groq connection error: {error}"
+                    f"Groq connection failed: {error}"
                 )
 
-            time.sleep(min(2 ** attempt, 15))
+            wait_time = min(2 ** attempt, 30)
+
+            print(
+                f"[AI BRAIN] CONNECTION ERROR. "
+                f"Retrying in {wait_time}s..."
+            )
+
+            time.sleep(wait_time)
 
     raise RuntimeError(
         "Groq API failed after all retries."
