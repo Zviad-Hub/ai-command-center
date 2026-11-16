@@ -1,5 +1,289 @@
 [
     {
+        "id": "0ab89d53",
+        "created_at": "2026-11-16T18:52:23.733022+00:00",
+        "task": "Create ONE 60-second English YouTube Shorts video about the Roanoke Lost Colony.  The Roanoke Lost Colony is the ONLY topic. Create one concept, one complete script, six timestamped visual directions, and an independent fact-check. Never invent historical facts. Mark unsupported claims NEEDS SOURCE. Do not approve publication.",
+        "analysis": "დავალება გაანალიზებულია. დეპარტამენტები შეირჩა დავალების შინაარსის მიხედვით.",
+        "departments": [
+            "media",
+            "audit"
+        ],
+        "requires_ceo_approval": true,
+        "results": [
+            {
+                "department": "media",
+                "status": "ERROR",
+                "message": "Groq response was truncated by token limit. Limit: 1800"
+            },
+            {
+                "department": "audit",
+                "status": "REVIEW_REQUIRED",
+                "audit_passed": false,
+                "message": "Audit failed. Human review is required.",
+                "auditor_reports": [
+                    {
+                        "auditor": "compliance",
+                        "status": "FAILED",
+                        "checks": [
+                            {
+                                "check": "CEO topic preservation",
+                                "passed": false,
+                                "details": "The original topic must remain consistent."
+                            },
+                            {
+                                "check": "Exactly one concept field",
+                                "passed": false,
+                                "details": "One non-empty concept is required."
+                            },
+                            {
+                                "check": "Exactly one original script field",
+                                "passed": false,
+                                "details": "One non-empty original script is required."
+                            },
+                            {
+                                "check": "Edited script exists",
+                                "passed": false,
+                                "details": ""
+                            },
+                            {
+                                "check": "Original script completeness",
+                                "passed": false,
+                                "details": "The original script may be incomplete."
+                            },
+                            {
+                                "check": "Edited script completeness",
+                                "passed": false,
+                                "details": "The edited script may be incomplete."
+                            },
+                            {
+                                "check": "60-second timeline",
+                                "passed": false,
+                                "details": "Detected timestamps: 0"
+                            }
+                        ]
+                    },
+                    {
+                        "auditor": "evidence",
+                        "status": "FAILED",
+                        "checks": [
+                            {
+                                "check": "Research sources exist",
+                                "passed": false,
+                                "details": "Valid source records: 0"
+                            },
+                            {
+                                "check": "All source records have valid structure",
+                                "passed": true,
+                                "details": "Invalid records: 0"
+                            },
+                            {
+                                "check": "Independent source verification",
+                                "passed": false,
+                                "details": "Unverified sources: 0"
+                            },
+                            {
+                                "check": "Fact-check report exists",
+                                "passed": false,
+                                "details": ""
+                            },
+                            {
+                                "check": "No unsupported claims",
+                                "passed": false,
+                                "details": "Claims needing sources: 0"
+                            },
+                            {
+                                "check": "No contradicted claims",
+                                "passed": false,
+                                "details": "Contradicted claims: 0"
+                            }
+                        ],
+                        "source_count": 0,
+                        "unverified_source_count": 0,
+                        "invalid_source_count": 0,
+                        "needs_source_count": 0,
+                        "contradicted_count": 0
+                    },
+                    {
+                        "auditor": "integrity",
+                        "status": "FAILED",
+                        "checks": [
+                            {
+                                "check": "Required field: concept",
+                                "passed": false,
+                                "details": "Missing or empty output."
+                            },
+                            {
+                                "check": "Required field: script",
+                                "passed": false,
+                                "details": "Missing or empty output."
+                            },
+                            {
+                                "check": "Required field: edited_script",
+                                "passed": false,
+                                "details": "Missing or empty output."
+                            },
+                            {
+                                "check": "Required field: research",
+                                "passed": false,
+                                "details": "Missing or empty output."
+                            },
+                            {
+                                "check": "Required field: fact_check",
+                                "passed": false,
+                                "details": "Missing or empty output."
+                            },
+                            {
+                                "check": "Media review status",
+                                "passed": false,
+                                "details": "Current status: ERROR"
+                            },
+                            {
+                                "check": "Publication approval remains blocked",
+                                "passed": false,
+                                "details": "Only CEO can authorize publication."
+                            },
+                            {
+                                "check": "Output type: concept",
+                                "passed": false,
+                                "details": "Expected a text string."
+                            },
+                            {
+                                "check": "Output type: script",
+                                "passed": false,
+                                "details": "Expected a text string."
+                            },
+                            {
+                                "check": "Output type: edited_script",
+                                "passed": false,
+                                "details": "Expected a text string."
+                            }
+                        ]
+                    }
+                ],
+                "failed_auditors": [
+                    "compliance",
+                    "evidence",
+                    "integrity"
+                ],
+                "failed_checks": [
+                    {
+                        "check": "CEO topic preservation",
+                        "passed": false,
+                        "details": "The original topic must remain consistent."
+                    },
+                    {
+                        "check": "Exactly one concept field",
+                        "passed": false,
+                        "details": "One non-empty concept is required."
+                    },
+                    {
+                        "check": "Exactly one original script field",
+                        "passed": false,
+                        "details": "One non-empty original script is required."
+                    },
+                    {
+                        "check": "Edited script exists",
+                        "passed": false,
+                        "details": ""
+                    },
+                    {
+                        "check": "Original script completeness",
+                        "passed": false,
+                        "details": "The original script may be incomplete."
+                    },
+                    {
+                        "check": "Edited script completeness",
+                        "passed": false,
+                        "details": "The edited script may be incomplete."
+                    },
+                    {
+                        "check": "60-second timeline",
+                        "passed": false,
+                        "details": "Detected timestamps: 0"
+                    },
+                    {
+                        "check": "Research sources exist",
+                        "passed": false,
+                        "details": "Valid source records: 0"
+                    },
+                    {
+                        "check": "Independent source verification",
+                        "passed": false,
+                        "details": "Unverified sources: 0"
+                    },
+                    {
+                        "check": "Fact-check report exists",
+                        "passed": false,
+                        "details": ""
+                    },
+                    {
+                        "check": "No unsupported claims",
+                        "passed": false,
+                        "details": "Claims needing sources: 0"
+                    },
+                    {
+                        "check": "No contradicted claims",
+                        "passed": false,
+                        "details": "Contradicted claims: 0"
+                    },
+                    {
+                        "check": "Required field: concept",
+                        "passed": false,
+                        "details": "Missing or empty output."
+                    },
+                    {
+                        "check": "Required field: script",
+                        "passed": false,
+                        "details": "Missing or empty output."
+                    },
+                    {
+                        "check": "Required field: edited_script",
+                        "passed": false,
+                        "details": "Missing or empty output."
+                    },
+                    {
+                        "check": "Required field: research",
+                        "passed": false,
+                        "details": "Missing or empty output."
+                    },
+                    {
+                        "check": "Required field: fact_check",
+                        "passed": false,
+                        "details": "Missing or empty output."
+                    },
+                    {
+                        "check": "Media review status",
+                        "passed": false,
+                        "details": "Current status: ERROR"
+                    },
+                    {
+                        "check": "Publication approval remains blocked",
+                        "passed": false,
+                        "details": "Only CEO can authorize publication."
+                    },
+                    {
+                        "check": "Output type: concept",
+                        "passed": false,
+                        "details": "Expected a text string."
+                    },
+                    {
+                        "check": "Output type: script",
+                        "passed": false,
+                        "details": "Expected a text string."
+                    },
+                    {
+                        "check": "Output type: edited_script",
+                        "passed": false,
+                        "details": "Expected a text string."
+                    }
+                ],
+                "total_checks": 23,
+                "passed_checks": 1,
+                "publication_approved": false
+            }
+        ]
+    },
+    {
         "id": "01de3083",
         "created_at": "2026-11-16T18:48:32.634934+00:00",
         "task": "Create ONE 60-second English YouTube Shorts video about the Roanoke Lost Colony.  Requirements: 1. Roanoke Lost Colony must remain the ONLY topic. 2. Create exactly one concept and one script. 3. Include timestamped visual directions from 0:00 to 1:00. 4. Research historical claims. 5. Independently audit the final result. 6. Do not publish without CEO approval.",
