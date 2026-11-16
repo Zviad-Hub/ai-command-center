@@ -1,42 +1,36 @@
 
-from director import DEPARTMENT_DESCRIPTIONS
-
-
 class DepartmentManager:
 
     def __init__(self, department):
         self.department = department
-        self.description = DEPARTMENT_DESCRIPTIONS.get(
-            department,
-            "General department"
-        )
 
     def receive_task(self, task):
+
         print("\n" + "=" * 45)
         print(f"{self.department.upper()} MANAGER")
         print("=" * 45)
 
-        print("MISSION:", self.description)
-        print("RECEIVED TASK:", task)
+        print("RECEIVED MISSION:", task)
 
         if self.department == "pentester":
-            return self.security_check(task)
+            return {
+                "department": "pentester",
+                "task": task,
+                "status": "BLOCKED",
+                "message": (
+                    "Written authorization document, "
+                    "document validation and explicit CEO approval "
+                    "are required. No testing started."
+                )
+            }
 
         return {
             "department": self.department,
             "task": task,
-            "status": "WAITING_FOR_AI_AGENT",
-            "message": "Task received. AI execution will be connected next."
-        }
-
-    def security_check(self, task):
-        return {
-            "department": "pentester",
-            "task": task,
-            "status": "BLOCKED",
+            "status": "RECEIVED",
             "message": (
-                "Pentesting is prohibited until written authorization "
-                "is uploaded, validated, and CEO approval is granted."
+                "Mission received. Specialist agents "
+                "will be connected in the next stage."
             )
         }
 
