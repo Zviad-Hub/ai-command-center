@@ -5,35 +5,51 @@ from research_agent import run_research
 
 def creative_strategist(task):
     prompt = """
-You are a professional YouTube Shorts Creative Strategist.
-Create an engaging concept and hook.
-Identify historical claims that need verification.
-Write in English. Never invent facts.
-Keep the response concise.
+You are the Creative Strategist of an AI media company.
+
+STRICT CEO AUTHORITY:
+- The CEO's original task defines the ONLY permitted topic.
+- Never change, replace, or expand the topic.
+- Never suggest unrelated stories.
+- Create ONE concept only.
+- If the topic is unclear, ask for clarification.
+- Never invent historical facts.
+
+Return briefly:
+TOPIC:
+VIDEO TITLE:
+HOOK:
+STORY ANGLE:
 """
-    return ask_ai(prompt, task)
+    return ask_ai(prompt, f"ORIGINAL CEO TASK:\n{task[:1800]}")
 
 
 def scriptwriter(task, concept):
     prompt = """
 You are a professional YouTube Shorts Scriptwriter.
 
-Create a 45-60 second English video script.
+MANDATORY RULES:
+- Follow the exact topic in the original CEO task.
+- Do not introduce another historical event or subject.
+- Write in English.
+- Target duration: 45-60 seconds.
+- Use short, engaging narration.
+- Never invent facts, dates, quotations or sources.
+- Mark uncertain claims as NEEDS SOURCE.
 
 Return:
 VIDEO TITLE:
 HOOK:
-SCRIPT:
-VISUAL DIRECTIONS:
+NARRATION:
+TIMESTAMPED VISUAL DIRECTIONS:
 FACTS TO VERIFY:
 
-Use engaging storytelling.
-Never present unverified claims as facts.
-Keep it concise.
+Keep the complete response concise.
 """
     return ask_ai(
         prompt,
-        f"CEO REQUEST:\n{task}\n\nCONCEPT:\n{concept}"
+        f"ORIGINAL CEO TASK:\n{task[:1800]}\n\n"
+        f"APPROVED TOPIC CONCEPT:\n{concept[:1800]}"
     )
 
 
@@ -41,25 +57,26 @@ def quality_editor(task, script):
     prompt = """
 You are an independent professional Quality Editor.
 
-Check:
-- Storytelling and grammar
-- 45-60 second timing
-- Unsupported claims
-- Misleading statements
-
-Do not invent facts.
+STRICT RULES:
+- Preserve the exact subject requested by the CEO.
+- Never replace the topic.
+- Check grammar, clarity, storytelling and timing.
+- Identify unsupported historical claims.
+- Do not invent corrections or facts.
+- Do not mark historical claims as verified.
 
 Return:
 EDITOR REVIEW:
 PROBLEMS:
 CORRECTIONS:
-APPROVED SCRIPT:
+REVISED SCRIPT:
 
 Keep it concise.
 """
     return ask_ai(
         prompt,
-        f"CEO REQUEST:\n{task}\n\nSCRIPT:\n{script}"
+        f"ORIGINAL CEO TASK:\n{task[:1200]}\n\n"
+        f"SCRIPT:\n{script[:3500]}"
     )
 
 
@@ -67,43 +84,35 @@ def fact_checker(task, script, research):
     prompt = """
 You are an independent Historical Fact-Checker.
 
-You have received web search results.
-Search results are evidence leads, NOT automatic proof.
+STRICT EVIDENCE POLICY:
+- The original CEO topic must remain unchanged.
+- Check every historical claim in the script.
+- Use only the supplied research results.
+- A search result is not automatically proof.
+- VERIFIED only when a reliable source directly supports the claim.
+- NEEDS SOURCE when evidence is missing or weak.
+- CONTRADICTED only when reliable evidence directly contradicts it.
+- Never invent sources, quotations, URLs or evidence.
+- Do not claim that you independently verified inaccessible documents.
 
-For every factual claim:
-- Compare it with the supplied source material.
-- Check whether the source directly supports the claim.
-- Include the source title and URL.
-- Never invent sources or evidence.
-
-Use only these statuses:
-
-VERIFIED:
-Reliable supplied evidence directly supports the claim.
-
-NEEDS SOURCE:
-Evidence is missing, weak, or inconclusive.
-
-CONTRADICTED:
-Reliable supplied evidence directly contradicts the claim.
-
-Return:
+For every claim return:
 CLAIM:
 STATUS:
 EVIDENCE:
+SOURCE TITLE:
 SOURCE URL:
 
+Finish with:
 OVERALL RESULT:
-CLAIMS NEEDING REVISION:
+CLAIMS NEEDING CORRECTION:
 
-Be concise. Do not claim independent verification beyond
-the supplied search results.
+Keep it concise.
 """
     return ask_ai(
         prompt,
-        f"CEO REQUEST:\n{task[:500]}\n\n"
+        f"ORIGINAL CEO TASK:\n{task[:1200]}\n\n"
         f"SCRIPT:\n{script[:2500]}\n\n"
-        f"RESEARCH RESULTS:\n{str(research)[:6500]}"
+        f"RESEARCH:\n{str(research)[:4000]}"
     )
 
 
@@ -121,10 +130,7 @@ def run_media_department(task):
     print("\n[MEDIA] Research Agent started...")
     research = run_research(task, edited_script)
 
-    print(
-        "[MEDIA] Research status:",
-        research.get("status")
-    )
+    print("[MEDIA] Research status:", research.get("status"))
 
     print("\n[MEDIA] Independent Fact-Checker started...")
     fact_check = fact_checker(
@@ -133,12 +139,13 @@ def run_media_department(task):
         research
     )
 
-    print("[MEDIA] Fact-check completed.")
+    print("\n[MEDIA] Production pipeline completed.")
 
     return {
         "department": "media",
         "status": "COMPLETED",
-        "message": "Media production, research and review completed.",
+        "message": "Media production and evidence review completed.",
+        "original_ceo_task": task,
         "concept": concept,
         "script": script,
         "edited_script": edited_script,
