@@ -5,6 +5,18 @@ import requests
 
 TAVILY_URL = "https://api.tavily.com/search"
 
+# წყაროების პრიორიტეტი
+TRUSTED_DOMAINS = [
+    "archives.gov",
+    "loc.gov",
+    "nps.gov",
+    "si.edu",
+    "britannica.com",
+    "history.com",
+    "edu",
+    "gov"
+]
+
 
 def run_research(task, script):
 
@@ -17,14 +29,19 @@ def run_research(task, script):
             "sources": []
         }
 
-    query = f"""
-    Historical fact checking:
-    Topic: {task[:400]}
-    Script claims: {script[:1200]}
+    # CEO-ს დავალება არის მთავარი თემა.
+    # სცენარი გამოიყენება მხოლოდ საკვლევი ფაქტების გამოსავლენად.
+    topic = str(task).strip()[:500]
+    script_text = str(script).strip()[:1000]
 
-    Find reliable historical sources, primary documents,
-    museums, universities and government archives.
-    """
+    query = (
+        f"Research ONLY this exact historical topic: {topic}. "
+        "Find reliable primary sources, government archives, "
+        "museums, universities, and established history institutions. "
+        "Do not research unrelated topics. "
+        "Find evidence that directly supports or contradicts "
+        "the historical claims in this topic."
+    )
 
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -33,9 +50,9 @@ def run_research(task, script):
 
     payload = {
         "query": query,
-        "search_depth": "basic",
+        "search_depth": "advanced",
         "topic": "general",
-        "max_results": 5,
+        "max_results": 7,
         "include_answer": False,
         "include_raw_content": False
     }
@@ -54,23 +71,41 @@ def run_research(task, script):
         sources = []
 
         for item in data.get("results", []):
+
+            url = item.get("url", "")
+            domain = url.lower()
+
+            # წყაროს სანდოობა ავტომატურად დადასტურებული არ არის.
+            trusted_candidate = any(
+                marker in domain
+                for marker in TRUSTED_DOMAINS
+            )
+
             sources.append({
                 "title": item.get("title", ""),
-                "url": item.get("url", ""),
-                "content": item.get("content", ""),
-                "score": item.get("score", 0)
+                "url": url,
+                "content": item.get("content", "")[:1200],
+                "score": item.get("score", 0),
+                "trusted_candidate": trusted_candidate,
+                "verification_status": "NOT_VERIFIED"
             })
 
         return {
             "status": "COMPLETED" if sources else "NO_RESULTS",
-            "query": query.strip(),
+            "original_ceo_topic": topic,
+            "script_used_for_context": bool(script_text),
             "source_count": len(sources),
-            "sources": sources
+            "sources": sources,
+            "warning": (
+                "Search results are leads, not verified evidence. "
+                "A trusted-domain match does not prove a claim."
+            )
         }
 
     except requests.exceptions.RequestException as error:
         return {
             "status": "ERROR",
+            "original_ceo_topic": topic,
             "message": str(error),
             "sources": []
         }
