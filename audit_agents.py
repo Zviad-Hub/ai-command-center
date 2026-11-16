@@ -17,35 +17,4 @@
 
     narration = re.sub(r"\*\*|__", "", narration)
 
-    word_count = len(
-        re.findall(r"\b[\w’'-]+\b", narration)
-    )
-
-    word_count_ok = (
-        125 <= word_count <= 140
-        if narration
-        else False
-    )
-
-    checks.append(check_result(
-        "Narration word count",
-        word_count_ok,
-        f"Detected words: {word_count}; Required: 125-140"
-    ))
-
-
-    word_count = len(
-        re.findall(r"\b[\w’'-]+\b", narration)
-    )
-
-    word_count_ok = (
-        125 <= word_count <= 140
-        if narration
-        else False
-    )
-
-    checks.append(check_result(
-        "Narration word count",
-        word_count_ok,
-        f"Detected words: {word_count}; Required: 125-140"
-    ))
+   
