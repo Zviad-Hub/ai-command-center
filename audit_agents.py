@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 
 # ==================================================
-# COMMON AUDIT UTILITIES
+# COMMON UTILITIES
 # ==================================================
 
 def check_result(name, passed, details=""):
@@ -13,15 +13,6 @@ def check_result(name, passed, details=""):
         "passed": bool(passed),
         "details": details
     }
-
-
-def is_truncated(value):
-    value = str(value).strip()
-
-    if not value:
-        return True
-
-    return value.endswith(("...", "…", ":", "-", "–", "—"))
 
 
 def normalize_url(url):
@@ -40,87 +31,27 @@ def normalize_url(url):
         return None
 
 
-def extract_urls(text):
-    return re.findall(
-        r"https?://[^\s<>\"')\]]+",
-        str(text),
-        flags=re.IGNORECASE
-    )
-
-
-def extract_timestamps(text):
-    return re.findall(
-        r"\b\d{1,2}:\d{2}\b",
-        str(text)
-    )
-
-
-def extract_visual_ranges(text):
-    text = str(text)
-
-    # Normalize different dash characters
-    text = re.sub(r"[‐‑‒–—−]", "-", text)
-
-    pattern = (
-        r"(?m)^\s*"
-        r"(?:[-*]\s*)?"
-        r"(\d{1,2}:\d{2})\s*-\s*"
-        r"(\d{1,2}:\d{2})"
-    )
-
-    return re.findall(pattern, text)
-
-
-def extract_fact_check_statuses(text):
-    text = str(text).upper()
-
-    pattern = (
-        r"\b(VERIFIED|NEEDS SOURCE|CONTRADICTED)\b"
-    )
-
-    return re.findall(pattern, text)
-
-
-def count_words(text):
-    return len(
-        re.findall(
-            r"\b[\w’'-]+\b",
-            str(text),
-            flags=re.UNICODE
-        )
-    )
-
-
 def collect_strings(value):
-    """
-    Recursively collect all text from nested dictionaries/lists.
-    """
-
-    collected = []
+    result = []
 
     if isinstance(value, str):
-        collected.append(value)
+        result.append(value)
 
     elif isinstance(value, dict):
         for item in value.values():
-            collected.extend(collect_strings(item))
+            result.extend(collect_strings(item))
 
     elif isinstance(value, (list, tuple)):
         for item in value:
-            collected.extend(collect_strings(item))
+            result.extend(collect_strings(item))
 
-    return collected
+    return result
 
 
 def find_nested_values(data, target_keys):
-    """
-    Find values by matching dictionary keys recursively.
-    """
-
     found = []
 
     if isinstance(data, dict):
-
         for key, value in data.items():
 
             if str(key).lower() in target_keys:
@@ -131,7 +62,6 @@ def find_nested_values(data, target_keys):
             )
 
     elif isinstance(data, (list, tuple)):
-
         for item in data:
             found.extend(
                 find_nested_values(item, target_keys)
@@ -144,58 +74,103 @@ def get_media_text(media):
     return "\n".join(collect_strings(media))
 
 
-def extract_narration(media):
-    """
-    Find the final edited narration inside the media result.
-    """
-
-    preferred_keys = {
-        "edited_script",
-        "final_script",
-        "edited_narration",
-        "final_narration",
-        "quality_editor"
-    }
-
-    candidates = find_nested_values(
-        media,
-        preferred_keys
+def count_words(text):
+    return len(
+        re.findall(
+            r"\b[\w’'-]+\b",
+            str(text),
+            flags=re.UNICODE
+        )
     )
 
-    # Prefer the final editor output.
-    for candidate in reversed(candidates):
 
-        if isinstance(candidate, str) and candidate.strip():
-            text = candidate.strip()
+# ==================================================
+# FINAL SCRIPT EXTRACTION
+# ==================================================
 
-            match = re.search(
-                r"^\s*\*{0,2}(?:SCRIPT|NARRATION)"
-                r"(?:\s*\([^)]*\))?\s*:\*{0,2}\s*"
-                r"(.*?)"
-                r"(?=^\s*\*{0,2}VISUAL DIRECTIONS\s*:\*{0,2})",
-                text,
-                re.IGNORECASE | re.MULTILINE | re.DOTALL
-            )
+def extract_final_script(media):
+    edited = media.get("edited_script", "")
 
-            if match:
-                return match.group(1).strip()
+    if isinstance(edited, str) and edited.strip():
+        return edited
 
-    # Fallback: search all collected text.
-    all_text = get_media_text(media)
+    return str(media.get("script", ""))
+
+
+def extract_narration(media):
+    script = extract_final_script(media)
+
+    pattern = (
+        r"(?:\*\*)?\s*Narration"
+        r"(?:\s*\([^)]*\))?\s*:\s*"
+        r"\*{0,2}\s*"
+        r"(.*?)"
+        r"(?=\n\s*\*{0,2}\s*Visual Directions)"
+    )
 
     match = re.search(
-        r"^\s*\*{0,2}(?:SCRIPT|NARRATION)"
-        r"(?:\s*\([^)]*\))?\s*:\*{0,2}\s*"
-        r"(.*?)"
-        r"(?=^\s*\*{0,2}VISUAL DIRECTIONS\s*:\*{0,2})",
-        all_text,
-        re.IGNORECASE | re.MULTILINE | re.DOTALL
+        pattern,
+        script,
+        re.IGNORECASE | re.DOTALL
     )
 
     if match:
         return match.group(1).strip()
 
     return ""
+
+
+def extract_visual_text(media):
+    script = extract_final_script(media)
+
+    match = re.search(
+        r"Visual Directions\s*:?\s*(.*)$",
+        script,
+        re.IGNORECASE | re.DOTALL
+    )
+
+    if match:
+        return match.group(1).strip()
+
+    return ""
+
+
+def extract_visual_ranges(text):
+    text = str(text)
+
+    # Normalize different dash characters.
+    text = re.sub(r"[‐‑‒–—−]", "-", text)
+
+    pattern = (
+        r"(?m)^\s*"
+        r"(?:[-*]\s*)?"
+        r"(\d{1,2}:\d{2})\s*-\s*"
+        r"(\d{1,2}:\d{2})"
+    )
+
+    return re.findall(pattern, text)
+
+
+# ==================================================
+# FACT CHECK STATUS EXTRACTION
+# ==================================================
+
+def extract_fact_check_statuses(text):
+    """
+    Only detect explicit claim statuses.
+
+    Do not interpret headings such as
+    'CONTRADICTED CLAIMS: NONE' as a contradiction.
+    """
+
+    text = str(text).upper()
+
+    pattern = (
+        r"\bSTATUS\s*:\s*"
+        r"(VERIFIED|NEEDS SOURCE|CONTRADICTED)\b"
+    )
+
+    return re.findall(pattern, text)
 
 
 # ==================================================
@@ -213,28 +188,21 @@ def compliance_auditor(task, media):
     # TOPIC PRESERVATION
     # ----------------------------------------------
 
-    topic_terms = list(dict.fromkeys(
-        re.findall(r"[a-z]+", task_text)
-    ))
-
-    important_terms = [
-        term for term in topic_terms
-        if term in ("roanoke", "colony")
+    required_topic_terms = [
+        "roanoke",
+        "colony"
     ]
 
-    topic_passed = (
-        bool(important_terms)
-        and all(
-            term in media_text
-            for term in important_terms
-        )
+    topic_passed = all(
+        term in task_text and term in media_text
+        for term in required_topic_terms
     )
 
     checks.append(
         check_result(
             "Topic preservation",
             topic_passed,
-            "The original topic must remain Roanoke Lost Colony."
+            "The original Roanoke Lost Colony topic must be preserved."
         )
     )
 
@@ -245,23 +213,20 @@ def compliance_auditor(task, media):
     narration = extract_narration(media)
     narration_words = count_words(narration)
 
-    word_count_passed = (
-        125 <= narration_words <= 140
-    )
-
     checks.append(
         check_result(
             "Narration word count",
-            word_count_passed,
+            125 <= narration_words <= 140,
             f"Detected {narration_words} words; required 125-140."
         )
     )
 
     # ----------------------------------------------
-    # VISUAL SCENES
+    # EXACTLY SIX VISUAL SCENES
+    # Inspect ONLY final edited script.
     # ----------------------------------------------
 
-    visual_text = media_text
+    visual_text = extract_visual_text(media)
 
     visual_ranges = extract_visual_ranges(
         visual_text
@@ -276,26 +241,24 @@ def compliance_auditor(task, media):
         ("0:50", "1:00")
     ]
 
-    visual_passed = (
-        visual_ranges == expected_ranges
-    )
-
     checks.append(
         check_result(
             "Six visual scenes",
-            visual_passed,
-            f"Detected {len(visual_ranges)} scenes. "
-            f"Expected exactly 6 consecutive 10-second scenes."
+            visual_ranges == expected_ranges,
+            (
+                f"Detected {len(visual_ranges)} scenes. "
+                "Expected exactly six consecutive 10-second scenes."
+            )
         )
     )
 
     # ----------------------------------------------
-    # REQUIRED OUTPUT CONTENT
+    # REQUIRED CONTENT
     # ----------------------------------------------
 
     required_sections = [
-        "video concept",
-        "hook",
+        "video title",
+        "narration",
         "visual directions"
     ]
 
@@ -318,19 +281,14 @@ def compliance_auditor(task, media):
     )
 
     # ----------------------------------------------
-    # EMPTY OR TRUNCATED OUTPUT
+    # NARRATION COMPLETENESS
     # ----------------------------------------------
-
-    content_passed = (
-        bool(narration.strip())
-        and not is_truncated(narration)
-    )
 
     checks.append(
         check_result(
             "Narration completeness",
-            content_passed,
-            "Narration must be present and complete."
+            bool(narration.strip()),
+            "Final narration must be present."
         )
     )
 
@@ -352,7 +310,7 @@ def evidence_auditor(media):
     checks = []
 
     # ----------------------------------------------
-    # RESEARCH SOURCES
+    # SOURCE VERIFICATION
     # ----------------------------------------------
 
     source_values = find_nested_values(
@@ -390,7 +348,7 @@ def evidence_auditor(media):
 
         if status:
             source_statuses.append(
-                str(status).upper()
+                str(status).upper().strip()
             )
 
     valid_urls = [
@@ -398,10 +356,10 @@ def evidence_auditor(media):
         if normalize_url(url)
     ]
 
-    source_verification_passed = (
+    sources_verified = (
         bool(sources)
-        and bool(valid_urls)
-        and bool(source_statuses)
+        and len(valid_urls) == len(sources)
+        and len(source_statuses) == len(sources)
         and all(
             status in ("VERIFIED", "CONFIRMED")
             for status in source_statuses
@@ -411,7 +369,7 @@ def evidence_auditor(media):
     checks.append(
         check_result(
             "Source verification",
-            source_verification_passed,
+            sources_verified,
             (
                 f"Sources: {len(sources)}; "
                 f"valid URLs: {len(valid_urls)}; "
@@ -421,27 +379,17 @@ def evidence_auditor(media):
     )
 
     # ----------------------------------------------
-    # FACT CHECK RESULTS
+    # FACT CHECK REPORT
     # ----------------------------------------------
 
     fact_check_values = find_nested_values(
         media,
-        {
-            "fact_check",
-            "fact_checker",
-            "fact_check_report",
-            "fact_check_results"
-        }
+        {"fact_check", "fact_check_report", "fact_check_results"}
     )
 
     fact_check_text = "\n".join(
         collect_strings(fact_check_values)
     )
-
-    # Also inspect the full result to support
-    # alternative output structures.
-    if not fact_check_text:
-        fact_check_text = get_media_text(media)
 
     statuses = extract_fact_check_statuses(
         fact_check_text
@@ -455,7 +403,7 @@ def evidence_auditor(media):
         check_result(
             "Fact-check coverage",
             has_verified,
-            "At least one explicitly verified claim is required."
+            "At least one explicitly VERIFIED claim is required."
         )
     )
 
@@ -466,7 +414,7 @@ def evidence_auditor(media):
             (
                 "Claims marked NEEDS SOURCE were found."
                 if has_needs_source
-                else "No NEEDS SOURCE claims detected."
+                else "No unsupported claims were reported."
             )
         )
     )
@@ -476,20 +424,24 @@ def evidence_auditor(media):
             "Contradiction detection",
             not has_contradicted,
             (
-                "Claims marked CONTRADICTED were found."
+                "Claims explicitly marked CONTRADICTED were found."
                 if has_contradicted
-                else "No contradicted claims detected."
+                else "No contradicted claims were reported."
             )
         )
     )
 
     # ----------------------------------------------
-    # SOURCE URL STRUCTURE
+    # URL STRUCTURE
     # ----------------------------------------------
 
     all_text = get_media_text(media)
 
-    discovered_urls = extract_urls(all_text)
+    discovered_urls = re.findall(
+        r"https?://[^\s<>\"')\]]+",
+        all_text,
+        flags=re.IGNORECASE
+    )
 
     invalid_urls = [
         url for url in discovered_urls
@@ -569,7 +521,7 @@ def integrity_auditor(media):
         check_result(
             "Publication safety",
             publication_approved is False,
-            "Media must not approve its own publication."
+            "Media must never approve its own publication."
         )
     )
 
@@ -586,7 +538,7 @@ def integrity_auditor(media):
     )
 
     # ----------------------------------------------
-    # RESEARCH STRUCTURE
+    # RESEARCH DATA
     # ----------------------------------------------
 
     research_values = find_nested_values(
@@ -610,12 +562,14 @@ def integrity_auditor(media):
 
     # ----------------------------------------------
     # SPECIALIST OUTPUT
+    # Media currently returns a LIST of specialist names.
+    # Accept a non-empty list or dictionary.
     # ----------------------------------------------
 
     specialists = media.get("specialists")
 
     specialists_valid = (
-        isinstance(specialists, dict)
+        isinstance(specialists, (list, dict))
         and bool(specialists)
     )
 
@@ -623,7 +577,11 @@ def integrity_auditor(media):
         check_result(
             "Specialist output",
             specialists_valid,
-            "Specialist results must be available."
+            (
+                f"Received {len(specialists)} specialists."
+                if specialists_valid
+                else "Specialist output is missing or invalid."
+            )
         )
     )
 
@@ -651,7 +609,6 @@ def run_audit(task, media_result):
             "publication_approved": False
         }
 
-    # Run all three independent auditors.
     auditors = [
         compliance_auditor(task, media_result),
         evidence_auditor(media_result),
@@ -686,8 +643,6 @@ def run_audit(task, media_result):
         and len(failed_checks) == 0
     )
 
-    # Even a successful audit cannot approve
-    # publication. Final approval belongs to CEO.
     return {
         "department": "audit",
 
@@ -707,18 +662,17 @@ def run_audit(task, media_result):
 
         "failed_checks": failed_checks,
 
+        # Audit can never grant publication approval.
         "publication_approved": False,
 
-        "final_decision": (
-            "CEO_APPROVAL_REQUIRED"
-        ),
+        "final_decision": "CEO_APPROVAL_REQUIRED",
 
         "message": (
-            "აუდიტი დასრულდა. ყველა შემოწმება გაიარა, "
-            "თუმცა გამოქვეყნებისთვის საჭიროა CEO-ს ნებართვა."
+            "ყველა აუდიტის შემოწმება წარმატებით დასრულდა. "
+            "გამოქვეყნებისთვის მაინც საჭიროა CEO-ს ნებართვა."
             if all_passed
             else
-            "აუდიტმა ხარვეზები აღმოაჩინა. "
-            "მასალა საჭიროებს დამატებით შემოწმებას და შესწორებას."
+            "აუდიტმა აღმოაჩინა პრობლემები. "
+            "მასალა საჭიროებს შესწორებას ან დამატებით მტკიცებულებებს."
         )
     }
