@@ -1,66 +1,127 @@
 
+import json
+
+from ai_brain import ask_ai
 from config import DEPARTMENTS
 
 
-DEPARTMENT_DESCRIPTIONS = {
-    "media": "ვიდეოები, ტრენდები, კვლევა და კონტენტი",
-    "tenders": "სახელმწიფო ტენდერები და შესყიდვები",
-    "finance": "ფინანსური და კრიპტო ბაზრის ანალიზი",
-    "business": "ბიზნეს იდეები და ბაზრის კვლევა",
-    "pentester": "კიბერუსაფრთხოება და ნებადართული პენტესტირება",
-    "technical": "პროგრამირება და ტექნიკური ავტომატიზაცია",
-    "audit": "შედეგების შემოწმება და ხარისხის კონტროლი"
+DIRECTOR_PROMPT = """
+You are the Chief AI Director of a multi-department AI organization.
+
+Your CEO speaks Georgian.
+
+Your job:
+1. Understand the CEO's task.
+2. Select the appropriate departments.
+3. You may select multiple departments.
+4. Create a clear mission for each department.
+5. Identify tasks requiring human approval.
+
+Available departments:
+- media
+- tenders
+- finance
+- business
+- pentester
+- technical
+- audit
+
+IMPORTANT SECURITY RULES:
+- Pentesting requires written authorization.
+- Pentesting requires explicit CEO approval.
+- Never authorize testing automatically.
+- Never initiate financial transactions.
+- Never submit tenders or publish content without CEO approval.
+
+Return ONLY valid JSON in this format:
+
+{
+  "analysis": "Short explanation in Georgian",
+  "departments": ["media"],
+  "missions": {
+    "media": "Detailed mission in Georgian"
+  },
+  "requires_ceo_approval": true
 }
+"""
 
 
 def route_task(task):
-    task_lower = task.lower()
+    prompt = f"""
+    Analyze this CEO task:
 
-    keywords = {
-        "media": ["ვიდეო", "youtube", "ტიკტოკ", "ისტორია", "კონტენტი"],
-        "tenders": ["ტენდერი", "შესყიდვა", "აუქციონი"],
-        "finance": ["კრიპტო", "ბიტკოინი", "ფინანს", "ბირჟა"],
-        "business": ["ბიზნეს", "კომპანია", "ბაზარი", "იდეა"],
-        "pentester": ["pentest", "ჰაკ", "უსაფრთხოება", "შეღწევა"],
-        "technical": ["კოდი", "პროგრამა", "შეცდომა", "ავტომატიზაცია"],
-        "audit": ["აუდიტი", "შემოწმება", "გადამოწმება"]
-    }
+    {task}
 
-    selected = []
+    Choose only relevant departments from:
+    {", ".join(DEPARTMENTS)}
 
-    for department, words in keywords.items():
-        if any(word in task_lower for word in words):
-            selected.append(department)
+    Return JSON only.
+    """
 
-    if not selected:
-        selected = ["technical"]
+    response = ask_ai(DIRECTOR_PROMPT, prompt)
 
-    return selected
+    try:
+        data = json.loads(response)
+
+        departments = data.get("departments", [])
+
+        if not departments:
+            raise ValueError("No departments selected")
+
+        if not all(d in DEPARTMENTS for d in departments):
+            raise ValueError("Invalid department selected")
+
+        missions = data.get("missions", {})
+
+        for department in departments:
+            if not isinstance(missions.get(department), str):
+                raise ValueError("Missing department mission")
+
+        return {
+            "analysis": str(data.get("analysis", "")),
+            "departments": list(dict.fromkeys(departments)),
+            "missions": missions,
+            "requires_ceo_approval": bool(
+                data.get("requires_ceo_approval", True)
+            )
+        }
+
+    except (json.JSONDecodeError, ValueError, TypeError):
+        print("AI response invalid. Using safe fallback.")
+        return {
+            "analysis": "დავალება გადაეცემა ტექნიკურ დეპარტამენტს.",
+            "departments": ["technical"],
+            "missions": {
+                "technical": task
+            },
+            "requires_ceo_approval": True
+        }
 
 
 def create_plan(task):
-    departments = route_task(task)
+    plan = route_task(task)
 
-    print("\nAI DIRECTOR — TASK ANALYSIS")
-    print("-" * 40)
-    print("CEO TASK:", task)
+    print("\nAI DIRECTOR — ANALYSIS")
+    print("-" * 45)
 
-    for department in departments:
+    print(plan["analysis"])
+
+    for department in plan["departments"]:
         print("\nMANAGER:", department.upper())
-        print("MISSION:", DEPARTMENT_DESCRIPTIONS[department])
+        print("MISSION:", plan["missions"][department])
 
-    if "pentester" in departments:
+    if "pentester" in plan["departments"]:
         print("\nSECURITY GATE ACTIVATED")
         print("Written authorization required.")
         print("CEO approval required.")
-        print("No testing will start automatically.")
+        print("Testing remains blocked.")
 
-    print("\nSTATUS: PLAN CREATED")
-    print("Execution is not yet enabled.")
+    print("\nCEO APPROVAL REQUIRED:",
+          plan["requires_ceo_approval"])
 
-    return departments
+    return plan["departments"]
 
 
 if __name__ == "__main__":
-    task = input("CEO, enter your task: ")
+    task = input("CEO > ")
     create_plan(task)
