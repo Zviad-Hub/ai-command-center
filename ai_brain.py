@@ -6,7 +6,7 @@ GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 GROQ_MODEL = os.getenv(
     "GROQ_MODEL",
-    "llama-3.3-70b-versatile"
+    "openai/gpt-oss-120b"
 )
 
 
@@ -33,8 +33,7 @@ def ask_ai(system_prompt, user_prompt):
                 "content": user_prompt
             }
         ],
-        "temperature": 0.2,
-        "max_tokens": 1200
+        "max_completion_tokens": 1200
     }
 
     try:
@@ -42,7 +41,7 @@ def ask_ai(system_prompt, user_prompt):
             GROQ_API_URL,
             headers=headers,
             json=payload,
-            timeout=(10, 45)
+            timeout=(10, 60)
         )
 
         response.raise_for_status()
@@ -62,13 +61,3 @@ def ask_ai(system_prompt, user_prompt):
 
     except requests.exceptions.RequestException as error:
         raise RuntimeError(f"Groq connection error: {error}")
-
-
-if __name__ == "__main__":
-    answer = ask_ai(
-        "You are the AI Director of a professional AI organization.",
-        "Introduce yourself in Georgian and explain your role."
-    )
-
-    print("\nAI DIRECTOR RESPONSE:\n")
-    print(answer)
