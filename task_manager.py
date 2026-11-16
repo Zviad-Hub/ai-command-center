@@ -4,21 +4,26 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from director import create_plan
+from director import route_task
 from managers import get_manager
 
 TASKS_FILE = Path("tasks.json")
 
 
+def load_tasks():
+    if not TASKS_FILE.exists():
+        return []
+
+    try:
+        return json.loads(
+            TASKS_FILE.read_text(encoding="utf-8")
+        )
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
 def save_task(task_data):
-    tasks = []
-
-    if TASKS_FILE.exists():
-        try:
-            tasks = json.loads(TASKS_FILE.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            tasks = []
-
+    tasks = load_tasks()
     tasks.append(task_data)
 
     TASKS_FILE.write_text(
@@ -30,43 +35,64 @@ def save_task(task_data):
 def submit_task(task):
     task_id = str(uuid.uuid4())[:8]
 
-    print("\nAI DIRECTOR: Analyzing task...")
+    print("\n[AI DIRECTOR] Analyzing CEO task...")
 
-    departments = create_plan(task)
+    try:
+        plan = route_task(task)
+    except Exception as error:
+        print("[AI DIRECTOR ERROR]", error)
+
+        plan = {
+            "analysis": "AI unavailable. Task requires review.",
+            "departments": ["technical"],
+            "missions": {"technical": task},
+            "requires_ceo_approval": True
+        }
+
+    departments = plan["departments"]
     results = []
+
+    print("\nDIRECTOR ANALYSIS:")
+    print(plan["analysis"])
 
     for department in departments:
         manager = get_manager(department)
-        result = manager.receive_task(task)
+
+        mission = plan["missions"].get(
+            department,
+            task
+        )
+
+        result = manager.receive_task(mission)
+
+        if department == "pentester":
+            result["status"] = "BLOCKED"
+            result["message"] = (
+                "Written authorization and CEO approval "
+                "are required. No testing started."
+            )
+
         results.append(result)
 
     task_data = {
         "id": task_id,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "task": task,
+        "analysis": plan["analysis"],
         "departments": departments,
+        "requires_ceo_approval": plan["requires_ceo_approval"],
         "results": results
     }
 
     save_task(task_data)
 
-    print("\nTASK SAVED")
-    print("TASK ID:", task_id)
+    print("\nTASK SAVED:", task_id)
 
     return task_data
 
 
 if __name__ == "__main__":
-    print("AI COMMAND CENTER")
-    print("Enter your task below.")
+    task = input("CEO > ").strip()
 
-    while True:
-        task = input("\nCEO > ").strip()
-
-        if task.lower() in ["exit", "quit", "გასვლა"]:
-            break
-
-        if not task:
-            continue
-
+    if task:
         submit_task(task)
