@@ -1,133 +1,273 @@
 
 import re
+from urllib.parse import urlparse
 
 
 def run_audit(task, media_result):
 
-    print("\n[AUDIT] Independent audit started...")
+    print("\n[AUDIT] Advanced independent audit started...")
 
     problems = []
     checks = []
 
-    # 1. CEO topic preservation
+    def add_check(name, passed, details=""):
+        checks.append({
+            "check": name,
+            "passed": bool(passed),
+            "details": details
+        })
+
+        if not passed:
+            problems.append(name + ": " + details)
+
+    # 1. ORIGINAL TOPIC PRESERVATION
+
     original_topic = str(task).lower()
+
     concept = str(media_result.get("concept", ""))
     script = str(media_result.get("script", ""))
     edited_script = str(media_result.get("edited_script", ""))
 
-    combined = (concept + script + edited_script).lower()
+    combined = (
+        concept + "\n" + script + "\n" + edited_script
+    ).lower()
 
     topic_ok = (
         "roanoke" in original_topic
         and "roanoke" in combined
     )
 
-    checks.append({
-        "check": "CEO topic preservation",
-        "passed": topic_ok
-    })
-
-    if not topic_ok:
-        problems.append("CEO topic was not preserved.")
-
-    # 2. One concept and one script
-    concept_ok = bool(concept.strip())
-    script_ok = bool(script.strip())
-
-    checks.append({
-        "check": "Concept exists",
-        "passed": concept_ok
-    })
-
-    checks.append({
-        "check": "Script exists",
-        "passed": script_ok
-    })
-
-    if not concept_ok:
-        problems.append("Video concept is missing.")
-
-    if not script_ok:
-        problems.append("Video script is missing.")
-
-    # 3. Timestamp coverage
-    timestamps = re.findall(
-        r"\b(?:0?[0-5]?\d):[0-5]\d\b",
-        script + edited_script
+    add_check(
+        "CEO topic preservation",
+        topic_ok,
+        "Roanoke must remain the only subject."
     )
 
-    has_timestamps = len(timestamps) >= 4
+    # 2. CONCEPT AND SCRIPT EXIST
 
-    checks.append({
-        "check": "Timestamped directions",
-        "passed": has_timestamps
-    })
+    concept_ok = bool(concept.strip())
+    script_ok = bool(script.strip())
+    edited_ok = bool(edited_script.strip())
 
-    if not has_timestamps:
-        problems.append("Timestamp coverage may be incomplete.")
+    add_check("Concept exists", concept_ok)
+    add_check("Original script exists", script_ok)
+    add_check("Edited script exists", edited_ok)
 
-    # 4. Research sources
+    # 3. DETECT TRUNCATED OUTPUT
+
+    def looks_truncated(value):
+
+        text = value.strip()
+
+        if not text:
+            return True
+
+        endings = (
+            ".", "!", "?", '"', "'", ")",
+            "]", "}", "—"
+        )
+
+        return not text.endswith(endings)
+
+    script_complete = not looks_truncated(script)
+    edited_complete = not looks_truncated(edited_script)
+
+    add_check(
+        "Original script completion",
+        script_complete,
+        "Script may end in an incomplete sentence."
+    )
+
+    add_check(
+        "Edited script completion",
+        edited_complete,
+        "Edited script may be truncated."
+    )
+
+    # 4. TIMESTAMP COVERAGE
+
+    timestamps = re.findall(
+        r"(?<!\d)(?:0?[0-9]|[1-5][0-9]):[0-5][0-9](?!\d)",
+        script + "\n" + edited_script
+    )
+
+    timestamp_seconds = set()
+
+    for timestamp in timestamps:
+        minutes, seconds = map(int, timestamp.split(":"))
+        timestamp_seconds.add(minutes * 60 + seconds)
+
+    has_start = 0 in timestamp_seconds
+    has_end = 60 in timestamp_seconds
+
+    timestamp_count = len(timestamp_seconds)
+
+    timeline_ok = (
+        has_start
+        and has_end
+        and timestamp_count >= 5
+    )
+
+    add_check(
+        "Full 0:00-1:00 timeline",
+        timeline_ok,
+        "Timeline must include 0:00, 1:00 and intermediate timestamps."
+    )
+
+    # 5. RESEARCH SOURCE VALIDATION
+
     research = media_result.get("research", {})
+
+    if not isinstance(research, dict):
+        research = {}
+
     sources = research.get("sources", [])
 
-    valid_sources = [
-        source for source in sources
-        if source.get("title") and source.get("url")
-    ]
+    if not isinstance(sources, list):
+        sources = []
+
+    valid_sources = []
+    invalid_sources = []
+
+    for source in sources:
+
+        if not isinstance(source, dict):
+            invalid_sources.append("Invalid source record")
+            continue
+
+        title = str(source.get("title", "")).strip()
+        url = str(source.get("url", "")).strip()
+
+        try:
+            parsed = urlparse(url)
+
+            valid_url = (
+                parsed.scheme == "https"
+                and bool(parsed.netloc)
+                and "." in parsed.netloc
+            )
+
+        except Exception:
+            valid_url = False
+
+        if title and valid_url:
+            valid_sources.append(source)
+        else:
+            invalid_sources.append(title or "Missing title or valid URL")
 
     sources_ok = len(valid_sources) > 0
 
-    checks.append({
-        "check": "Research source titles and URLs",
-        "passed": sources_ok
-    })
+    add_check(
+        "Research source structure",
+        sources_ok,
+        f"Valid sources: {len(valid_sources)}"
+    )
 
-    if not sources_ok:
-        problems.append("No usable research sources were supplied.")
+    # 6. SOURCE VERIFICATION STATUS
 
-    # 5. Fact-check review
-    fact_check = str(media_result.get("fact_check", ""))
+    unverified_sources = [
+        source for source in valid_sources
+        if source.get("verification_status") != "VERIFIED"
+    ]
 
-    fact_check_exists = bool(fact_check.strip())
+    all_sources_verified = (
+        len(valid_sources) > 0
+        and len(unverified_sources) == 0
+    )
 
-    checks.append({
-        "check": "Fact-check report exists",
-        "passed": fact_check_exists
-    })
+    add_check(
+        "Independent source verification",
+        all_sources_verified,
+        f"{len(unverified_sources)} sources are not independently verified."
+    )
 
-    if not fact_check_exists:
-        problems.append("Fact-check report is missing.")
+    # 7. FACT CHECK REPORT
 
-    # 6. Publication safety
+    fact_check = media_result.get("fact_check", "")
+
+    if isinstance(fact_check, dict):
+        fact_text = str(fact_check)
+    else:
+        fact_text = str(fact_check)
+
+    fact_check_exists = bool(fact_text.strip())
+
+    add_check(
+        "Fact-check report exists",
+        fact_check_exists
+    )
+
+    needs_source_count = len(
+        re.findall(r"NEEDS SOURCE", fact_text, re.IGNORECASE)
+    )
+
+    contradicted_count = len(
+        re.findall(r"CONTRADICTED", fact_text, re.IGNORECASE)
+    )
+
+    add_check(
+        "Unsupported claims identified",
+        fact_check_exists,
+        f"NEEDS SOURCE: {needs_source_count}; "
+        f"CONTRADICTED: {contradicted_count}"
+    )
+
+    # 8. MEDIA STATUS
+
+    media_status = media_result.get("status")
+
+    media_status_ok = media_status == "REVIEW_REQUIRED"
+
+    add_check(
+        "Media review status",
+        media_status_ok,
+        f"Current media status: {media_status}"
+    )
+
+    # 9. PUBLICATION SECURITY
+
     publication_approved = media_result.get(
         "publication_approved",
         False
     )
 
-    if publication_approved is not False:
-        problems.append("Publication approval must remain false.")
+    publication_blocked = publication_approved is False
 
-    checks.append({
-        "check": "Publication remains blocked",
-        "passed": publication_approved is False
-    })
+    add_check(
+        "Publication remains blocked",
+        publication_blocked,
+        "CEO approval is mandatory."
+    )
 
-    # 7. Final audit decision
-    audit_status = (
-        "REVIEW_REQUIRED"
-        if problems
-        else "PASSED_WITH_LIMITATIONS"
+    # 10. FINAL AUDIT DECISION
+
+    audit_passed = (
+        len(problems) == 0
+        and all_sources_verified
+        and script_complete
+        and edited_complete
+        and timeline_ok
+    )
+
+    final_status = (
+        "PASSED_WITH_LIMITATIONS"
+        if audit_passed
+        else "REVIEW_REQUIRED"
     )
 
     return {
         "department": "audit",
-        "status": audit_status,
+        "status": final_status,
+        "audit_passed": audit_passed,
         "message": (
-            "Independent audit completed. "
+            "Advanced audit completed. "
             "CEO approval is still required."
         ),
         "checks": checks,
         "problems": problems,
         "source_count": len(valid_sources),
+        "unverified_source_count": len(unverified_sources),
+        "needs_source_count": needs_source_count,
+        "contradicted_count": contradicted_count,
         "publication_approved": False
     }
