@@ -4,6 +4,7 @@ import re
 import time
 import requests
 
+
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 GROQ_MODEL = os.getenv(
@@ -12,6 +13,42 @@ GROQ_MODEL = os.getenv(
 )
 
 MAX_RETRIES = 5
+
+# ინდივიდუალური ლიმიტები თითოეული ტიპის სამუშაოსთვის
+TOKEN_LIMITS = {
+    "director": 700,
+    "creative": 900,
+    "script": 1800,
+    "editor": 1800,
+    "fact_check": 1600,
+    "audit": 1200,
+    "default": 1200
+}
+
+
+def detect_token_limit(system_prompt):
+
+    prompt = str(system_prompt).lower()
+
+    if "chief ai director" in prompt:
+        return TOKEN_LIMITS["director"]
+
+    if "creative strategist" in prompt:
+        return TOKEN_LIMITS["creative"]
+
+    if "youtube shorts scriptwriter" in prompt:
+        return TOKEN_LIMITS["script"]
+
+    if "quality editor" in prompt:
+        return TOKEN_LIMITS["editor"]
+
+    if "historical fact-checker" in prompt:
+        return TOKEN_LIMITS["fact_check"]
+
+    if "auditor" in prompt:
+        return TOKEN_LIMITS["audit"]
+
+    return TOKEN_LIMITS["default"]
 
 
 def ask_ai(system_prompt, user_prompt):
@@ -26,6 +63,8 @@ def ask_ai(system_prompt, user_prompt):
         "Content-Type": "application/json"
     }
 
+    token_limit = detect_token_limit(system_prompt)
+
     payload = {
         "model": GROQ_MODEL,
         "messages": [
@@ -38,17 +77,18 @@ def ask_ai(system_prompt, user_prompt):
                 "content": user_prompt
             }
         ],
-        "max_completion_tokens": 1200
+        "max_completion_tokens": token_limit
     }
 
     for attempt in range(MAX_RETRIES + 1):
 
         try:
+
             response = requests.post(
                 GROQ_API_URL,
                 headers=headers,
                 json=payload,
-                timeout=(10, 90)
+                timeout=(10, 120)
             )
 
             if response.status_code == 429:
@@ -69,6 +109,7 @@ def ask_ai(system_prompt, user_prompt):
                         pass
 
                 if wait_time is None:
+
                     match = re.search(
                         r"try again in ([0-9.]+)s",
                         response.text,
@@ -97,37 +138,57 @@ def ask_ai(system_prompt, user_prompt):
 
             choices = result.get("choices", [])
 
-            content = ""
-
-            if choices:
-                content = (
-                    choices[0]
-                    .get("message", {})
-                    .get("content", "")
-                )
-
-            if isinstance(content, str) and content.strip():
-                return content.strip()
-
-            if attempt == MAX_RETRIES:
+            if not choices:
                 raise RuntimeError(
-                    "Groq returned an empty response "
-                    "after all retries."
+                    "Groq returned no choices."
                 )
 
-            wait_time = min(2 * (attempt + 1), 15)
+            message = choices[0].get("message", {})
 
-            print(
-                f"[AI BRAIN] Empty response. "
-                f"Retrying in {wait_time}s..."
+            content = message.get("content", "")
+
+            finish_reason = choices[0].get(
+                "finish_reason",
+                "unknown"
             )
 
-            time.sleep(wait_time)
+            if not isinstance(content, str) or not content.strip():
+
+                if attempt == MAX_RETRIES:
+                    raise RuntimeError(
+                        "Groq returned an empty response."
+                    )
+
+                time.sleep(min(2 * (attempt + 1), 15))
+                continue
+
+            if finish_reason == "length":
+
+                print(
+                    "[AI BRAIN] WARNING: Response reached "
+                    "the token limit and may be incomplete."
+                )
+
+                # Do not silently treat truncated output as complete.
+                raise RuntimeError(
+                    "Groq response was truncated by token limit. "
+                    f"Limit: {token_limit}"
+                )
+
+            print(
+                f"[AI BRAIN] Response received. "
+                f"Tokens limit: {token_limit}, "
+                f"Finish reason: {finish_reason}"
+            )
+
+            return content.strip()
 
         except requests.exceptions.Timeout:
 
             if attempt == MAX_RETRIES:
-                raise RuntimeError("Groq API request timed out.")
+                raise RuntimeError(
+                    "Groq API request timed out."
+                )
 
             time.sleep(min(2 ** attempt, 15))
 
@@ -148,4 +209,6 @@ def ask_ai(system_prompt, user_prompt):
 
             time.sleep(min(2 ** attempt, 15))
 
-    raise RuntimeError("Groq API failed after all retries.")
+    raise RuntimeError(
+        "Groq API failed after all retries."
+    )
