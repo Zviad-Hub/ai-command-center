@@ -9,41 +9,36 @@ You are a professional YouTube Shorts Creative Strategist.
 
 STRICT CEO TOPIC LOCK:
 - The CEO's original request is the ONLY topic.
-- Never replace it with another topic.
-- Never generate unrelated alternatives.
-- Create exactly ONE video concept about the requested topic.
+- Never replace or change the topic.
+- Create exactly ONE video concept.
 - Do not invent historical facts.
-- Mark uncertain details as claims requiring research.
+- Mark uncertain details as NEEDS SOURCE.
 
 Return:
 EXACT TOPIC:
 VIDEO CONCEPT:
 HOOK:
 KEY QUESTIONS TO INVESTIGATE:
-
-Keep it concise.
 """
     return ask_ai(prompt, task)
 
 
 def scriptwriter(task, concept):
     prompt = """
-You are a professional YouTube Shorts Scriptwriter.
+You are a professional historical YouTube Shorts Scriptwriter.
 
-STRICT TOPIC LOCK:
-The CEO REQUEST is the final authority.
-Use exactly that subject.
-If the concept suggests another subject, IGNORE it.
+The CEO ORIGINAL REQUEST is the final authority.
+The topic must never change.
 
-Create a 45-60 second English YouTube Shorts script.
+Create ONE English YouTube Shorts script
+lasting approximately 60 seconds.
 
 Rules:
 - Strong opening hook.
-- Short, natural sentences.
-- Engaging storytelling.
+- Natural, engaging narration.
 - Timestamped visual directions.
-- Never invent dates, names, numbers, quotations or events.
-- Unverified statements must be marked [NEEDS VERIFICATION].
+- No invented dates, names, numbers or quotations.
+- Unverified claims must be marked [NEEDS SOURCE].
 - Do not invent sources.
 
 Return:
@@ -53,35 +48,29 @@ HOOK:
 SCRIPT:
 VISUAL DIRECTIONS:
 FACTS TO VERIFY:
-
-Keep it concise.
 """
     return ask_ai(
         prompt,
-        f"CEO ORIGINAL REQUEST:\n{task}\n\nCONCEPT:\n{concept[:1800]}"
+        f"CEO ORIGINAL REQUEST:\n{task}\n\nCONCEPT:\n{str(concept)[:1800]}"
     )
 
 
 def quality_editor(task, script):
     prompt = """
-You are an independent professional Quality Editor.
+You are an independent Quality Editor.
 
-MANDATORY:
-Preserve the exact topic in the CEO's original request.
+Preserve the CEO's exact original topic.
 
 Check:
 - Topic consistency.
 - Grammar and storytelling.
 - 45-60 second timing.
 - Unsupported historical claims.
-- Misleading or invented details.
+- Invented or misleading details.
 
-Rules:
-- Remove unrelated material.
-- Do not add new historical facts.
-- Do not invent sources.
-- Keep uncertain claims marked [NEEDS VERIFICATION].
-- Do not declare historical accuracy approved.
+Do not add historical facts.
+Do not invent sources.
+Keep unsupported claims marked [NEEDS SOURCE].
 
 Return:
 TOPIC CHECK:
@@ -90,53 +79,53 @@ PROBLEMS:
 CORRECTIONS:
 EDITED SCRIPT:
 FACTS STILL NEEDING VERIFICATION:
-
-Keep it concise.
 """
     return ask_ai(
         prompt,
-        f"CEO ORIGINAL REQUEST:\n{task}\n\nSCRIPT:\n{script[:3000]}"
+        f"CEO ORIGINAL REQUEST:\n{task}\n\nSCRIPT:\n{str(script)[:3000]}"
     )
 
 
 def fact_checker(task, script, research):
     prompt = """
-You are a strict independent Historical Fact-Checker.
+You are a STRICT independent historical fact-checker.
 
-The CEO's original topic is mandatory.
-Do not change the topic.
+The CEO ORIGINAL TOPIC is mandatory.
+Never change it.
 
-IMPORTANT EVIDENCE RULES:
+EVIDENCE RULES:
 
-1. Search results are NOT automatically proof.
-2. A source title or domain alone does not verify a claim.
+1. Search-result snippets are not automatically proof.
+2. A domain name alone does not verify a claim.
 3. A source must directly support the specific claim.
-4. Government, museum and university sources are preferred.
-5. Social media, LinkedIn, forums, SEO blogs and user uploads
-   are not sufficient by themselves for historical verification.
-6. Never invent URLs, quotations, evidence or historical facts.
-7. If evidence is missing or weak, use NEEDS SOURCE.
-8. Use CONTRADICTED only when supplied reliable evidence
-   directly contradicts the claim.
-9. Do not claim to have independently opened or checked
-   a source. You only have the supplied search results.
+4. Prefer original historical documents, government archives,
+   museums and universities.
+5. You may only use sources included in the supplied research.
+6. Never invent source titles, URLs, quotations or evidence.
+7. If a source does not directly support a claim,
+   mark it NEEDS SOURCE.
+8. Do not mark a claim VERIFIED based only on a search snippet.
+9. Do not claim to have opened or independently verified a URL.
+10. If evidence is insufficient, the overall result is REVIEW REQUIRED.
 
-Allowed statuses:
-VERIFIED
-NEEDS SOURCE
-CONTRADICTED
+For EACH historical claim return:
 
-For every claim return:
 CLAIM:
-STATUS:
+STATUS: VERIFIED / NEEDS SOURCE / CONTRADICTED
 REASON:
 SOURCE TITLE:
 SOURCE URL:
 
-If no supplied source directly supports a claim,
-it MUST be NEEDS SOURCE.
+A claim can only be VERIFIED if the supplied source content
+directly supports it.
+
+If no source directly supports it:
+STATUS: NEEDS SOURCE
+SOURCE TITLE: NONE
+SOURCE URL: NONE
 
 Return:
+
 FACT CHECK RESULTS:
 UNSUPPORTED CLAIMS:
 CONTRADICTED CLAIMS:
@@ -145,13 +134,13 @@ OVERALL RESULT:
 Overall result must be REVIEW REQUIRED if any claim
 is NEEDS SOURCE or CONTRADICTED.
 
-Be strict and concise.
+Never approve publication.
 """
     return ask_ai(
         prompt,
-        f"CEO ORIGINAL REQUEST:\n{task[:600]}\n\n"
-        f"SCRIPT:\n{script[:2500]}\n\n"
-        f"SUPPLIED RESEARCH:\n{str(research)[:4500]}"
+        f"CEO ORIGINAL REQUEST:\n{task[:700]}\n\n"
+        f"SCRIPT:\n{str(script)[:3000]}\n\n"
+        f"RESEARCH SOURCES:\n{str(research)[:5000]}"
     )
 
 
@@ -169,17 +158,10 @@ def run_media_department(task):
     print("\n[MEDIA] Research Agent started...")
     research = run_research(task, edited_script)
 
-    print(
-        "\n[MEDIA] Research status:",
-        research.get("status")
-    )
+    print("\n[MEDIA] Research status:", research.get("status"))
 
     print("\n[MEDIA] Independent Fact-Checker started...")
-    fact_check = fact_checker(
-        task,
-        edited_script,
-        research
-    )
+    fact_check = fact_checker(task, edited_script, research)
 
     print("\n[MEDIA] Fact-check completed.")
 
