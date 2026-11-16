@@ -4,7 +4,9 @@ class DepartmentManager:
     def __init__(self, department):
         self.department = department
 
-    def receive_task(self, task):
+    def receive_task(self, task, context=None):
+
+        context = context or {}
 
         print("\n" + "=" * 45)
         print(f"{self.department.upper()} MANAGER")
@@ -12,16 +14,15 @@ class DepartmentManager:
 
         print("RECEIVED MISSION:", task)
 
-        # SECURITY GATE: Pentester
+        # PENTESTER SECURITY GATE
         if self.department == "pentester":
             return {
                 "department": "pentester",
-                "task": task,
                 "status": "BLOCKED",
                 "message": (
                     "შეღწევადობის ტესტირება დაბლოკილია. "
-                    "საჭიროა კომპანიის წერილობითი თანხმობა "
-                    "და CEO-ს ცალკე ნებართვა. ტესტირება არ დაწყებულა."
+                    "საჭიროა წერილობითი თანხმობა "
+                    "და CEO-ს ცალკე ნებართვა."
                 )
             }
 
@@ -30,22 +31,56 @@ class DepartmentManager:
             try:
                 from media_agents import run_media_department
 
-                result = run_media_department(task)
-
-                return result
+                return run_media_department(task)
 
             except Exception as error:
                 return {
                     "department": "media",
-                    "task": task,
                     "status": "ERROR",
-                    "message": f"Media department error: {error}"
+                    "message": str(error)
+                }
+
+        # AUDIT DEPARTMENT
+        if self.department == "audit":
+            try:
+                from audit_agents import run_audit
+
+                previous_results = context.get(
+                    "previous_results", []
+                )
+
+                media_result = next(
+                    (
+                        result for result in previous_results
+                        if result.get("department") == "media"
+                    ),
+                    None
+                )
+
+                if not media_result:
+                    return {
+                        "department": "audit",
+                        "status": "REVIEW_REQUIRED",
+                        "message": (
+                            "აუდიტმა მედიის შედეგი ვერ მიიღო. "
+                            "დამოუკიდებელი შემოწმება ვერ დასრულდა."
+                        ),
+                        "publication_approved": False
+                    }
+
+                return run_audit(task, media_result)
+
+            except Exception as error:
+                return {
+                    "department": "audit",
+                    "status": "ERROR",
+                    "message": str(error),
+                    "publication_approved": False
                 }
 
         # OTHER DEPARTMENTS
         return {
             "department": self.department,
-            "task": task,
             "status": "RECEIVED",
             "message": (
                 "დავალება მიღებულია. "
