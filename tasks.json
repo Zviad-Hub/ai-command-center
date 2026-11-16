@@ -99,5 +99,30 @@
                 "message": "Media department error: Groq API HTTP error: 429 {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m7jkt3ppepqbdze731vxn8y4` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6550, Requested 1604. Please try again in 1.155s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}\n"
             }
         ]
+    },
+    {
+        "id": "18966751",
+        "created_at": "2026-11-16T17:30:30.324224+00:00",
+        "task": "Create a 60-second YouTube Shorts video about the mysterious disappearance of the Roanoke Colony.  Requirements: 1. Create a powerful opening hook. 2. Write an engaging English narration script. 3. Provide detailed visual directions with timestamps. 4. Create an attractive YouTube Shorts title. 5. Have the Quality Editor independently review and improve the script. 6. Have the Fact-Checker independently examine every historical claim. 7. Clearly label unsupported claims as NEEDS SOURCE. 8. Never invent historical facts or pretend that facts have been verified without reliable source evidence. 9. Keep the final video script within 45–60 seconds.  Return all agent results separately.",
+        "analysis": "CEO-ს მოთხოვნა ვიდეოს კონტენტის შექმნა, სკრიპტი, ვიზუალური მითითებები, სათაური, ხარისხის რედაქტორსა და ფაქტ‑ჩეკერის დამოუკიდებელი მიმოწმება. ამისთვის საჭიროა მედია და აუდიტის განყოფილებები.",
+        "departments": [
+            "media",
+            "audit"
+        ],
+        "requires_ceo_approval": true,
+        "results": [
+            {
+                "department": "media",
+                "task": "მოქმედება: 1) 60-წამიან YouTube Shorts-ის ძლიერი შესაწყის შექმნა; 2) ინგლისურ ენაზე მიმზიდველი ნარაციის სკრიპტის დაწერა; 3) დეტალური ვიზუალური მითითებების მიწოდება დროის კოდის (timestamp) მიხედვით; 4) მიმზიდველი Shorts-ის სათაური შექმნა; 5) მასალების მიწოდება Quality Editor‑ს დამოუკიდებლად გადამოწმებისთვის.",
+                "status": "ERROR",
+                "message": "Media department error: Groq returned an empty response."
+            },
+            {
+                "department": "audit",
+                "task": "მოქმედება: 1) Fact‑Checker‑ის დამოუკიდებლად ყველა ისტორიული პრინციპის შემოწმება; 2) დაუკარგავი პრინციპები ჭერად მონიშნული იყოს “NEEDS SOURCE”; 3) არასანდო ფაქტების არ შექმნა; 4) Quality Editor‑ის გამოყოფილი მიმოხილვა; 5) საბოლოო სკრიპტის შემოწმება, რომ დრო 45–60 წამია.",
+                "status": "RECEIVED",
+                "message": "დავალება მიღებულია. სპეციალიზებული აგენტები შემდეგ ეტაპზე დაემატება."
+            }
+        ]
     }
 ]
