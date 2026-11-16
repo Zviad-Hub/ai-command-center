@@ -77,7 +77,9 @@ def ask_ai(system_prompt, user_prompt):
                 "content": user_prompt
             }
         ],
-        "max_completion_tokens": token_limit
+        "max_completion_tokens": token_limit,
+        "reasoning_effort": "low",
+        "include_reasoning": False
     }
 
     for attempt in range(MAX_RETRIES + 1):
