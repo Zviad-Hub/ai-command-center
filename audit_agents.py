@@ -17,29 +17,21 @@ def check_result(name, passed, details=""):
 
 def normalize_text(text):
     text = str(text or "")
-
-    text = text.replace("\r\n", "\n")
-    text = text.replace("\r", "\n")
-
-    return text
+    return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def normalize_dashes(text):
-    return re.sub(r"[‐-‒–—−]", "-", str(text or ""))
+    return re.sub(r"[‐‑‒–—−]", "-", str(text or ""))
 
 
 def normalize_url(url):
-
     try:
         parsed = urlparse(str(url).strip())
 
         if parsed.scheme not in ("http", "https"):
             return None
 
-        if not parsed.netloc:
-            return None
-
-        if "." not in parsed.netloc:
+        if not parsed.netloc or "." not in parsed.netloc:
             return None
 
         return str(url).strip()
@@ -49,19 +41,16 @@ def normalize_url(url):
 
 
 def collect_strings(value):
-
     result = []
 
     if isinstance(value, str):
         result.append(value)
 
     elif isinstance(value, dict):
-
         for item in value.values():
             result.extend(collect_strings(item))
 
     elif isinstance(value, (list, tuple)):
-
         for item in value:
             result.extend(collect_strings(item))
 
@@ -69,13 +58,10 @@ def collect_strings(value):
 
 
 def find_nested_values(data, target_keys):
-
     found = []
 
     if isinstance(data, dict):
-
         for key, value in data.items():
-
             if str(key).lower() in target_keys:
                 found.append(value)
 
@@ -84,7 +70,6 @@ def find_nested_values(data, target_keys):
             )
 
     elif isinstance(data, (list, tuple)):
-
         for item in data:
             found.extend(
                 find_nested_values(item, target_keys)
@@ -98,10 +83,7 @@ def get_media_text(media):
 
 
 def count_words(text):
-
-    text = str(text or "")
-
-    text = re.sub(r"\*\*|__", "", text)
+    text = re.sub(r"\*\*|__", "", str(text or ""))
 
     return len(
         re.findall(
@@ -117,7 +99,6 @@ def count_words(text):
 # ==================================================
 
 def extract_final_script(media):
-
     edited = media.get("edited_script", "")
 
     if isinstance(edited, str) and edited.strip():
@@ -133,19 +114,18 @@ def extract_final_script(media):
 # ==================================================
 
 def extract_narration(media):
-
     script = extract_final_script(media)
 
     pattern = (
-        r"^\s*(?:[-*]\s*)?"
-        r"(?:\*\*)?"
-        r"(?:SCRIPT|NARRATION)"
-        r"(?:\s*\([^)]*\))?"
-        r"\s*:\s*(?:\*\*)?\s*"
+        r"(?im)^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?(?:SCRIPT|NARRATION)"
+        r"(?:\s*\([^)]*\))?\s*:"
+        r"\s*(?:\*\*)?\s*"
         r"(.*?)"
-        r"(?=^\s*(?:[-*]\s*)?(?:\*\*)?"
-        r"VISUAL DIRECTIONS"
-        r"\s*:\s*(?:\*\*)?|"
+        r"(?=^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?VISUAL DIRECTIONS\s*:|"
+        r"^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?FACTS TO VERIFY\s*:|"
         r"\Z)"
     )
 
@@ -155,10 +135,7 @@ def extract_narration(media):
         re.IGNORECASE | re.MULTILINE | re.DOTALL
     )
 
-    if not match:
-        return ""
-
-    return match.group(1).strip()
+    return match.group(1).strip() if match else ""
 
 
 # ==================================================
@@ -166,21 +143,18 @@ def extract_narration(media):
 # ==================================================
 
 def extract_visual_text(media):
-
     script = extract_final_script(media)
 
     pattern = (
-        r"^\s*(?:[-*]\s*)?"
-        r"(?:\*\*)?"
-        r"VISUAL DIRECTIONS"
-        r"\s*:\s*(?:\*\*)?\s*"
+        r"(?im)^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?VISUAL DIRECTIONS\s*:"
+        r"\s*(?:\*\*)?\s*"
         r"(.*?)"
-        r"(?=^\s*(?:[-*]\s*)?(?:\*\*)?"
-        r"(?:FACTS TO VERIFY|FACT CHECK|"
+        r"(?=^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?(?:FACTS TO VERIFY|FACT CHECK|"
         r"EDITOR REVIEW|PROBLEMS|CORRECTIONS|"
         r"FACTS STILL NEEDING|UNSUPPORTED CLAIMS)"
-        r"\s*:|"
-        r"\Z)"
+        r"\s*:|\Z)"
     )
 
     match = re.search(
@@ -189,25 +163,18 @@ def extract_visual_text(media):
         re.IGNORECASE | re.MULTILINE | re.DOTALL
     )
 
-    if match:
-        return match.group(1).strip()
-
-    return ""
+    return match.group(1).strip() if match else ""
 
 
 def extract_visual_ranges(text):
-
     text = normalize_dashes(text)
 
-    pattern = (
+    return re.findall(
         r"(?m)^\s*(?:[-*]\s*)?"
-        r"(\d{1,2}:\d{2})"
-        r"\s*-\s*"
-        r"(\d{1,2}:\d{2})"
-        r"(?!\d)"
+        r"(\d{1,2}:\d{2})\s*-\s*"
+        r"(\d{1,2}:\d{2})(?!\d)",
+        text
     )
-
-    return re.findall(pattern, text)
 
 
 # ==================================================
@@ -215,7 +182,6 @@ def extract_visual_ranges(text):
 # ==================================================
 
 def extract_fact_check_statuses(text):
-
     text = str(text or "").upper()
 
     pattern = (
@@ -231,7 +197,6 @@ def extract_fact_check_statuses(text):
 # ==================================================
 
 def collect_sources(media):
-
     source_values = find_nested_values(
         media,
         {"sources", "source_results"}
@@ -241,9 +206,6 @@ def collect_sources(media):
     seen = set()
 
     for value in source_values:
-
-        items = []
-
         if isinstance(value, list):
             items = [
                 item for item in value
@@ -253,8 +215,10 @@ def collect_sources(media):
         elif isinstance(value, dict):
             items = [value]
 
-        for item in items:
+        else:
+            items = []
 
+        for item in items:
             identity = (
                 str(item.get("url", "")).strip(),
                 str(item.get("title", "")).strip()
@@ -274,15 +238,12 @@ def collect_sources(media):
 # ==================================================
 
 def compliance_auditor(task, media):
-
     checks = []
 
     task_text = str(task).lower()
     media_text = get_media_text(media).lower()
 
-    # ----------------------------------------------
     # TOPIC PRESERVATION
-    # ----------------------------------------------
 
     required_topic_terms = [
         "roanoke",
@@ -302,34 +263,23 @@ def compliance_auditor(task, media):
         )
     )
 
-    # ----------------------------------------------
     # NARRATION WORD COUNT
-    # ----------------------------------------------
 
     narration = extract_narration(media)
-
     narration_words = count_words(narration)
 
     checks.append(
         check_result(
             "Narration word count",
             125 <= narration_words <= 140,
-            (
-                f"Detected {narration_words} words; "
-                "required 125-140."
-            )
+            f"Detected {narration_words} words; required 125-140."
         )
     )
 
-    # ----------------------------------------------
     # SIX VISUAL SCENES
-    # ----------------------------------------------
 
     visual_text = extract_visual_text(media)
-
-    visual_ranges = extract_visual_ranges(
-        visual_text
-    )
+    visual_ranges = extract_visual_ranges(visual_text)
 
     expected_ranges = [
         ("0:00", "0:10"),
@@ -351,22 +301,26 @@ def compliance_auditor(task, media):
         )
     )
 
-    # ----------------------------------------------
     # REQUIRED CONTENT SECTIONS
-    # ----------------------------------------------
+
+    final_script = extract_final_script(media)
 
     required_sections = [
         "video title",
         "script",
-        "visual directions"
+        "visual directions",
+        "facts to verify"
     ]
-
-    final_script = extract_final_script(media).lower()
 
     missing_sections = [
         section
         for section in required_sections
-        if section not in final_script
+        if not re.search(
+            r"(?im)^\s*(?:#{1,6}\s*)?(?:\*\*)?"
+            + re.escape(section)
+            + r"\s*:",
+            final_script
+        )
     ]
 
     checks.append(
@@ -376,14 +330,12 @@ def compliance_auditor(task, media):
             (
                 "Missing: " + ", ".join(missing_sections)
                 if missing_sections
-                else "Required sections detected."
+                else "All required sections detected."
             )
         )
     )
 
-    # ----------------------------------------------
     # NARRATION COMPLETENESS
-    # ----------------------------------------------
 
     checks.append(
         check_result(
@@ -396,9 +348,7 @@ def compliance_auditor(task, media):
     return {
         "auditor": "Compliance Auditor",
         "checks": checks,
-        "passed": all(
-            item["passed"] for item in checks
-        )
+        "passed": all(item["passed"] for item in checks)
     }
 
 
@@ -407,12 +357,9 @@ def compliance_auditor(task, media):
 # ==================================================
 
 def evidence_auditor(media):
-
     checks = []
 
-    # ----------------------------------------------
     # SOURCE VERIFICATION
-    # ----------------------------------------------
 
     sources = collect_sources(media)
 
@@ -420,16 +367,12 @@ def evidence_auditor(media):
     source_statuses = []
 
     for source in sources:
-
         url = source.get("url")
 
         if url:
             source_urls.append(url)
 
-        status = source.get(
-            "verification_status",
-            ""
-        )
+        status = source.get("verification_status", "")
 
         if status:
             source_statuses.append(
@@ -458,15 +401,13 @@ def evidence_auditor(media):
             (
                 f"Sources: {len(sources)}; "
                 f"valid URLs: {len(valid_urls)}; "
-                f"statuses: {source_statuses}; "
+                f"statuses: {source_statuses}. "
                 "URL structure does not prove source verification."
             )
         )
     )
 
-    # ----------------------------------------------
-    # FACT CHECK REPORT
-    # ----------------------------------------------
+    # FACT CHECK REPORT EXISTENCE
 
     fact_check_values = find_nested_values(
         media,
@@ -479,20 +420,48 @@ def evidence_auditor(media):
 
     fact_check_text = "\n".join(
         collect_strings(fact_check_values)
-    )
+    ).strip()
+
+    report_present = bool(fact_check_text)
 
     statuses = extract_fact_check_statuses(
         fact_check_text
     )
 
+    statuses_present = bool(statuses)
+
+    checks.append(
+        check_result(
+            "Fact-check report present",
+            report_present,
+            (
+                "A fact-check report was supplied."
+                if report_present
+                else "Fact-check report is missing or empty."
+            )
+        )
+    )
+
+    checks.append(
+        check_result(
+            "Fact-check statuses present",
+            statuses_present,
+            (
+                f"Detected {len(statuses)} explicit claim statuses."
+                if statuses_present
+                else "No explicit VERIFIED, NEEDS SOURCE or CONTRADICTED statuses found."
+            )
+        )
+    )
+
+    # FACT CHECK COVERAGE
+
     has_verified = "VERIFIED" in statuses
-    has_needs_source = "NEEDS SOURCE" in statuses
-    has_contradicted = "CONTRADICTED" in statuses
 
     checks.append(
         check_result(
             "Fact-check coverage",
-            has_verified,
+            statuses_present and has_verified,
             (
                 "At least one explicitly VERIFIED claim is required."
                 if not has_verified
@@ -501,33 +470,59 @@ def evidence_auditor(media):
         )
     )
 
+    # UNSUPPORTED CLAIMS
+    # Missing report or missing statuses MUST FAIL.
+
+    has_needs_source = "NEEDS SOURCE" in statuses
+
+    unsupported_passed = (
+        statuses_present
+        and not has_needs_source
+    )
+
     checks.append(
         check_result(
             "Unsupported claims",
-            not has_needs_source,
+            unsupported_passed,
             (
                 "Claims marked NEEDS SOURCE were found."
                 if has_needs_source
-                else "No claims marked NEEDS SOURCE were found."
+                else (
+                    "No NEEDS SOURCE claims found in a present report."
+                    if unsupported_passed
+                    else "Cannot pass: fact-check report or explicit statuses are missing."
+                )
             )
         )
+    )
+
+    # CONTRADICTION DETECTION
+    # Missing report or missing statuses MUST FAIL.
+
+    has_contradicted = "CONTRADICTED" in statuses
+
+    contradiction_passed = (
+        statuses_present
+        and not has_contradicted
     )
 
     checks.append(
         check_result(
             "Contradiction detection",
-            not has_contradicted,
+            contradiction_passed,
             (
                 "Claims explicitly marked CONTRADICTED were found."
                 if has_contradicted
-                else "No claims marked CONTRADICTED were found."
+                else (
+                    "No CONTRADICTED claims found in a present report."
+                    if contradiction_passed
+                    else "Cannot pass: fact-check report or explicit statuses are missing."
+                )
             )
         )
     )
 
-    # ----------------------------------------------
     # URL STRUCTURE
-    # ----------------------------------------------
 
     all_text = get_media_text(media)
 
@@ -557,9 +552,7 @@ def evidence_auditor(media):
     return {
         "auditor": "Evidence Auditor",
         "checks": checks,
-        "passed": all(
-            item["passed"] for item in checks
-        )
+        "passed": all(item["passed"] for item in checks)
     }
 
 
@@ -568,12 +561,9 @@ def evidence_auditor(media):
 # ==================================================
 
 def integrity_auditor(media):
-
     checks = []
 
-    # ----------------------------------------------
     # DEPARTMENT IDENTITY
-    # ----------------------------------------------
 
     department = str(
         media.get("department", "")
@@ -587,9 +577,7 @@ def integrity_auditor(media):
         )
     )
 
-    # ----------------------------------------------
     # MEDIA STATUS
-    # ----------------------------------------------
 
     status = str(
         media.get("status", "")
@@ -603,9 +591,7 @@ def integrity_auditor(media):
         )
     )
 
-    # ----------------------------------------------
     # PUBLICATION SAFETY
-    # ----------------------------------------------
 
     publication_approved = media.get(
         "publication_approved"
@@ -619,9 +605,7 @@ def integrity_auditor(media):
         )
     )
 
-    # ----------------------------------------------
     # RESULT STRUCTURE
-    # ----------------------------------------------
 
     checks.append(
         check_result(
@@ -631,9 +615,7 @@ def integrity_auditor(media):
         )
     )
 
-    # ----------------------------------------------
     # RESEARCH DATA
-    # ----------------------------------------------
 
     research_values = find_nested_values(
         media,
@@ -641,8 +623,7 @@ def integrity_auditor(media):
     )
 
     research_present = any(
-        isinstance(value, dict)
-        and bool(value)
+        isinstance(value, dict) and bool(value)
         for value in research_values
     )
 
@@ -654,9 +635,7 @@ def integrity_auditor(media):
         )
     )
 
-    # ----------------------------------------------
     # SPECIALIST OUTPUT
-    # ----------------------------------------------
 
     specialists = media.get("specialists")
 
@@ -680,9 +659,7 @@ def integrity_auditor(media):
     return {
         "auditor": "Integrity Auditor",
         "checks": checks,
-        "passed": all(
-            item["passed"] for item in checks
-        )
+        "passed": all(item["passed"] for item in checks)
     }
 
 
@@ -693,12 +670,12 @@ def integrity_auditor(media):
 def run_audit(task, media_result):
 
     if not isinstance(media_result, dict):
-
         return {
             "department": "audit",
             "status": "ERROR",
             "message": "Invalid media result. Expected dictionary.",
-            "publication_approved": False
+            "publication_approved": False,
+            "final_decision": "CEO_APPROVAL_REQUIRED"
         }
 
     auditors = [
@@ -710,9 +687,7 @@ def run_audit(task, media_result):
     all_checks = []
 
     for auditor in auditors:
-
         for check in auditor["checks"]:
-
             all_checks.append({
                 "auditor": auditor["auditor"],
                 **check
@@ -754,7 +729,7 @@ def run_audit(task, media_result):
 
         "failed_checks": failed_checks,
 
-        # Audit can never grant publication approval.
+        # Audit NEVER approves publication.
         "publication_approved": False,
 
         "final_decision": "CEO_APPROVAL_REQUIRED",
