@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 import os
 import sys
 import tempfile
@@ -178,7 +179,9 @@ def submit_task(ceo_task):
         context = {
             "original_task": ceo_task,
             "department_mission": mission,
-            "previous_results": list(results)
+            # Managers receive an isolated snapshot: a later department must
+            # never be able to mutate an earlier department's recorded result.
+            "previous_results": deepcopy(results)
         }
 
         try:
