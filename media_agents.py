@@ -30,13 +30,13 @@ MAX_WORDS = 140
 def requested_language_instruction(task):
     """Keep generated creative content in the CEO request's language."""
     task_text = str(task or "")
-    if re.search(r"[\\u10A0-\\u10FF]", task_text):
+    if re.search(r"[\u10A0-\u10FF]", task_text):
         language = "Georgian"
     else:
         language = "the same language as the CEO's original request"
 
     return (
-        "LANGUAGE REQUIREMENT (MANDATORY):\\n"
+        "LANGUAGE REQUIREMENT (MANDATORY):\n"
         f"- Write all user-facing creative content in {language}.\\n"
         "- The narration, hook, title, visual descriptions, concept, and editorial "
         "explanations must use that language.\\n"
@@ -49,8 +49,8 @@ def requested_language_instruction(task):
 
 def narration_matches_requested_language(task, narration):
     """Return False when a Georgian request receives non-Georgian narration."""
-    if re.search(r"[\\u10A0-\\u10FF]", str(task or "")):
-        return bool(re.search(r"[\\u10A0-\\u10FF]", str(narration or "")))
+    if re.search(r"[\u10A0-\u10FF]", str(task or "")):
+        return bool(re.search(r"[\u10A0-\u10FF]", str(narration or "")))
     return True
 
 
@@ -487,7 +487,7 @@ Never replace or expand it.
 NARRATION:
 - 125-140 spoken words.
 - Aim for approximately 132 words.
-- Natural, engaging spoken English.
+- Natural, engaging spoken language matching the CEO request.
 - Do not count headings or visual directions.
 
 HISTORICAL ACCURACY:
@@ -616,7 +616,7 @@ Improve the supplied script without changing its topic.
 
 Check:
 1. Exact topic preservation.
-2. English grammar and clarity.
+2. Grammar and clarity in the requested language.
 3. Narration word count.
 4. Unsupported historical claims.
 5. Invented or misleading details.
