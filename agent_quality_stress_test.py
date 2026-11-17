@@ -482,6 +482,29 @@ def evaluate_live_result(department, result):
     # The first two checks + three department-specific checks = 10 points.
     score = sum(item["points"] for item in checks)
     issues = [item["detail"] for item in checks if not item["passed"]]
+    diagnostics = []
+    manager_error_code = result.get("error_code")
+    if manager_error_code:
+        diagnostics.append({
+            "source": "department_manager",
+            "error_code": str(manager_error_code),
+        })
+
+    for failure in result.get("specialist_failures", []):
+        if isinstance(failure, dict) and failure.get("error_code"):
+            diagnostics.append({
+                "source": str(failure.get("specialist") or "specialist"),
+                "error_code": str(failure["error_code"]),
+            })
+
+    for failure in result.get("specialist_results", []):
+        if isinstance(failure, dict) and failure.get("status") != "COMPLETED":
+            if failure.get("error_code"):
+                diagnostics.append({
+                    "source": str(failure.get("specialist") or "technical_specialist"),
+                    "error_code": str(failure["error_code"]),
+                })
+
     return {
         "department": department,
         "status": "PASS" if score == 10 else "NEEDS_REVIEW",
@@ -489,6 +512,7 @@ def evaluate_live_result(department, result):
         "score_out_of_10": score,
         "checks": checks,
         "issues": issues,
+        "diagnostics": diagnostics,
         "human_review_required": True,
         "result": result,
     }
