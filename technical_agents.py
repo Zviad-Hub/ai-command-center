@@ -2,145 +2,193 @@
 from ai_brain import ask_ai
 
 
+# ==================================================
+# TECHNICAL SPECIALISTS
+# ==================================================
+
 SPECIALIST_PROMPTS = {
     "system_architect": """
 You are a Senior System Architect.
-Analyze system architecture, components, dependencies,
-scalability, reliability and technical design.
+Analyze software architecture, components, dependencies,
+scalability, reliability, and technical risks.
 Provide practical architecture recommendations.
 """,
 
     "backend_developer": """
 You are a Senior Backend Developer.
-Analyze backend code, APIs, business logic,
-server architecture and integrations.
-Write reliable and maintainable backend code when authorized.
+Analyze backend logic, APIs, server architecture,
+business logic, data processing, and error handling.
+Provide concrete implementation recommendations.
 """,
 
     "frontend_developer": """
 You are a Senior Frontend Developer.
-Analyze UI, UX, frontend architecture,
-accessibility, responsiveness and frontend code.
+Analyze user interfaces, usability, frontend logic,
+accessibility, responsiveness, and client-side errors.
+Provide practical recommendations.
 """,
 
     "devops_engineer": """
 You are a Senior DevOps Engineer.
 Analyze deployment, CI/CD, infrastructure,
-automation, monitoring and reliability.
-Never deploy without explicit CEO approval.
+environment variables, configuration, and reliability.
+Provide practical recommendations.
 """,
 
     "qa_engineer": """
 You are a Senior QA Engineer.
-Design test cases, identify edge cases,
-analyze failures and recommend automated tests.
-Never claim tests were executed unless actually run.
+Analyze requirements, test scenarios, edge cases,
+expected behavior, and possible software defects.
+Propose tests, but do not claim they were executed.
 """,
 
     "code_reviewer": """
 You are a Senior Code Reviewer.
-Review code quality, maintainability,
-logic errors, security risks and performance.
-Never claim code was changed.
+Review code quality, maintainability, readability,
+logic errors, potential bugs, and performance risks.
+Do not claim to have inspected files that were not provided.
 """,
 
     "security_engineer": """
 You are a Defensive Security Engineer.
-Perform passive security analysis,
-identify vulnerabilities and recommend mitigations.
-Never perform active testing without written authorization
-and separate CEO approval.
+Analyze application security risks and recommend
+defensive improvements.
+Never perform unauthorized testing or exploitation.
 """,
 
     "database_engineer": """
 You are a Senior Database Engineer.
-Analyze database schemas, queries, data integrity,
-migrations, indexing, backups and performance.
-Never execute destructive database operations.
+Analyze database structure, relationships, queries,
+data integrity, migrations, and performance.
+Provide practical recommendations.
 """
 }
 
 
-def run_specialist(specialist, mission, context=None):
-    specialist = str(specialist or "").strip()
-    mission = str(mission or "").strip()
-    context = str(context or "").strip()
+# ==================================================
+# COMMON UTILITIES
+# ==================================================
 
-    if specialist not in SPECIALIST_PROMPTS:
+def normalize_specialist(specialist):
+    """
+    Supports both a specialist ID string and a
+    specialist dictionary returned by Technical Manager.
+    """
+
+    if isinstance(specialist, dict):
+        specialist_id = specialist.get("id", "")
+        specialist_name = specialist.get("name", specialist_id)
+        specialist_mission = specialist.get("mission", "")
+    else:
+        specialist_id = str(specialist or "").strip()
+        specialist_name = specialist_id
+        specialist_mission = ""
+
+    return (
+        str(specialist_id).strip(),
+        str(specialist_name).strip(),
+        str(specialist_mission).strip()
+    )
+
+
+# ==================================================
+# RUN SPECIALIST
+# ==================================================
+
+def run_specialist(specialist, mission=None, context=None):
+
+    specialist_id, specialist_name, assigned_mission = (
+        normalize_specialist(specialist)
+    )
+
+    if specialist_id not in SPECIALIST_PROMPTS:
         return {
-            "specialist": specialist,
-            "status": "REJECTED",
-            "message": "Unknown technical specialist."
+            "specialist": specialist_id,
+            "status": "ERROR",
+            "error": "Unknown technical specialist.",
+            "execution_performed": False,
+            "code_modified": False,
+            "tests_executed": False,
+            "requires_ceo_approval": True
         }
 
-    if not mission:
+    # Prefer the specific mission assigned by the manager.
+    actual_mission = assigned_mission or str(mission or "").strip()
+
+    if not actual_mission:
         return {
-            "specialist": specialist,
-            "status": "REJECTED",
-            "message": "Mission is empty."
+            "specialist": specialist_id,
+            "status": "ERROR",
+            "error": "No mission was provided.",
+            "execution_performed": False,
+            "code_modified": False,
+            "tests_executed": False,
+            "requires_ceo_approval": True
         }
 
-    prompt = f"""
-{SPECIALIST_PROMPTS[specialist]}
+    context_text = str(context or "").strip()
 
-YOUR OPERATING RULES:
+    system_prompt = SPECIALIST_PROMPTS[specialist_id]
 
-1. Understand your assigned mission.
-2. Provide practical and technically accurate analysis.
-3. Never invent test results.
-4. Never claim that code was executed or modified
-   unless that actually happened.
-5. Identify assumptions and missing information.
-6. Explain risks and limitations.
-7. Do not expose secrets, passwords or API keys.
-8. Do not deploy, merge or modify production systems.
-9. Code changes require explicit CEO approval.
-10. Return a structured report.
+    user_prompt = f"""
+SPECIALIST: {specialist_name}
 
 ASSIGNED MISSION:
-{mission}
+{actual_mission}
 
 ADDITIONAL CONTEXT:
-{context}
+{context_text if context_text else "No additional context provided."}
 
-Return your response using these sections:
+INSTRUCTIONS:
+
+1. Analyze only your assigned technical responsibility.
+2. Give practical, specific recommendations.
+3. Identify risks, missing information, and dependencies.
+4. Clearly distinguish facts from assumptions.
+5. If source code is not provided, do not claim to have inspected it.
+6. Do not claim that code was modified or tests were executed.
+7. Do not deploy, execute, or modify anything.
+8. Any real implementation or execution requires separate CEO approval.
+
+Return a structured report with these sections:
 
 SPECIALIST:
-TASK UNDERSTANDING:
+MISSION:
 ANALYSIS:
-PROPOSED SOLUTION:
-CODE OR TECHNICAL EXAMPLE:
-TESTING RECOMMENDATIONS:
+FINDINGS:
+RECOMMENDATIONS:
 RISKS:
-MISSING INFORMATION:
-FINAL RESULT:
+DEPENDENCIES:
+NEXT STEPS:
 """
 
     try:
-        response = ask_ai(prompt)
+        response = ask_ai(system_prompt, user_prompt)
 
         if not response or not str(response).strip():
-            raise ValueError("Empty AI response.")
+            raise ValueError("AI returned an empty specialist report.")
 
         return {
-            "specialist": specialist,
+            "specialist": specialist_id,
+            "specialist_name": specialist_name,
             "status": "COMPLETED",
-            "mission": mission,
             "report": str(response).strip(),
             "execution_performed": False,
             "code_modified": False,
             "tests_executed": False,
-            "requires_ceo_approval": True
+            "requires_ceo_approval": True,
+            "execution_authorized": False
         }
 
     except Exception as error:
         return {
-            "specialist": specialist,
+            "specialist": specialist_id,
+            "specialist_name": specialist_name,
             "status": "ERROR",
-            "mission": mission,
-            "message": str(error),
+            "error": str(error),
             "execution_performed": False,
             "code_modified": False,
             "tests_executed": False,
-            "requires_ceo_approval": True
+            "requires_ceo_approval": True,
+            "execution_authorized": False
         }
