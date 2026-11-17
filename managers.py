@@ -76,7 +76,7 @@ class DepartmentManager:
                 return {
                     "department": "audit",
                     "status": "ERROR",
-                    "message": str(error),
+                    "message": "Department workflow failed safely; internal error details were withheld.",
                     "publication_approved": False
                 }
 
@@ -98,7 +98,7 @@ class DepartmentManager:
                 return {
                     "department": "technical",
                     "status": "ERROR",
-                    "message": str(error),
+                    "message": "Department workflow failed safely; internal error details were withheld.",
                     "execution_performed": False,
                     "code_modified": False,
                     "tests_executed": False,
@@ -122,7 +122,7 @@ class DepartmentManager:
                     "department": self.department,
                     "status": "REVIEW_REQUIRED",
                     "message": "Specialized department workflow failed.",
-                    "error": str(error),
+                    "error": "WORKFLOW_FAILED",
                     "report": "",
                     "advisory_only": True,
                     "requires_ceo_approval": True,
