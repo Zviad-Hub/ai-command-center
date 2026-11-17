@@ -25,14 +25,20 @@ class TaskManagerTests(unittest.TestCase):
         media_manager = Mock()
         media_manager.receive_task.return_value = {
             "department": "media",
-            "status": "COMPLETED",
-            "artifact": "video-script"
+            "status": "REVIEW_REQUIRED",
+            "artifact": "video-script",
+            "edited_script": "Final edited script.",
+            "fact_check": "VERIFIED claims were reviewed.",
+            "validation": {"word_count_passed": True},
+            "publication_approved": False
         }
         audit_manager = Mock()
         audit_manager.receive_task.return_value = {
             "department": "audit",
-            "status": "COMPLETED",
-            "publication_approved": False
+            "status": "PASSED_WITH_LIMITATIONS",
+            "publication_approved": False,
+            "summary": {"total_checks": 12, "passed_checks": 12, "failed_checks": 0},
+            "final_decision": "CEO_APPROVAL_REQUIRED"
         }
         manager_factory.side_effect = [media_manager, audit_manager]
 
@@ -60,6 +66,10 @@ class TaskManagerTests(unittest.TestCase):
         )
         self.assertEqual(record["departments"], ["media", "audit"])
         self.assertEqual(len(record["results"]), 2)
+        self.assertEqual(record["organization_audit"]["status"], "PASS")
+        self.assertEqual(record["overall_status"], "COMPLETED")
+        self.assertEqual(record["organization_audit"]["content_alignment_status"], "HUMAN_REVIEW_REQUIRED")
+        self.assertTrue(record["human_review_required"])
         save_mock.assert_called_once()
 
     @patch("task_manager.save_tasks")
