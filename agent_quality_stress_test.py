@@ -129,8 +129,33 @@ def _contains_number_near(text, expected, tolerance=0.02):
     return any(abs(value - expected) <= tolerance for value in _numeric_values(text))
 
 
+def _contains_daily_quota_exhaustion(value):
+    """Detect a provider daily-quota failure without masking quality failures."""
+    flattened = _flatten(value).lower()
+    indicators = (
+        "daily quota has been exhausted",
+        "daily quota exhausted",
+        "daily limit has been reached",
+        "quota for this model has been exceeded",
+        "tokens per day limit",
+        "requests per day limit",
+    )
+    return any(indicator in flattened for indicator in indicators)
+
+
 def evaluate_live_result(department, result):
     """Return a transparent 10-point heuristic score, not a truth guarantee."""
+    if _contains_daily_quota_exhaustion(result):
+        return {
+            "department": department,
+            "score_out_of_10": None,
+            "status": "BLOCKED",
+            "checks": [],
+            "issues": ["Provider daily quota was exhausted; this department could not be evaluated."],
+            "blocked_reason": "PROVIDER_DAILY_QUOTA_EXHAUSTED",
+            "human_review_required": True,
+        }
+
     if not isinstance(result, dict):
         return {
             "department": department,
@@ -374,8 +399,11 @@ def run_live_suite():
     }
 
     outputs = []
-    for department, scenario in SCENARIOS.items():
-        print(f"\n[LIVE QUALITY TEST] {department.upper()}", flush=True)
+    departments = list(SCENARIOS.items())
+    blocked = False
+
+    for index, (department, scenario) in enumerate(departments):
+        print(f"\\n[LIVE QUALITY TEST] {department.upper()}", flush=True)
         if department in ("finance", "business", "tenders"):
             result = run_department_workflow(
                 department, scenario["task"], context=scenario["context"]
@@ -388,21 +416,57 @@ def run_live_suite():
             result = run_technical_department(
                 scenario["task"], context=scenario["context"]
             )
-        outputs.append(evaluate_live_result(department, result))
+
+        evaluated = evaluate_live_result(department, result)
+        outputs.append(evaluated)
+
+        if evaluated["status"] == "BLOCKED":
+            blocked = True
+            for remaining_department, _ in departments[index + 1:]:
+                outputs.append({
+                    "department": remaining_department,
+                    "status": "NOT_RUN",
+                    "score_out_of_10": None,
+                    "checks": [],
+                    "issues": [
+                        "Not run because the provider daily quota was exhausted earlier in this suite."
+                    ],
+                    "blocked_reason": "EARLIER_DAILY_QUOTA_EXHAUSTION",
+                    "human_review_required": True,
+                })
+            break
 
     passed = sum(item["status"] == "PASS" for item in outputs)
-    total = len(outputs)
+    failed = sum(item["status"] == "NEEDS_REVIEW" for item in outputs)
+    blocked_count = sum(item["status"] == "BLOCKED" for item in outputs)
+    not_run = sum(item["status"] == "NOT_RUN" for item in outputs)
+    scored = sum(item["score_out_of_10"] is not None for item in outputs)
+    total = len(SCENARIOS)
+    if blocked or not_run:
+        suite_status = "BLOCKED"
+    elif passed == total:
+        suite_status = "PASS"
+    else:
+        suite_status = "NEEDS_REVIEW"
+
     return {
         "suite": "LIVE_AGENT_QUALITY_STRESS_TEST",
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "status": "PASS" if passed == total else "NEEDS_REVIEW",
+        "status": suite_status,
         "passed_departments": passed,
-        "failed_departments": total - passed,
+        "failed_departments": failed,
+        "blocked_departments": blocked_count,
+        "not_run_departments": not_run,
+        "scored_departments": scored,
         "total_departments": total,
-        "score_out_of_50": sum(item["score_out_of_10"] for item in outputs),
+        "score_out_of_50": sum(
+            item["score_out_of_10"] or 0 for item in outputs
+        ),
+        "score_denominator": scored * 10,
         "scoring_note": (
             "Heuristic structural/content checks only; not proof of factual truth. "
-            "Every output requires human review."
+            "Every output requires human review. BLOCKED/NOT_RUN departments are "
+            "excluded from the score denominator."
         ),
         "external_research_performed": False,
         "external_actions_performed": False,
@@ -430,6 +494,8 @@ def main():
     print("\n" + rendered)
     Path(args.output).write_text(rendered + "\n", encoding="utf-8")
     print(f"\nSaved report to: {args.output}")
+    if report["status"] == "BLOCKED":
+        return 2
     return 0 if report["status"] == "PASS" else 1
 
 
