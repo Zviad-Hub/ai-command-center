@@ -192,6 +192,14 @@ def _ask_fallback_chain(system_prompt, user_prompt, token_limit, providers):
         raise RuntimeError("All configured fallback providers failed. " + "; ".join(failures))
     raise RuntimeError("No fallback AI provider is configured.")
 
+def _fallback_or_raise(system_prompt, user_prompt, token_limit, fallback_configs, message):
+    """Fail over only after retryable primary-provider failures are exhausted."""
+    if fallback_configs:
+        print("[AI BRAIN] Groq request failed after bounded retries; switching to configured fallback chain.")
+        return _ask_fallback_chain(system_prompt, user_prompt, token_limit, fallback_configs)
+    raise RuntimeError(message)
+
+
 def get_retry_wait(response, attempt):
 
     wait_time = None
@@ -303,9 +311,9 @@ def ask_ai(system_prompt, user_prompt):
                     )
 
                 if attempt >= MAX_RETRIES:
-                    raise RuntimeError(
-                        "Groq rate limit exceeded after all retries; "
-                        "provider details were withheld."
+                    return _fallback_or_raise(
+                        system_prompt, user_prompt, token_limit, fallback_configs,
+                        "Groq rate limit exceeded after all retries; provider details were withheld."
                     )
 
                 wait_time = get_retry_wait(response, attempt)
@@ -326,9 +334,9 @@ def ask_ai(system_prompt, user_prompt):
             if response.status_code in (500, 502, 503, 504):
 
                 if attempt >= MAX_RETRIES:
-                    raise RuntimeError(
-                        f"Groq server error: HTTP {response.status_code}; "
-                        "provider details were withheld."
+                    return _fallback_or_raise(
+                        system_prompt, user_prompt, token_limit, fallback_configs,
+                        f"Groq server error: HTTP {response.status_code}; provider details were withheld."
                     )
 
                 wait_time = min(2 ** (attempt + 1), 20)
@@ -356,19 +364,22 @@ def ask_ai(system_prompt, user_prompt):
             # READ RESPONSE
             # ------------------------------------------
 
-            result = response.json()
-
-            choices = result.get("choices", [])
-
-            if not choices:
-                raise RuntimeError(
-                    "Groq returned no choices."
-                )
-
-            choice = choices[0]
-
-            message = choice.get("message", {})
-            content = message.get("content", "")
+            try:
+                result = response.json()
+                if not isinstance(result, dict):
+                    raise ValueError("response root is not an object")
+                choices = result.get("choices", [])
+                if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
+                    raise ValueError("response choices are invalid")
+                choice = choices[0]
+                message = choice.get("message", {})
+                if not isinstance(message, dict):
+                    raise ValueError("response message is invalid")
+                content = message.get("content", "")
+            except (ValueError, TypeError, AttributeError, IndexError) as error:
+                if fallback_configs:
+                    return _ask_fallback_chain(system_prompt, user_prompt, token_limit, fallback_configs)
+                raise RuntimeError("Groq returned an invalid response; provider details were withheld.") from error
 
             finish_reason = choice.get(
                 "finish_reason",
@@ -378,7 +389,8 @@ def ask_ai(system_prompt, user_prompt):
             if not isinstance(content, str) or not content.strip():
 
                 if attempt >= MAX_RETRIES:
-                    raise RuntimeError(
+                    return _fallback_or_raise(
+                        system_prompt, user_prompt, token_limit, fallback_configs,
                         "Groq returned an empty response."
                     )
 
@@ -414,7 +426,8 @@ def ask_ai(system_prompt, user_prompt):
                     )
                     continue
 
-                raise RuntimeError(
+                return _fallback_or_raise(
+                    system_prompt, user_prompt, token_limit, fallback_configs,
                     "Groq response remained truncated after adaptive token-limit retries. "
                     f"Final limit: {token_limit}; cap: {MAX_COMPLETION_TOKEN_CAP}. "
                     "The task may need a shorter output or a larger configured cap."
@@ -443,7 +456,8 @@ def ask_ai(system_prompt, user_prompt):
         except requests.exceptions.Timeout:
 
             if attempt >= MAX_RETRIES:
-                raise RuntimeError(
+                return _fallback_or_raise(
+                    system_prompt, user_prompt, token_limit, fallback_configs,
                     "Groq API request timed out after all retries."
                 )
 
@@ -459,9 +473,9 @@ def ask_ai(system_prompt, user_prompt):
         except requests.exceptions.RequestException as error:
 
             if attempt >= MAX_RETRIES:
-                raise RuntimeError(
-                    "Groq connection failed after all retries; "
-                    "connection details were withheld."
+                return _fallback_or_raise(
+                    system_prompt, user_prompt, token_limit, fallback_configs,
+                    "Groq connection failed after all retries; connection details were withheld."
                 )
 
             wait_time = min(2 ** (attempt + 1), 20)
