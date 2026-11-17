@@ -6,28 +6,83 @@ from research_agent import run_research
 
 
 # ==================================================
-# COMMON MEDIA UTILITIES
+# CONFIGURATION
 # ==================================================
 
 REQUIRED_TIMESTAMPS = [
-    "0:00-0:10",
-    "0:10-0:20",
-    "0:20-0:30",
-    "0:30-0:40",
-    "0:40-0:50",
-    "0:50-1:00"
+    ("0:00", "0:10"),
+    ("0:10", "0:20"),
+    ("0:20", "0:30"),
+    ("0:30", "0:40"),
+    ("0:40", "0:50"),
+    ("0:50", "1:00")
 ]
 
+MIN_WORDS = 125
+MAX_WORDS = 140
+
+
+# ==================================================
+# COMMON TEXT UTILITIES
+# ==================================================
+
+def normalize_text(text):
+    text = str(text or "")
+
+    text = text.replace("\r\n", "\n")
+    text = text.replace("\r", "\n")
+
+    return text
+
+
+def normalize_dashes(text):
+    return re.sub(r"[‐‑‒–—−]", "-", str(text or ""))
+
+
+def clean_markdown(text):
+    text = str(text or "")
+
+    text = re.sub(r"\*\*", "", text)
+    text = re.sub(r"__", "", text)
+
+    return text.strip()
+
+
+def count_words(text):
+    text = clean_markdown(text)
+
+    return len(
+        re.findall(
+            r"\b[\w’'-]+\b",
+            text,
+            flags=re.UNICODE
+        )
+    )
+
+
+# ==================================================
+# NARRATION EXTRACTION
+# ==================================================
 
 def extract_narration(text):
 
-    text = str(text or "")
+    text = normalize_text(text)
+
+    heading_pattern = (
+        r"^\s*(?:[-*]\s*)?"
+        r"(?:\*\*)?"
+        r"(?:SCRIPT|NARRATION)"
+        r"(?:\s*\([^)]*\))?"
+        r"\s*:\s*(?:\*\*)?\s*"
+    )
 
     match = re.search(
-        r"^\s*\*{0,2}(?:SCRIPT|NARRATION)"
-        r"(?:\s*\([^)]*\))?\s*:\*{0,2}\s*"
-        r"(.*?)"
-        r"(?=^\s*\*{0,2}VISUAL DIRECTIONS\s*:\*{0,2})",
+        heading_pattern
+        + r"(.*?)"
+        + r"(?=^\s*(?:[-*]\s*)?(?:\*\*)?"
+        + r"VISUAL DIRECTIONS"
+        + r"\s*:\s*(?:\*\*)?|"
+        + r"\Z)",
         text,
         re.IGNORECASE | re.MULTILINE | re.DOTALL
     )
@@ -35,31 +90,57 @@ def extract_narration(text):
     if not match:
         return ""
 
-    narration = match.group(1).strip()
-    narration = re.sub(r"\*\*|__", "", narration)
+    narration = clean_markdown(match.group(1))
 
     return narration
 
 
-def count_words(text):
-
-    return len(
-        re.findall(r"\b[\w’'-]+\b", str(text or ""))
-    )
-
+# ==================================================
+# VISUAL SECTION EXTRACTION
+# ==================================================
 
 def extract_visual_section(text):
 
-    text = str(text or "")
+    text = normalize_text(text)
+
+    pattern = (
+        r"^\s*(?:[-*]\s*)?"
+        r"(?:\*\*)?"
+        r"VISUAL DIRECTIONS"
+        r"\s*:\s*(?:\*\*)?\s*"
+        r"(.*?)"
+        r"(?=^\s*(?:[-*]\s*)?(?:\*\*)?"
+        r"(?:FACTS TO VERIFY|FACT CHECK|"
+        r"EDITOR REVIEW|PROBLEMS|CORRECTIONS|"
+        r"FACTS STILL NEEDING|UNSUPPORTED CLAIMS)"
+        r"\s*:|"
+        r"\Z)"
+    )
 
     return re.search(
-        r"^\s*\*{0,2}VISUAL DIRECTIONS\s*:\*{0,2}\s*"
-        r"(.*?)(?=^\s*\*{0,2}(?:FACTS TO VERIFY|FACT CHECK|"
-        r"EDITOR REVIEW|PROBLEMS|CORRECTIONS|FACTS STILL NEEDING)"
-        r"\b|$(?![\s\S]))",
+        pattern,
         text,
         re.IGNORECASE | re.MULTILINE | re.DOTALL
     )
+
+
+# ==================================================
+# VISUAL TIMESTAMP EXTRACTION
+# ==================================================
+
+def extract_visual_ranges(text):
+
+    text = normalize_dashes(text)
+
+    pattern = (
+        r"(?m)^\s*(?:[-*]\s*)?"
+        r"(\d{1,2}:\d{2})"
+        r"\s*-\s*"
+        r"(\d{1,2}:\d{2})"
+        r"(?!\d)"
+    )
+
+    return re.findall(pattern, text)
 
 
 def count_visual_scenes(text):
@@ -69,14 +150,11 @@ def count_visual_scenes(text):
     if not section:
         return 0
 
-    return len(
-        re.findall(
-            r"(?m)^\s*(?:[-*]\s*)?"
-            r"(?:0:00-0:10|0:10-0:20|0:20-0:30|"
-            r"0:30-0:40|0:40-0:50|0:50-1:00)\b",
-            section.group(1)
-        )
+    ranges = extract_visual_ranges(
+        section.group(1)
     )
+
+    return len(ranges)
 
 
 def check_timestamps(text):
@@ -86,14 +164,50 @@ def check_timestamps(text):
     if not section:
         return False
 
-    found = re.findall(
-        r"(?m)^\s*(?:[-*]\s*)?"
-        r"(\d:\d{2}-\d:\d{2})\b",
+    found = extract_visual_ranges(
         section.group(1)
     )
 
     return found == REQUIRED_TIMESTAMPS
 
+
+# ==================================================
+# SCRIPT VALIDATION
+# ==================================================
+
+def validate_script(text):
+
+    narration = extract_narration(text)
+
+    words = count_words(narration)
+
+    section = extract_visual_section(text)
+
+    visual_ranges = (
+        extract_visual_ranges(section.group(1))
+        if section
+        else []
+    )
+
+    timestamps_ok = (
+        visual_ranges == REQUIRED_TIMESTAMPS
+    )
+
+    return {
+        "narration_found": bool(narration.strip()),
+        "narration_word_count": words,
+        "word_count_passed": MIN_WORDS <= words <= MAX_WORDS,
+        "visual_section_found": section is not None,
+        "visual_scene_count": len(visual_ranges),
+        "visual_scene_count_passed": len(visual_ranges) == 6,
+        "timestamps_passed": timestamps_ok,
+        "visual_ranges": visual_ranges
+    }
+
+
+# ==================================================
+# REFUSAL DETECTION
+# ==================================================
 
 def is_refusal(text):
 
@@ -115,6 +229,10 @@ def is_refusal(text):
         for phrase in refusal_phrases
     )
 
+
+# ==================================================
+# RESEARCH SERIALIZATION
+# ==================================================
 
 def serialize_research(research, max_chars=14000):
 
@@ -143,7 +261,8 @@ def serialize_research(research, max_chars=14000):
         "- URL verification and claim verification are separate.",
         "- Do not claim to have independently opened a URL.",
         "- Use only the actual supplied content.",
-        "- A search snippet is weaker than a full-page extract.",
+        "- Search snippets are weaker than full-page extracts.",
+        "- Never invent quotations or evidence.",
         ""
     ]
 
@@ -158,12 +277,15 @@ def serialize_research(research, max_chars=14000):
         title = str(source.get("title", "Unknown title"))
         url = str(source.get("url", ""))
         content = str(source.get("content", ""))
+
         content_type = str(
             source.get("content_type", "UNKNOWN")
         )
+
         verification = str(
             source.get("verification_status", "NOT_VERIFIED")
         )
+
         url_status = str(
             source.get(
                 "url_verification_status",
@@ -201,27 +323,16 @@ def serialize_research(research, max_chars=14000):
         included_sources += 1
 
     if included_sources == 0:
-        output.append("No usable source excerpts were supplied.")
+        output.append(
+            "No usable source excerpts were supplied."
+        )
 
     return "\n".join(output)
 
 
-def validate_script(text):
-
-    narration = extract_narration(text)
-    words = count_words(narration)
-    scenes = count_visual_scenes(text)
-    timestamps_ok = check_timestamps(text)
-
-    return {
-        "narration_found": bool(narration),
-        "narration_word_count": words,
-        "word_count_passed": 125 <= words <= 140,
-        "visual_scene_count": scenes,
-        "visual_scene_count_passed": scenes == 6,
-        "timestamps_passed": timestamps_ok
-    }
-
+# ==================================================
+# RESEARCH VALIDATION
+# ==================================================
 
 def has_usable_research(research):
 
@@ -239,6 +350,10 @@ def has_usable_research(research):
         for source in sources
     )
 
+
+# ==================================================
+# ERROR RESULT
+# ==================================================
 
 def build_error_result(task, stage, error, partial=None):
 
@@ -279,12 +394,12 @@ def build_error_result(task, stage, error, partial=None):
 
 
 # ==================================================
-# 1. RESEARCH-AWARE CREATIVE STRATEGIST
+# 1. CREATIVE STRATEGIST
 # ==================================================
 
 def creative_strategist(task, research):
 
-    print("\n[CREATIVE STRATEGIST] Creating research-based concept...")
+    print("\n[CREATIVE STRATEGIST] Creating concept...")
 
     supplied_sources = serialize_research(research)
 
@@ -298,13 +413,14 @@ STRICT RULES:
 1. Preserve the exact topic requested by the CEO.
 2. Never replace or expand the topic.
 3. Create exactly ONE video concept.
-4. Use supplied research to understand the subject.
+4. Use supplied research.
 5. Do not invent historical facts.
 6. Do not treat search snippets as verified facts.
 7. Uncertain details must be marked NEEDS SOURCE.
 8. Do not invent sources or claim independent verification.
 9. Do not write the full narration.
 10. Do not create alternative concepts.
+11. Never invent exact population counts or numbers.
 
 Return exactly:
 
@@ -329,7 +445,9 @@ Be specific and useful.
     result = ask_ai(prompt, user_prompt)
 
     if not isinstance(result, str) or not result.strip():
-        raise RuntimeError("Creative Strategist returned empty output.")
+        raise RuntimeError(
+            "Creative Strategist returned empty output."
+        )
 
     result = result.strip()
 
@@ -341,7 +459,9 @@ Be specific and useful.
     ]
 
     if is_refusal(result):
-        raise RuntimeError("Creative Strategist refused the task.")
+        raise RuntimeError(
+            "Creative Strategist refused the task."
+        )
 
     missing = [
         section for section in required_sections
@@ -365,7 +485,7 @@ Be specific and useful.
 
 def scriptwriter(task, concept, research):
 
-    print("\n[SCRIPTWRITER] Writing research-based script...")
+    print("\n[SCRIPTWRITER] Writing script...")
 
     supplied_sources = serialize_research(research)
 
@@ -388,12 +508,13 @@ NARRATION:
 - Do not count headings or visual directions as narration.
 
 HISTORICAL ACCURACY:
-- Use supplied research as the available evidence.
+- Use supplied research as available evidence.
 - Never invent dates, names, numbers, quotations or events.
 - Do not present theories as established facts.
 - Mark uncertain claims [NEEDS SOURCE].
 - Do not invent source references.
 - A search snippet is not equivalent to a verified primary source.
+- Do not invent exact population counts.
 
 VISUAL TIMELINE:
 Create exactly six scenes.
@@ -435,7 +556,9 @@ Do not omit any section.
     result = ask_ai(prompt, user_prompt)
 
     if not isinstance(result, str) or not result.strip():
-        raise RuntimeError("Scriptwriter returned empty output.")
+        raise RuntimeError(
+            "Scriptwriter returned empty output."
+        )
 
     result = result.strip()
 
@@ -524,7 +647,9 @@ Also include FACTS TO VERIFY after the visual directions.
     edited = ask_ai(prompt, user_prompt)
 
     if not isinstance(edited, str) or not edited.strip():
-        raise RuntimeError("Quality Editor returned empty output.")
+        raise RuntimeError(
+            "Quality Editor returned empty output."
+        )
 
     edited = edited.strip()
 
@@ -532,7 +657,7 @@ Also include FACTS TO VERIFY after the visual directions.
 
     if not validation["narration_found"]:
         raise RuntimeError(
-            "Quality Editor did not return a readable narration."
+            "Quality Editor did not return readable narration."
         )
 
     if not validation["word_count_passed"]:
@@ -675,7 +800,9 @@ Be concise but do not omit important claims.
     result = ask_ai(prompt, user_prompt)
 
     if not isinstance(result, str) or not result.strip():
-        raise RuntimeError("Fact-Checker returned empty output.")
+        raise RuntimeError(
+            "Fact-Checker returned empty output."
+        )
 
     return result.strip()
 
@@ -764,7 +891,7 @@ The EDITED SCRIPT must contain:
 
     if not validation["narration_found"]:
         raise RuntimeError(
-            "Evidence Editor did not return a readable narration."
+            "Evidence Editor did not return readable narration."
         )
 
     print(
@@ -818,7 +945,6 @@ def run_media_department(task):
         research = run_research(task)
 
         if not isinstance(research, dict):
-
             raise RuntimeError(
                 "Research Agent returned invalid data."
             )
@@ -829,10 +955,12 @@ def run_media_department(task):
             research.get("status", "UNKNOWN")
         ).upper()
 
-        source_count = len(
-            research.get("sources", [])
-            if isinstance(research.get("sources", []), list)
-            else []
+        sources = research.get("sources", [])
+
+        source_count = (
+            len(sources)
+            if isinstance(sources, list)
+            else 0
         )
 
         print("[MEDIA] Research status:", research_status)
@@ -841,7 +969,6 @@ def run_media_department(task):
         partial["specialists"].append("Research Agent")
 
         if research_status in ("ERROR", "NO_RESULTS"):
-
             raise RuntimeError(
                 "Research Agent did not produce usable research. "
                 f"Research status: {research_status}. "
@@ -849,7 +976,6 @@ def run_media_department(task):
             )
 
         if not has_usable_research(research):
-
             raise RuntimeError(
                 "Research Agent supplied no usable source content."
             )
@@ -950,58 +1076,63 @@ def run_media_department(task):
         warnings = []
 
         if research_status != "COMPLETED":
-
             warnings.append(
                 "Research was partial and did not complete "
                 "with full-page extracts."
             )
 
         if not validation["word_count_passed"]:
-
             warnings.append(
                 "Narration does not meet the 125-140 word requirement."
             )
 
         if not validation["visual_scene_count_passed"]:
-
             warnings.append(
                 "Final script does not contain exactly six visual scenes."
             )
 
         if not validation["timestamps_passed"]:
-
             warnings.append(
                 "Final visual timestamps are missing or out of order."
             )
 
         if not validation["narration_found"]:
-
             warnings.append(
                 "Final narration could not be extracted."
             )
 
         if "NEEDS SOURCE" in final_fact_check.upper():
-
             warnings.append(
                 "Final fact-check identified claims needing sources."
             )
 
         if "CONTRADICTED" in final_fact_check.upper():
-
             warnings.append(
                 "Final fact-check identified contradicted claims."
             )
+
+        if not validation["word_count_passed"]:
+            final_status = "REVIEW_REQUIRED"
+        elif not validation["visual_scene_count_passed"]:
+            final_status = "REVIEW_REQUIRED"
+        elif not validation["timestamps_passed"]:
+            final_status = "REVIEW_REQUIRED"
+        elif not validation["narration_found"]:
+            final_status = "REVIEW_REQUIRED"
+        else:
+            final_status = "REVIEW_REQUIRED"
 
         print("\n" + "=" * 55)
         print("MEDIA DEPARTMENT COMPLETED")
         print("NARRATION WORDS:", narration_words)
         print("VISUAL SCENES:", validation["visual_scene_count"])
+        print("TIMESTAMPS PASSED:", validation["timestamps_passed"])
         print("PUBLICATION APPROVED: False")
         print("=" * 55)
 
         return {
             "department": "media",
-            "status": "REVIEW_REQUIRED",
+            "status": final_status,
             "message": (
                 "Media production, research, editing and final "
                 "fact-check completed. CEO review is required."
