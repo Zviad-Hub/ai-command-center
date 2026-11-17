@@ -40,13 +40,27 @@ class MainOutputTests(unittest.TestCase):
         with redirect_stdout(output):
             display_manager_result({
                 "department": "business",
-                "status": "RECEIVED",
+                "status": "NOT_IMPLEMENTED",
                 "message": "Workflow not implemented yet."
             })
 
         rendered = output.getvalue()
-        self.assertIn("BUSINESS: RECEIVED", rendered)
+        self.assertIn("BUSINESS: NOT_IMPLEMENTED", rendered)
         self.assertIn("Workflow not implemented yet.", rendered)
+
+    def test_displays_specialized_department_report(self):
+        output = StringIO()
+        with redirect_stdout(output):
+            display_manager_result({
+                "department": "finance",
+                "status": "COMPLETED",
+                "message": "Advisory report prepared.",
+                "report": "EXECUTIVE SUMMARY\\nBudget review."
+            })
+
+        rendered = output.getvalue()
+        self.assertIn("DEPARTMENT REPORT", rendered)
+        self.assertIn("Budget review.", rendered)
 
 
 if __name__ == "__main__":
