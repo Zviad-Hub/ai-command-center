@@ -31,6 +31,30 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertEqual(result["status"], "BLOCKED")
         self.assertIsNone(result["score_out_of_10"])
 
+    def test_failure_diagnostics_are_exposed_without_raw_error_text(self):
+        result = evaluate_live_result("business", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_reports": {"market_analyst": "partial"},
+            "specialist_failures": [{
+                "specialist": "strategy_planner",
+                "error": "SPECIALIST_FAILED",
+                "error_code": "PROVIDER_RATE_LIMIT_EXHAUSTED",
+            }],
+            "error_code": "AGENT_PROCESSING_ERROR",
+            "report": "",
+        })
+        self.assertEqual(result["diagnostics"], [
+            {
+                "source": "department_manager",
+                "error_code": "AGENT_PROCESSING_ERROR",
+            },
+            {
+                "source": "strategy_planner",
+                "error_code": "PROVIDER_RATE_LIMIT_EXHAUSTED",
+            },
+        ])
+        self.assertNotIn("provider details", repr(result["diagnostics"]))
+
     def test_non_object_result_is_rejected(self):
         result = evaluate_live_result("finance", None)
         self.assertEqual(result["score_out_of_10"], 0)
