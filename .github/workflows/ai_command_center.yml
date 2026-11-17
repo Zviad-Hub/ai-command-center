@@ -47,18 +47,18 @@ jobs:
           import os
           import sys
 
-          from task_manager import submit_task
+          from task_manager import build_public_task_summary, submit_task
 
           try:
               # Agent prompts and reports must not leak into public Actions logs.
               with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                   record = submit_task(os.environ["CEO_TASK"])
 
-              print(json.dumps({
-                  "task_id": record.get("id"),
-                  "status": "FINISHED",
-                  "departments": record.get("departments", [])
-              }, ensure_ascii=False))
+              # Publish only non-sensitive gate statuses; never print tasks or reports.
+              print(json.dumps(
+                  build_public_task_summary(record),
+                  ensure_ascii=False
+              ))
           except Exception as error:
               # Keep user prompts, provider responses and exception details out of logs.
               print(json.dumps({
