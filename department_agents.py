@@ -198,65 +198,71 @@ def _missing_report_sections(department, report):
 
 
 def _review_is_substantive(review):
-    """Accept explicit PASS reviews with colon or standalone section headings."""
+    """Accept only an explicit PASS with three populated, standalone review sections."""
     review_text = str(review or "").strip()
     lines = review_text.splitlines()
     if not lines or lines[0].strip() != "REVIEW STATUS: PASS":
         return False
-    required_sections = ("issues", "required corrections", "final quality summary")
+
+    required_sections = (
+        "issues",
+        "required corrections",
+        "final quality summary",
+    )
     sections = {}
     current_section = None
+
     for line in lines[1:]:
         stripped = line.strip()
-        normalized = stripped.casefold()
         matched = False
+
         for section in required_sections:
             prefix = f"{section}:"
-            if normalized == section or normalized.startswith(prefix):
+            if stripped.casefold().startswith(prefix):
                 if section in sections:
                     return False
-                sections[section] = stripped[len(prefix):].strip() if normalized.startswith(prefix) else ""
+                sections[section] = stripped[len(prefix):].strip()
                 current_section = section
                 matched = True
                 break
+
         if not matched and stripped and current_section:
-            sections[current_section] = f"{sections[current_section]} {stripped}".strip()
+            sections[current_section] = (
+                f"{sections[current_section]} {stripped}".strip()
+            )
+
     if len(review_text) < 100 or set(sections) != set(required_sections):
         return False
+
     if not sections["issues"] or not sections["required corrections"]:
         return False
+
     summary = sections["final quality summary"].casefold()
     generic_summaries = {"none", "n/a", "no issues", "review complete", "looks good"}
     return len(summary) >= 30 and summary not in generic_summaries
-def _research_context(task, department):
-    """Research is optional evidence gathering, never proof by itself."""
 
-    if not os.getenv("TAVILY_API_KEY"):
-        return {
-            "status": "NOT_CONFIGURED",
-            "sources": [],
-            "warning": "TAVILY_API_KEY is not configured; no web research was performed."
-        }
 
-    try:
-        result = run_research(task)
+REVIEWER_PROMPT = """
+You are an independent Department Quality Reviewer.
+Review the manager's complete draft against the original mission, specialist analyses,
+and supplied evidence. Check whether all department-required report sections are present.
+Check unsupported claims, arithmetic errors, invented sources or tender requirements,
+missing uncertainty, contradictions, unaddressed specialist warnings, and unsafe claims
+of completed actions. A one-line or generic approval is not a valid review.
 
-        if not isinstance(result, dict):
-            return {
-                "status": "ERROR",
-                "sources": [],
-                "warning": "Research returned an invalid result."
-            }
+Do not add new findings. Do not treat research snippets as independently
+verified facts. Ensure the report is advisory only and does not claim that
+payments, investments, bid submissions, external contact, hiring, contracts,
+or other real-world actions occurred.
 
-        return result
+Your first line MUST be exactly one of:
+REVIEW STATUS: PASS
+REVIEW STATUS: NEEDS_REVISION
 
-    except Exception as error:
-        return {
-            "status": "ERROR",
-            "sources": [],
-            "warning": "Research failed; internal error details were withheld."
-        }
-
+Then provide exactly these standalone headings, each followed by a colon: ISSUES:, REQUIRED CORRECTIONS:, and FINAL QUALITY SUMMARY:. Put the section content after each heading.
+Use NEEDS_REVISION if any material issue remains or evidence is insufficient
+to support a material claim.
+"""
 
 def _format_research(research):
     sources = research.get("sources", [])
