@@ -11,6 +11,8 @@ class MediaAuditHealthCheckTests(unittest.TestCase):
     def test_detects_health_check_prompts(self):
         self.assertTrue(is_system_health_check("SYSTEM HEALTH CHECK: inspect all departments"))
         self.assertTrue(is_system_health_check("Run a complete system diagnostic"))
+        self.assertFalse(is_system_health_check("Run a provider health check before the Technical task."))
+        self.assertFalse(is_system_health_check("Analyze Groq provider health and fallback reliability in Technical."))
         self.assertFalse(is_system_health_check("Create a YouTube video about history."))
 
     def test_health_check_only_inspects_media_and_audit_entrypoints(self):
