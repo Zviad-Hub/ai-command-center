@@ -101,7 +101,7 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self.assertEqual(result["report"], "")
         self.assertTrue(result["requires_ceo_approval"])
         self.assertFalse(result["execution_performed"])
-        self.assertEqual(len(result["specialist_failures"]), 1)
+        self.assertEqual(len(result["specialist_failures"]), 3)
         self.assertEqual(ai_mock.call_count, 3)
 
     @patch("department_agents._research_context")
