@@ -189,7 +189,7 @@ def run_technical_manager(task):
             "manager": "Technical Manager",
             "status": "ERROR",
             "message": "Technical planning failed.",
-            "error": str(error),
+            "error": "TECHNICAL_PLANNING_FAILED",
             "selected_specialists": [],
             "requires_ceo_approval": True,
             "execution_authorized": False
