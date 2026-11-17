@@ -314,6 +314,13 @@ def build_public_task_summary(record):
         if isinstance(failed_stage, str) and failed_stage.strip():
             row["failed_stage"] = failed_stage.strip()[:80]
 
+        error_type = item.get("error_type")
+        if isinstance(error_type, str) and error_type.strip():
+            row["error_type"] = error_type.strip()[:80]
+        error_code = item.get("error_code")
+        if isinstance(error_code, str) and error_code.strip():
+            row["error_code"] = error_code.strip()[:100]
+
         research = item.get("research")
         if isinstance(research, dict):
             research_status = research.get("status")
