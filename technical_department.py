@@ -49,7 +49,7 @@ Your first line MUST be exactly one of:
 REVIEW STATUS: PASS
 REVIEW STATUS: NEEDS_REVISION
 
-Then provide ISSUES, REQUIRED CORRECTIONS, and FINAL QUALITY SUMMARY.
+Then provide exactly these standalone headings, each followed by a colon: ISSUES:, REQUIRED CORRECTIONS:, and FINAL QUALITY SUMMARY:. Put the section content after each heading.
 Use NEEDS_REVISION if any material issue remains.
 """
 
