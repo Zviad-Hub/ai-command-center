@@ -69,7 +69,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_manager_daily_quota_failure_is_also_blocked(self):
         result = evaluate_live_result("business", {
             "status": "REVIEW_REQUIRED",
-            "specialist_reports": _good_department_specialists("finance"),
+            "specialist_reports": _good_department_specialists("business"),
             "error": "Groq daily quota has been exhausted.",
         })
         self.assertEqual(result["status"], "BLOCKED")
@@ -684,6 +684,28 @@ class AgentQualityStressTestTests(unittest.TestCase):
         )
         self.assertFalse(passed)
         self.assertTrue(any("qa_engineer" in issue and "no report" in issue for issue in issues))
+
+
+    def test_department_scorecard_rejects_wrong_role_even_with_three_outputs(self):
+        reports = _good_department_specialists("finance")
+        reports["risk_controller"] = "Looks good; approve the report."
+        result = evaluate_live_result("finance", {
+            "status": "COMPLETED",
+            "specialist_reports": reports,
+            "quality_review": (
+                "REVIEW STATUS: PASS\\n"
+                "ISSUES: No material issues found.\\n"
+                "REQUIRED CORRECTIONS: None; calculations and evidence were checked.\\n"
+                "FINAL QUALITY SUMMARY: The report is internally consistent and remains advisory."
+            ),
+            "quality_review_passed": True,
+            "report": "Revenue 2160 GEL; variable cost 840 GEL; contribution 1320 GEL; operating result -2880 GEL before tax. Tax not provided.",
+            "requires_ceo_approval": True,
+            "execution_performed": False,
+        })
+        failed = [item["name"] for item in result["checks"] if not item["passed"]]
+        self.assertIn("specialist_contribution", failed)
+        self.assertLess(result["score_out_of_10"], 10)
 
 
 if __name__ == "__main__":
