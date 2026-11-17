@@ -272,3 +272,105 @@ def submit_task(ceo_task):
     save_tasks(tasks)
 
     return record
+
+
+
+def build_public_task_summary(record):
+    """Return gate statuses only; never expose task text, reports, or issue details."""
+    if not isinstance(record, dict):
+        return {
+            "run_status": "FAILED",
+            "error_code": "INVALID_TASK_RECORD",
+            "human_review_required": True,
+        }
+
+    department_results = []
+    raw_results = record.get("results", [])
+    for item in raw_results if isinstance(raw_results, list) else []:
+        if not isinstance(item, dict):
+            continue
+
+        row = {
+            "department": str(item.get("department") or "unknown"),
+            "status": str(item.get("status") or "UNKNOWN"),
+        }
+
+        specialist_reports = item.get("specialist_reports")
+        specialist_results = item.get("specialist_results")
+        specialists = item.get("specialists")
+        auditors = item.get("auditors")
+        if isinstance(specialist_reports, dict):
+            row["specialist_count"] = len(specialist_reports)
+        elif isinstance(specialist_results, list):
+            row["specialist_count"] = len(specialist_results)
+        elif isinstance(specialists, list):
+            row["specialist_count"] = len(specialists)
+        if isinstance(auditors, list):
+            row["auditor_count"] = len(auditors)
+
+        specialist_validation = item.get("specialist_quality_validation")
+        if isinstance(specialist_validation, dict):
+            row["specialist_validation_status"] = str(
+                specialist_validation.get("status") or "UNKNOWN"
+            )
+
+        evidence_validation = item.get("evidence_validation")
+        if isinstance(evidence_validation, dict):
+            row["evidence_validation_status"] = str(
+                evidence_validation.get("status") or "UNKNOWN"
+            )
+
+        for field in (
+            "quality_review_passed",
+            "publication_approved",
+            "requires_ceo_approval",
+            "execution_authorized",
+            "execution_performed",
+            "active_testing_available",
+        ):
+            value = item.get(field)
+            if isinstance(value, bool):
+                row[field] = value
+
+        department_results.append(row)
+
+    organization = record.get("organization_audit")
+    if not isinstance(organization, dict):
+        organization = {}
+    organization_checks = []
+    raw_checks = organization.get("department_checks", [])
+    for check in raw_checks if isinstance(raw_checks, list) else []:
+        if not isinstance(check, dict):
+            continue
+        issues = check.get("issues")
+        organization_checks.append({
+            "department": str(check.get("department") or "unknown"),
+            "status": str(check.get("status") or "UNKNOWN"),
+            "issue_count": len(issues) if isinstance(issues, list) else 0,
+        })
+
+    semantic = record.get("semantic_audit")
+    if not isinstance(semantic, dict):
+        semantic = {}
+
+    return {
+        "run_status": "FINISHED",
+        "task_id": str(record.get("id") or ""),
+        "overall_status": str(record.get("overall_status") or "UNKNOWN"),
+        "departments": [
+            str(value) for value in record.get("departments", [])
+        ] if isinstance(record.get("departments"), list) else [],
+        "department_results": department_results,
+        "organization_audit": {
+            "status": str(organization.get("status") or "UNKNOWN"),
+            "content_alignment_status": str(
+                organization.get("content_alignment_status") or "UNKNOWN"
+            ),
+            "department_checks": organization_checks,
+        },
+        "semantic_audit": {
+            "status": str(semantic.get("status") or "UNKNOWN"),
+            "task_coverage": str(semantic.get("task_coverage") or "UNKNOWN"),
+        },
+        "human_review_required": record.get("human_review_required") is True,
+    }
