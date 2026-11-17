@@ -232,24 +232,28 @@ def evaluate_live_result(department, result):
         )
     else:
         plan = result.get("manager_plan", {})
+        review = str(result.get("quality_review", ""))
         report_format_ok = (
             report_text.startswith("TECHNICAL DEPARTMENT — FINAL REPORT")
             and "\nSTATUS:" in report_text
             and "\\n" not in report_text
+            and "MANAGER SYNTHESIS:" in report_text
             and "EVIDENCE LIMITATIONS:" in report_text
             and "EXECUTION AND APPROVAL:" in report_text
         )
         reviewer_passed = (
-            status in ("COMPLETED", "PARTIALLY_COMPLETED")
+            status == "COMPLETED"
             and isinstance(plan, dict)
             and plan.get("status") in ("PLAN_CREATED", "PLANNED")
             and bool(plan.get("selected_specialists"))
+            and substantive_review(review)
+            and result.get("quality_review_passed") is True
             and report_format_ok
         )
     add(
         "manager_and_quality_gate",
         reviewer_passed,
-        "Independent reviewer PASS required for reviewed departments; technical requires a valid manager plan.",
+        "Independent reviewer PASS and completed status required; Technical also requires a valid manager plan and complete report.",
     )
 
     if department == "finance":
