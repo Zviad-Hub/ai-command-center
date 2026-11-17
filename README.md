@@ -139,7 +139,7 @@ You can submit a task without running Python locally:
 8. Start the workflow and wait for it to finish.
 9. Open the run to inspect its logs and result.
 
-The current workflow runs `task_manager.submit_task()` with read-only repository permissions. It uploads `tasks.json` as the `ai-command-center-task-report` artifact (available from the workflow run) for 14 days. It does not push generated task history into a source branch.
+The workflow runs `task_manager.submit_task()` with read-only repository permissions and stores its temporary history under the runner's temporary directory. It suppresses agent prompts and full reports from Actions logs. A complete report artifact is uploaded for 7 days only when the repository is private. Because this repository is currently public, full task reports are deliberately not uploaded; the public run shows only a task ID, status and department names. Make the repository private before running confidential tasks or expecting downloadable full reports. The workflow never pushes generated task history into a source branch.
 
 A successful GitHub Actions run means the workflow completed; it does **not** automatically mean every department completed its mission or that its output is factually correct. Download and inspect the task-report artifact and each manager's result.
 
@@ -263,7 +263,7 @@ Do not scan, probe, connect to, exploit or modify any system.
 
 ## Task history
 
-Each submitted task is stored locally in `tasks.json`. In GitHub Actions, this file is uploaded as a workflow artifact named `ai-command-center-task-report` and retained for 14 days. The record includes:
+Each submitted task is stored outside the repository in the operating system's private application-data directory. You can override the location with `AI_COMMAND_CENTER_TASKS_FILE`. On Windows the default is under `%LOCALAPPDATA%\\AI Command Center\\tasks.json`; on macOS it is under `~/Library/Application Support/AI Command Center/tasks.json`; on Linux it is under `$XDG_STATE_HOME/ai-command-center/tasks.json` or `~/.local/state/ai-command-center/tasks.json`. A legacy root-level `tasks.json` is migrated on first run if it is still present. **Before pulling this update in an older checkout, copy the file to the new private location first**, because Git will remove the tracked root-level file. Windows PowerShell: `New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\\AI Command Center" | Out-Null; Copy-Item .\\tasks.json "$env:LOCALAPPDATA\\AI Command Center\\tasks.json"`. Linux: `mkdir -p ~/.local/state/ai-command-center && cp tasks.json ~/.local/state/ai-command-center/tasks.json`. macOS: `mkdir -p "$HOME/Library/Application Support/AI Command Center" && cp tasks.json "$HOME/Library/Application Support/AI Command Center/tasks.json"`. If you use `AI_COMMAND_CENTER_TASKS_FILE` or `XDG_STATE_HOME`, copy it to that configured path instead. In GitHub Actions the file is temporary, and a full report artifact is created only for private repositories. The record includes:
 
 - `id`: short task identifier
 - `created_at`: UTC timestamp
@@ -278,6 +278,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 - **Human CEO remains in control.** AI output is advice or prepared work until reviewed.
 - Never put API keys, passwords, tokens or private credentials in prompts.
+- Task prompts and reports can contain confidential business or personal information. This repository is public; do not submit confidential tasks until the repository is made private. Public Actions runs intentionally do not publish full task reports.
 - Do not ask agents to access systems, accounts or data you do not own or have permission to use.
 - Pentester performs passive analysis only. Written authorization and exact scope require human verification; separate CEO approval is required for any future active testing. The current workflow cannot perform active testing.
 - Do not publish media, submit tenders, make payments, contact third parties, merge code or deploy to production without the required explicit approval.
@@ -300,7 +301,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 75 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, and Pentester specialist/reviewer safety gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 81 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, and Pentester specialist/reviewer safety gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
