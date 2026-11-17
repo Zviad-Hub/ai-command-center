@@ -23,16 +23,12 @@ MAX_WORDS = 140
 
 
 # ==================================================
-# COMMON TEXT UTILITIES
+# TEXT UTILITIES
 # ==================================================
 
 def normalize_text(text):
     text = str(text or "")
-
-    text = text.replace("\r\n", "\n")
-    text = text.replace("\r", "\n")
-
-    return text
+    return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def normalize_dashes(text):
@@ -41,23 +37,29 @@ def normalize_dashes(text):
 
 def clean_markdown(text):
     text = str(text or "")
-
     text = re.sub(r"\*\*", "", text)
     text = re.sub(r"__", "", text)
-
     return text.strip()
 
 
 def count_words(text):
-    text = clean_markdown(text)
-
     return len(
         re.findall(
             r"\b[\w’'-]+\b",
-            text,
+            clean_markdown(text),
             flags=re.UNICODE
         )
     )
+
+
+def has_heading(text, heading):
+    text = clean_markdown(text).upper()
+    pattern = (
+        r"(?m)^\s*(?:#{1,6}\s*)?"
+        + re.escape(heading.upper())
+        + r"\s*:?\s*$"
+    )
+    return bool(re.search(pattern, text))
 
 
 # ==================================================
@@ -65,56 +67,46 @@ def count_words(text):
 # ==================================================
 
 def extract_narration(text):
-
     text = normalize_text(text)
 
-    heading_pattern = (
-        r"^\s*(?:[-*]\s*)?"
-        r"(?:\*\*)?"
-        r"(?:SCRIPT|NARRATION)"
-        r"(?:\s*\([^)]*\))?"
-        r"\s*:\s*(?:\*\*)?\s*"
+    pattern = (
+        r"(?im)^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?(?:SCRIPT|NARRATION)"
+        r"(?:\s*\([^)]*\))?\s*:\s*(?:\*\*)?\s*"
+        r"(.*?)"
+        r"(?=^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?VISUAL DIRECTIONS\s*:|"
+        r"^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?FACTS TO VERIFY\s*:|"
+        r"\Z)"
     )
 
     match = re.search(
-        heading_pattern
-        + r"(.*?)"
-        + r"(?=^\s*(?:[-*]\s*)?(?:\*\*)?"
-        + r"VISUAL DIRECTIONS"
-        + r"\s*:\s*(?:\*\*)?|"
-        + r"\Z)",
+        pattern,
         text,
         re.IGNORECASE | re.MULTILINE | re.DOTALL
     )
 
-    if not match:
-        return ""
-
-    narration = clean_markdown(match.group(1))
-
-    return narration
+    return clean_markdown(match.group(1)) if match else ""
 
 
 # ==================================================
-# VISUAL SECTION EXTRACTION
+# VISUAL EXTRACTION
 # ==================================================
 
 def extract_visual_section(text):
-
     text = normalize_text(text)
 
     pattern = (
-        r"^\s*(?:[-*]\s*)?"
-        r"(?:\*\*)?"
-        r"VISUAL DIRECTIONS"
-        r"\s*:\s*(?:\*\*)?\s*"
+        r"(?im)^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?VISUAL DIRECTIONS\s*:"
+        r"\s*(?:\*\*)?\s*"
         r"(.*?)"
-        r"(?=^\s*(?:[-*]\s*)?(?:\*\*)?"
-        r"(?:FACTS TO VERIFY|FACT CHECK|"
+        r"(?=^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
+        r"(?:\*\*)?(?:FACTS TO VERIFY|FACT CHECK|"
         r"EDITOR REVIEW|PROBLEMS|CORRECTIONS|"
         r"FACTS STILL NEEDING|UNSUPPORTED CLAIMS)"
-        r"\s*:|"
-        r"\Z)"
+        r"\s*:|\Z)"
     )
 
     return re.search(
@@ -124,51 +116,35 @@ def extract_visual_section(text):
     )
 
 
-# ==================================================
-# VISUAL TIMESTAMP EXTRACTION
-# ==================================================
-
 def extract_visual_ranges(text):
-
     text = normalize_dashes(text)
 
-    pattern = (
+    return re.findall(
         r"(?m)^\s*(?:[-*]\s*)?"
-        r"(\d{1,2}:\d{2})"
-        r"\s*-\s*"
-        r"(\d{1,2}:\d{2})"
-        r"(?!\d)"
+        r"(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})(?!\d)",
+        text
     )
-
-    return re.findall(pattern, text)
 
 
 def count_visual_scenes(text):
-
     section = extract_visual_section(text)
 
     if not section:
         return 0
 
-    ranges = extract_visual_ranges(
-        section.group(1)
-    )
-
-    return len(ranges)
+    return len(extract_visual_ranges(section.group(1)))
 
 
 def check_timestamps(text):
-
     section = extract_visual_section(text)
 
     if not section:
         return False
 
-    found = extract_visual_ranges(
-        section.group(1)
+    return (
+        extract_visual_ranges(section.group(1))
+        == REQUIRED_TIMESTAMPS
     )
-
-    return found == REQUIRED_TIMESTAMPS
 
 
 # ==================================================
@@ -176,22 +152,15 @@ def check_timestamps(text):
 # ==================================================
 
 def validate_script(text):
-
     narration = extract_narration(text)
-
-    words = count_words(narration)
-
     section = extract_visual_section(text)
 
     visual_ranges = (
         extract_visual_ranges(section.group(1))
-        if section
-        else []
+        if section else []
     )
 
-    timestamps_ok = (
-        visual_ranges == REQUIRED_TIMESTAMPS
-    )
+    words = count_words(narration)
 
     return {
         "narration_found": bool(narration.strip()),
@@ -200,7 +169,7 @@ def validate_script(text):
         "visual_section_found": section is not None,
         "visual_scene_count": len(visual_ranges),
         "visual_scene_count_passed": len(visual_ranges) == 6,
-        "timestamps_passed": timestamps_ok,
+        "timestamps_passed": visual_ranges == REQUIRED_TIMESTAMPS,
         "visual_ranges": visual_ranges
     }
 
@@ -210,10 +179,9 @@ def validate_script(text):
 # ==================================================
 
 def is_refusal(text):
-
     text = str(text or "").lower()
 
-    refusal_phrases = [
+    phrases = [
         "i'm sorry",
         "i am sorry",
         "i cannot fulfill",
@@ -224,10 +192,7 @@ def is_refusal(text):
         "i am unable to"
     ]
 
-    return any(
-        phrase in text
-        for phrase in refusal_phrases
-    )
+    return any(phrase in text for phrase in phrases)
 
 
 # ==================================================
@@ -235,7 +200,6 @@ def is_refusal(text):
 # ==================================================
 
 def serialize_research(research, max_chars=14000):
-
     if not isinstance(research, dict):
         return "INVALID RESEARCH DATA"
 
@@ -245,67 +209,43 @@ def serialize_research(research, max_chars=14000):
         return "NO VALID SOURCE LIST"
 
     output = [
-        "RESEARCH STATUS: "
-        + str(research.get("status", "UNKNOWN")),
-
-        "EXTRACTED TOPIC: "
-        + str(research.get("extracted_topic", "UNKNOWN")),
-
-        "SOURCE COUNT: "
-        + str(len(sources)),
-
+        "RESEARCH STATUS: " + str(research.get("status", "UNKNOWN")),
+        "EXTRACTED TOPIC: " + str(research.get("extracted_topic", "UNKNOWN")),
+        "SOURCE COUNT: " + str(len(sources)),
         "",
-        "IMPORTANT EVIDENCE RULES:",
-        "- These are supplied research results.",
-        "- A preferred domain is not proof of accuracy.",
+        "EVIDENCE RULES:",
+        "- Supplied research is not automatically verified.",
         "- URL verification and claim verification are separate.",
-        "- Do not claim to have independently opened a URL.",
-        "- Use only the actual supplied content.",
+        "- Never claim to have independently opened a URL.",
+        "- Use only supplied source content.",
         "- Search snippets are weaker than full-page extracts.",
-        "- Never invent quotations or evidence.",
+        "- Never invent facts, quotations or evidence.",
         ""
     ]
 
     used = sum(len(item) for item in output)
-    included_sources = 0
+    included = 0
 
     for index, source in enumerate(sources, start=1):
-
         if not isinstance(source, dict):
             continue
 
-        title = str(source.get("title", "Unknown title"))
-        url = str(source.get("url", ""))
-        content = str(source.get("content", ""))
+        content = str(source.get("content", "")).strip()
 
-        content_type = str(
-            source.get("content_type", "UNKNOWN")
-        )
-
-        verification = str(
-            source.get("verification_status", "NOT_VERIFIED")
-        )
-
-        url_status = str(
-            source.get(
-                "url_verification_status",
-                "NOT_INDEPENDENTLY_VERIFIED"
-            )
-        )
-
-        if not content.strip():
+        if not content:
             continue
 
         block = (
             f"SOURCE {index}\n"
-            f"TITLE: {title}\n"
-            f"URL: {url}\n"
-            f"CONTENT TYPE: {content_type}\n"
-            f"CLAIM EVIDENCE STATUS: {verification}\n"
-            f"URL VERIFICATION STATUS: {url_status}\n"
-            f"SUPPLIED CONTENT:\n"
-            f"{content.strip()[:1200]}\n"
-            f"{'-' * 40}\n"
+            f"TITLE: {source.get('title', 'Unknown title')}\n"
+            f"URL: {source.get('url', '')}\n"
+            f"CONTENT TYPE: {source.get('content_type', 'UNKNOWN')}\n"
+            f"CLAIM EVIDENCE STATUS: "
+            f"{source.get('verification_status', 'NOT_VERIFIED')}\n"
+            f"URL VERIFICATION STATUS: "
+            f"{source.get('url_verification_status', 'NOT_INDEPENDENTLY_VERIFIED')}\n"
+            f"SUPPLIED CONTENT:\n{content[:1200]}\n"
+            + "-" * 40 + "\n"
         )
 
         remaining = max_chars - used
@@ -313,29 +253,20 @@ def serialize_research(research, max_chars=14000):
         if remaining <= 300:
             break
 
+        output.append(block[:remaining])
+        used += min(len(block), remaining)
+        included += 1
+
         if len(block) > remaining:
-            output.append(block[:remaining])
-            included_sources += 1
             break
 
-        output.append(block)
-        used += len(block)
-        included_sources += 1
-
-    if included_sources == 0:
-        output.append(
-            "No usable source excerpts were supplied."
-        )
+    if not included:
+        output.append("No usable source excerpts were supplied.")
 
     return "\n".join(output)
 
 
-# ==================================================
-# RESEARCH VALIDATION
-# ==================================================
-
 def has_usable_research(research):
-
     if not isinstance(research, dict):
         return False
 
@@ -351,12 +282,25 @@ def has_usable_research(research):
     )
 
 
+def count_unverified_sources(research):
+    sources = research.get("sources", [])
+
+    if not isinstance(sources, list):
+        return 0
+
+    return sum(
+        1 for source in sources
+        if isinstance(source, dict)
+        and str(source.get("verification_status", "NOT_VERIFIED")).upper()
+        not in ("VERIFIED", "CONFIRMED")
+    )
+
+
 # ==================================================
 # ERROR RESULT
 # ==================================================
 
 def build_error_result(task, stage, error, partial=None):
-
     partial = partial or {}
 
     return {
@@ -372,15 +316,9 @@ def build_error_result(task, stage, error, partial=None):
         "fact_check": partial.get("fact_check", ""),
         "research": partial.get(
             "research",
-            {
-                "status": "NOT_STARTED",
-                "sources": []
-            }
+            {"status": "NOT_STARTED", "sources": []}
         ),
-        "narration_word_count": partial.get(
-            "narration_word_count",
-            0
-        ),
+        "narration_word_count": partial.get("narration_word_count", 0),
         "validation": partial.get("validation", {}),
         "publication_approved": False,
         "specialists": partial.get("specialists", []),
@@ -398,80 +336,89 @@ def build_error_result(task, stage, error, partial=None):
 # ==================================================
 
 def creative_strategist(task, research):
-
     print("\n[CREATIVE STRATEGIST] Creating concept...")
-
-    supplied_sources = serialize_research(research)
 
     prompt = """
 You are a professional YouTube Shorts Creative Strategist.
 
-THE CEO ORIGINAL REQUEST IS THE FINAL AUTHORITY.
+The CEO's original topic is the final authority.
 
-STRICT RULES:
+Create exactly ONE concept about that exact topic.
 
-1. Preserve the exact topic requested by the CEO.
-2. Never replace or expand the topic.
-3. Create exactly ONE video concept.
-4. Use supplied research.
-5. Do not invent historical facts.
-6. Do not treat search snippets as verified facts.
-7. Uncertain details must be marked NEEDS SOURCE.
-8. Do not invent sources or claim independent verification.
-9. Do not write the full narration.
-10. Do not create alternative concepts.
-11. Never invent exact population counts or numbers.
+Do not change or expand the topic.
+Do not write the full narration.
+Do not invent historical facts.
+Do not treat snippets as verified evidence.
+Do not invent numbers, dates, names or quotations.
+Use uncertainty labels where evidence is insufficient.
 
-Return exactly:
+Return a concise concept containing:
+- Exact topic
+- One video concept
+- One hook
+- Key questions to investigate
+- Supported historical details
+- Uncertain details
 
-EXACT TOPIC:
-VIDEO CONCEPT:
-HOOK:
-KEY QUESTIONS TO INVESTIGATE:
-SUPPORTED HISTORICAL DETAILS:
-UNCERTAIN DETAILS:
-
+Do not create alternative concepts.
 Maximum 220 words.
-Be specific and useful.
 """
 
     user_prompt = (
         "CEO ORIGINAL REQUEST:\n"
         + str(task)
         + "\n\nSUPPLIED RESEARCH:\n"
-        + supplied_sources
+        + serialize_research(research)
     )
 
     result = ask_ai(prompt, user_prompt)
 
     if not isinstance(result, str) or not result.strip():
-        raise RuntimeError(
-            "Creative Strategist returned empty output."
-        )
+        raise RuntimeError("Creative Strategist returned empty output.")
 
     result = result.strip()
 
-    required_sections = [
+    if is_refusal(result):
+        raise RuntimeError("Creative Strategist refused the task.")
+
+    # IMPORTANT:
+    # Missing headings must never stop the entire pipeline.
+    # Preserve the model's useful response and normalize its format.
+
+    required = [
         "EXACT TOPIC:",
         "VIDEO CONCEPT:",
         "HOOK:",
         "KEY QUESTIONS TO INVESTIGATE:"
     ]
 
-    if is_refusal(result):
-        raise RuntimeError(
-            "Creative Strategist refused the task."
-        )
-
     missing = [
-        section for section in required_sections
-        if section.lower() not in result.lower()
+        heading for heading in required
+        if heading.lower() not in clean_markdown(result).lower()
     ]
 
     if missing:
-        raise RuntimeError(
-            "Creative Strategist omitted required sections: "
-            + ", ".join(missing)
+        result = (
+            "EXACT TOPIC:\n"
+            + str(task)
+            + "\n\nVIDEO CONCEPT:\n"
+            + result
+            + "\n\nHOOK:\n"
+            + "Investigate the central historical mystery using "
+              "evidence rather than assumptions."
+            + "\n\nKEY QUESTIONS TO INVESTIGATE:\n"
+            + "Which details are supported by the supplied historical "
+              "evidence, and which remain uncertain?"
+            + "\n\nSUPPORTED HISTORICAL DETAILS:\n"
+            + "Use only details directly supported by supplied research."
+            + "\n\nUNCERTAIN DETAILS:\n"
+            + "Claims without sufficient supplied evidence require "
+              "further verification."
+        )
+
+        print(
+            "[CREATIVE STRATEGIST] Output headings normalized. "
+            "Pipeline will continue."
         )
 
     print("[CREATIVE STRATEGIST] Concept completed.")
@@ -484,41 +431,34 @@ Be specific and useful.
 # ==================================================
 
 def scriptwriter(task, concept, research):
-
     print("\n[SCRIPTWRITER] Writing script...")
-
-    supplied_sources = serialize_research(research)
 
     prompt = """
 You are a professional historical YouTube Shorts Scriptwriter.
 
-THE CEO ORIGINAL REQUEST IS THE FINAL AUTHORITY.
+Create exactly ONE English YouTube Shorts video script.
 
-Create exactly ONE English YouTube Shorts script.
-
-TOPIC LOCK:
-- The exact CEO topic must never change.
-- Do not introduce another subject.
-- Do not create alternative scripts.
+TOPIC:
+The exact topic in the CEO request is mandatory.
+Never replace or expand it.
 
 NARRATION:
-- MUST contain 125-140 words.
-- Target approximately 132 words.
-- Write natural, engaging spoken English.
-- Do not count headings or visual directions as narration.
+- 125-140 spoken words.
+- Aim for approximately 132 words.
+- Natural, engaging spoken English.
+- Do not count headings or visual directions.
 
 HISTORICAL ACCURACY:
-- Use supplied research as available evidence.
-- Never invent dates, names, numbers, quotations or events.
+- Use supplied research only.
+- Never invent facts, dates, names, numbers, quotations or events.
 - Do not present theories as established facts.
 - Mark uncertain claims [NEEDS SOURCE].
 - Do not invent source references.
-- A search snippet is not equivalent to a verified primary source.
-- Do not invent exact population counts.
+- Search snippets are not verified evidence.
 
-VISUAL TIMELINE:
+VISUALS:
 Create exactly six scenes.
-Use these exact timestamps, once each, in this order:
+Use each timestamp exactly once, in this order:
 
 0:00-0:10
 0:10-0:20
@@ -529,9 +469,9 @@ Use these exact timestamps, once each, in this order:
 
 Each scene must describe one clear visual.
 Visuals must match the narration.
-Do not invent visual evidence.
+Do not depict invented evidence as historical fact.
 
-Return exactly:
+Return these sections:
 
 VIDEO TITLE:
 EXACT TOPIC:
@@ -540,8 +480,7 @@ SCRIPT:
 VISUAL DIRECTIONS:
 FACTS TO VERIFY:
 
-Count narration words before returning.
-Do not omit any section.
+Count the narration words before returning.
 """
 
     user_prompt = (
@@ -550,18 +489,15 @@ Do not omit any section.
         + "\n\nAPPROVED CONCEPT:\n"
         + str(concept)
         + "\n\nSUPPLIED RESEARCH:\n"
-        + supplied_sources
+        + serialize_research(research)
     )
 
     result = ask_ai(prompt, user_prompt)
 
     if not isinstance(result, str) or not result.strip():
-        raise RuntimeError(
-            "Scriptwriter returned empty output."
-        )
+        raise RuntimeError("Scriptwriter returned empty output.")
 
     result = result.strip()
-
     validation = validate_script(result)
 
     if not validation["narration_found"]:
@@ -569,15 +505,8 @@ Do not omit any section.
             "Scriptwriter did not return a readable SCRIPT section."
         )
 
-    print(
-        "[SCRIPTWRITER] Narration words:",
-        validation["narration_word_count"]
-    )
-
-    print(
-        "[SCRIPTWRITER] Visual scenes:",
-        validation["visual_scene_count"]
-    )
+    print("[SCRIPTWRITER] Narration words:", validation["narration_word_count"])
+    print("[SCRIPTWRITER] Visual scenes:", validation["visual_scene_count"])
 
     return result
 
@@ -587,72 +516,54 @@ Do not omit any section.
 # ==================================================
 
 def quality_editor(task, script):
-
     print("\n[QUALITY EDITOR] Reviewing script...")
 
     prompt = """
 You are an independent professional Quality Editor.
 
-THE CEO ORIGINAL REQUEST IS THE FINAL AUTHORITY.
-
 Improve the supplied script without changing its topic.
 
-CHECK:
+Check:
 1. Exact topic preservation.
-2. Natural English and grammar.
+2. English grammar and clarity.
 3. Narration word count.
 4. Unsupported historical claims.
-5. Misleading or invented details.
+5. Invented or misleading details.
 6. Exactly six visual scenes.
-7. Correct visual timestamps.
+7. Correct timestamps.
 8. Consistency between narration and visuals.
 
-STRICT RULES:
+Rules:
 - Do not add historical facts.
 - Do not invent dates, names, numbers or quotations.
-- Keep uncertainty labels.
+- Preserve uncertainty labels.
 - Do not turn theories into facts.
-- Preserve the meaning of supported claims.
 - Keep exactly six visual scenes.
-- Use all six required timestamps in order.
-- Narration MUST contain 125-140 words.
-- Do not create another concept or script.
-- Do not claim that facts are verified.
+- Keep all six required timestamps in order.
+- Narration must contain 125-140 words.
+- Do not create another concept.
 
-Return exactly:
-
-TOPIC CHECK:
-EDITOR REVIEW:
-PROBLEMS:
-CORRECTIONS:
-EDITED SCRIPT:
-
-Inside EDITED SCRIPT, include these exact headings:
+Return a complete edited script with these exact headings:
 
 SCRIPT:
 VISUAL DIRECTIONS:
+FACTS TO VERIFY:
 
-The EDITED SCRIPT must contain the complete narration
-and all six timestamped visual directions.
-Also include FACTS TO VERIFY after the visual directions.
+You may include a short editor review before the script.
 """
 
-    user_prompt = (
+    result = ask_ai(
+        prompt,
         "CEO ORIGINAL REQUEST:\n"
         + str(task)
         + "\n\nORIGINAL SCRIPT:\n"
         + str(script)
     )
 
-    edited = ask_ai(prompt, user_prompt)
+    if not isinstance(result, str) or not result.strip():
+        raise RuntimeError("Quality Editor returned empty output.")
 
-    if not isinstance(edited, str) or not edited.strip():
-        raise RuntimeError(
-            "Quality Editor returned empty output."
-        )
-
-    edited = edited.strip()
-
+    edited = result.strip()
     validation = validate_script(edited)
 
     if not validation["narration_found"]:
@@ -661,53 +572,43 @@ Also include FACTS TO VERIFY after the visual directions.
         )
 
     if not validation["word_count_passed"]:
-
-        print(
-            "[QUALITY EDITOR] Word count outside target:",
-            validation["narration_word_count"]
-        )
-
         repair_prompt = """
-You are a professional YouTube Shorts Script Editor.
+Correct the narration length in the supplied complete script.
 
-Correct ONLY the narration length in the supplied edited script.
+Narration must contain 125-140 words.
 
-MANDATORY:
-- Narration must contain 125-140 words.
-- Preserve the exact CEO topic.
-- Preserve historical accuracy.
-- Do not invent facts.
-- Keep uncertainty labels.
-- Preserve all six visual scenes and timestamps.
-- Do not add another concept or script.
+Preserve:
+- Exact CEO topic.
+- Historical accuracy.
+- Uncertainty labels.
+- All six visual scenes.
+- All six exact timestamps.
 
-Inside the complete corrected script use these exact headings:
+Do not invent facts.
+Do not add unsupported claims.
+Do not create another script.
+
+Return the COMPLETE script using:
 
 SCRIPT:
 VISUAL DIRECTIONS:
-
-Return the COMPLETE corrected edited script.
-Do not omit any section.
+FACTS TO VERIFY:
 """
 
-        repair_input = (
-            "CEO ORIGINAL REQUEST:\n"
+        repaired = ask_ai(
+            repair_prompt,
+            "CEO TOPIC:\n"
             + str(task)
-            + "\n\nCURRENT EDITED SCRIPT:\n"
+            + "\n\nCURRENT SCRIPT:\n"
             + edited
             + "\n\nCURRENT WORD COUNT: "
             + str(validation["narration_word_count"])
-            + "\nREQUIRED: 125-140 words."
         )
 
-        repaired = ask_ai(repair_prompt, repair_input)
-
         if isinstance(repaired, str) and repaired.strip():
-
             repaired = repaired.strip()
-            repaired_validation = validate_script(repaired)
 
-            if repaired_validation["narration_found"]:
+            if validate_script(repaired)["narration_found"]:
                 edited = repaired
 
     final_validation = validate_script(edited)
@@ -730,34 +631,27 @@ Do not omit any section.
 # ==================================================
 
 def fact_checker(task, script, research):
-
     print("\n[FACT CHECKER] Checking historical claims...")
-
-    supplied_sources = serialize_research(research)
 
     prompt = """
 You are a STRICT independent historical fact-checker.
 
-THE CEO ORIGINAL TOPIC IS MANDATORY.
+Use ONLY the supplied source excerpts.
 
-EVIDENCE RULES:
+Check every important historical claim in the narration.
 
-1. Use ONLY the supplied source excerpts.
-2. Check every important historical claim in the narration.
-3. Search-result URLs alone are NOT evidence.
-4. A source title or domain alone is NOT evidence.
-5. Evidence must directly support the specific claim.
-6. Do not invent source titles, URLs, quotations or evidence.
-7. Do not claim to have independently opened a URL.
-8. Do not mark a claim VERIFIED unless supplied content
-   directly supports that specific claim.
-9. If evidence is insufficient, mark NEEDS SOURCE.
-10. Use CONTRADICTED only when supplied content
-    directly contradicts the claim.
-11. Cite the exact supplied source title and URL when available.
-12. Distinguish full-page extracts from search snippets.
-13. URL verification and claim verification are separate.
-14. Never approve publication.
+Rules:
+1. A URL alone is not evidence.
+2. A source title or domain alone is not evidence.
+3. Evidence must directly support the specific claim.
+4. Never invent source titles, URLs, quotations or evidence.
+5. Never claim to have independently opened a URL.
+6. Do not mark a claim VERIFIED without direct supporting content.
+7. If evidence is insufficient, mark NEEDS SOURCE.
+8. Use CONTRADICTED only when supplied content directly contradicts it.
+9. Distinguish full-page extracts from search snippets.
+10. URL verification and claim verification are separate.
+11. Never approve publication.
 
 For every important claim return:
 
@@ -769,40 +663,36 @@ SOURCE TITLE:
 SOURCE URL:
 
 If no supplied content directly supports a claim:
-
 STATUS: NEEDS SOURCE
 EVIDENCE EXCERPT: NONE
 SOURCE TITLE: NONE
 SOURCE URL: NONE
 
-Return exactly:
+Return:
 
 FACT CHECK RESULTS:
 UNSUPPORTED CLAIMS:
 CONTRADICTED CLAIMS:
 OVERALL RESULT:
 
-If any important claim is NEEDS SOURCE or CONTRADICTED,
+If any important claim needs a source or is contradicted,
 OVERALL RESULT must be REVIEW REQUIRED.
 
-Be concise but do not omit important claims.
+If no claims can be checked, explicitly say so.
 """
 
-    user_prompt = (
+    result = ask_ai(
+        prompt,
         "CEO ORIGINAL REQUEST:\n"
         + str(task)
-        + "\n\nFINAL SCRIPT TO CHECK:\n"
+        + "\n\nSCRIPT TO CHECK:\n"
         + str(script)
-        + "\n\nSUPPLIED RESEARCH EXCERPTS:\n"
-        + supplied_sources
+        + "\n\nSUPPLIED RESEARCH:\n"
+        + serialize_research(research)
     )
 
-    result = ask_ai(prompt, user_prompt)
-
     if not isinstance(result, str) or not result.strip():
-        raise RuntimeError(
-            "Fact-Checker returned empty output."
-        )
+        raise RuntimeError("Fact-Checker returned empty output.")
 
     return result.strip()
 
@@ -812,62 +702,45 @@ Be concise but do not omit important claims.
 # ==================================================
 
 def evidence_based_editor(task, script, research, fact_check):
-
     print("\n[EVIDENCE EDITOR] Correcting unsupported claims...")
-
-    supplied_sources = serialize_research(research)
 
     prompt = """
 You are an independent historical evidence-based script editor.
 
-THE CEO ORIGINAL TOPIC IS LOCKED.
+The CEO's exact topic is locked.
 
-Your job is to correct the narration using ONLY:
-1. Supplied source excerpts.
-2. The independent fact-check results.
+Use ONLY supplied source excerpts and fact-check results.
 
-STRICT RULES:
-
+Rules:
 1. Remove or rewrite claims marked NEEDS SOURCE.
-2. Remove claims that supplied content cannot support.
+2. Remove claims that supplied evidence cannot support.
 3. Remove claims marked CONTRADICTED.
-4. Never turn an unconfirmed theory into a historical fact.
+4. Never turn an unconfirmed theory into a fact.
 5. Never invent dates, numbers, names, quotations or events.
 6. Never invent evidence or citations.
-7. Preserve facts directly supported by supplied content.
-8. Do not add claims simply to reach the word count.
+7. Preserve directly supported facts.
+8. Do not add claims merely to reach the word count.
 9. Preserve the exact CEO topic.
 10. Preserve exactly six visual scenes.
-11. Preserve the six required timestamps in their original order.
-12. Make visuals consistent with the corrected narration.
-13. Do not create another concept or video.
-14. Do not claim that publication is approved.
+11. Preserve the six exact timestamps in order.
+12. Make visuals consistent with corrected narration.
+13. Never claim publication is approved.
 
-If the evidence cannot support 125-140 words,
-return the most accurate narration possible and explain why.
+Aim for 125-140 narration words ONLY if the evidence allows it.
+Accuracy is more important than word count.
 
-NARRATION TARGET:
-125-140 words, if the evidence allows it.
-
-Return exactly:
+Return a complete script with:
 
 EVIDENCE EDITOR REVIEW:
 REMOVED UNSUPPORTED CLAIMS:
 RETAINED SUPPORTED CLAIMS:
-EDITED SCRIPT:
-
-Inside EDITED SCRIPT, use these exact headings:
-
 SCRIPT:
 VISUAL DIRECTIONS:
-
-The EDITED SCRIPT must contain:
-- One complete narration.
-- Exactly six timestamped visual scenes.
-- FACTS TO VERIFY after the visual directions.
+FACTS TO VERIFY:
 """
 
-    user_prompt = (
+    result = ask_ai(
+        prompt,
         "CEO ORIGINAL REQUEST:\n"
         + str(task)
         + "\n\nCURRENT SCRIPT:\n"
@@ -875,34 +748,23 @@ The EDITED SCRIPT must contain:
         + "\n\nFACT CHECK RESULTS:\n"
         + str(fact_check)
         + "\n\nSUPPLIED RESEARCH:\n"
-        + supplied_sources
+        + serialize_research(research)
     )
 
-    result = ask_ai(prompt, user_prompt)
-
     if not isinstance(result, str) or not result.strip():
-        raise RuntimeError(
-            "Evidence-Based Editor returned empty output."
-        )
+        raise RuntimeError("Evidence-Based Editor returned empty output.")
 
     edited = result.strip()
 
-    validation = validate_script(edited)
-
-    if not validation["narration_found"]:
+    if not validate_script(edited)["narration_found"]:
         raise RuntimeError(
             "Evidence Editor did not return readable narration."
         )
 
-    print(
-        "[EVIDENCE EDITOR] Narration words:",
-        validation["narration_word_count"]
-    )
+    validation = validate_script(edited)
 
-    print(
-        "[EVIDENCE EDITOR] Visual scenes:",
-        validation["visual_scene_count"]
-    )
+    print("[EVIDENCE EDITOR] Narration words:", validation["narration_word_count"])
+    print("[EVIDENCE EDITOR] Visual scenes:", validation["visual_scene_count"])
 
     return edited
 
@@ -912,7 +774,6 @@ The EDITED SCRIPT must contain:
 # ==================================================
 
 def run_media_department(task):
-
     print("\n" + "=" * 55)
     print("MEDIA DEPARTMENT STARTED")
     print("=" * 55)
@@ -935,19 +796,15 @@ def run_media_department(task):
     stage = "Initialization"
 
     try:
-
         # STEP 1: RESEARCH
 
         stage = "Research Agent"
-
-        print("\n[MEDIA] Step 1: Research Agent started...")
+        print("\n[MEDIA] Step 1: Research Agent...")
 
         research = run_research(task)
 
         if not isinstance(research, dict):
-            raise RuntimeError(
-                "Research Agent returned invalid data."
-            )
+            raise RuntimeError("Research Agent returned invalid data.")
 
         partial["research"] = research
 
@@ -956,12 +813,7 @@ def run_media_department(task):
         ).upper()
 
         sources = research.get("sources", [])
-
-        source_count = (
-            len(sources)
-            if isinstance(sources, list)
-            else 0
-        )
+        source_count = len(sources) if isinstance(sources, list) else 0
 
         print("[MEDIA] Research status:", research_status)
         print("[MEDIA] Sources collected:", source_count)
@@ -971,7 +823,6 @@ def run_media_department(task):
         if research_status in ("ERROR", "NO_RESULTS"):
             raise RuntimeError(
                 "Research Agent did not produce usable research. "
-                f"Research status: {research_status}. "
                 + str(research.get("message", ""))
             )
 
@@ -983,8 +834,7 @@ def run_media_department(task):
         # STEP 2: CREATIVE STRATEGIST
 
         stage = "Creative Strategist"
-
-        print("\n[MEDIA] Step 2: Creative Strategist started...")
+        print("\n[MEDIA] Step 2: Creative Strategist...")
 
         concept = creative_strategist(task, research)
 
@@ -994,8 +844,7 @@ def run_media_department(task):
         # STEP 3: SCRIPTWRITER
 
         stage = "Scriptwriter"
-
-        print("\n[MEDIA] Step 3: Scriptwriter started...")
+        print("\n[MEDIA] Step 3: Scriptwriter...")
 
         script = scriptwriter(task, concept, research)
 
@@ -1005,8 +854,7 @@ def run_media_department(task):
         # STEP 4: QUALITY EDITOR
 
         stage = "Quality Editor"
-
-        print("\n[MEDIA] Step 4: Quality Editor started...")
+        print("\n[MEDIA] Step 4: Quality Editor...")
 
         edited_script = quality_editor(task, script)
 
@@ -1016,8 +864,7 @@ def run_media_department(task):
         # STEP 5: INITIAL FACT CHECK
 
         stage = "Initial Fact-Checker"
-
-        print("\n[MEDIA] Step 5: Initial Fact-Checker started...")
+        print("\n[MEDIA] Step 5: Initial Fact-Checker...")
 
         initial_fact_check = fact_checker(
             task,
@@ -1031,8 +878,7 @@ def run_media_department(task):
         # STEP 6: EVIDENCE EDITOR
 
         stage = "Evidence-Based Editor"
-
-        print("\n[MEDIA] Step 6: Evidence-Based Editor started...")
+        print("\n[MEDIA] Step 6: Evidence-Based Editor...")
 
         evidence_edited_script = evidence_based_editor(
             task,
@@ -1047,8 +893,7 @@ def run_media_department(task):
         # STEP 7: FINAL FACT CHECK
 
         stage = "Final Fact-Checker"
-
-        print("\n[MEDIA] Step 7: Final Fact-Checker started...")
+        print("\n[MEDIA] Step 7: Final Fact-Checker...")
 
         final_fact_check = fact_checker(
             task,
@@ -1059,26 +904,30 @@ def run_media_department(task):
         partial["fact_check"] = final_fact_check
         partial["specialists"].append("Final Fact-Checker")
 
-        print("\n[MEDIA] Final fact-check completed.")
-
         # STEP 8: FINAL VALIDATION
 
         stage = "Final Validation"
 
         validation = validate_script(evidence_edited_script)
-
         partial["validation"] = validation
 
         narration_words = validation["narration_word_count"]
-
         partial["narration_word_count"] = narration_words
 
         warnings = []
 
         if research_status != "COMPLETED":
             warnings.append(
-                "Research was partial and did not complete "
-                "with full-page extracts."
+                "Research did not report COMPLETED status."
+            )
+
+        unverified_count = count_unverified_sources(research)
+
+        if unverified_count:
+            warnings.append(
+                f"{unverified_count} research sources are not marked "
+                "VERIFIED or CONFIRMED. Their content must not be "
+                "treated as independently verified."
             )
 
         if not validation["word_count_passed"]:
@@ -1101,26 +950,28 @@ def run_media_department(task):
                 "Final narration could not be extracted."
             )
 
-        if "NEEDS SOURCE" in final_fact_check.upper():
-            warnings.append(
-                "Final fact-check identified claims needing sources."
-            )
-
-        if "CONTRADICTED" in final_fact_check.upper():
-            warnings.append(
-                "Final fact-check identified contradicted claims."
-            )
-
-        if not validation["word_count_passed"]:
-            final_status = "REVIEW_REQUIRED"
-        elif not validation["visual_scene_count_passed"]:
-            final_status = "REVIEW_REQUIRED"
-        elif not validation["timestamps_passed"]:
-            final_status = "REVIEW_REQUIRED"
-        elif not validation["narration_found"]:
-            final_status = "REVIEW_REQUIRED"
+        if not final_fact_check.strip():
+            warnings.append("Final fact-check report is missing.")
         else:
-            final_status = "REVIEW_REQUIRED"
+            fact_upper = final_fact_check.upper()
+
+            if "NEEDS SOURCE" in fact_upper:
+                warnings.append(
+                    "Final fact-check identified claims needing sources."
+                )
+
+            if "CONTRADICTED" in fact_upper:
+                warnings.append(
+                    "Final fact-check identified contradicted claims."
+                )
+
+            if "VERIFIED" not in fact_upper:
+                warnings.append(
+                    "Final fact-check contains no VERIFIED claim status."
+                )
+
+        # Publication is NEVER approved automatically.
+        final_status = "REVIEW_REQUIRED"
 
         print("\n" + "=" * 55)
         print("MEDIA DEPARTMENT COMPLETED")
@@ -1152,12 +1003,7 @@ def run_media_department(task):
         }
 
     except Exception as error:
-
-        print(
-            "\n[MEDIA] ERROR during stage:",
-            stage
-        )
-
+        print("\n[MEDIA] ERROR during stage:", stage)
         print("[MEDIA] ERROR details:", str(error))
 
         return build_error_result(
