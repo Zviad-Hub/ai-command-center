@@ -185,8 +185,8 @@ def ask_ai(system_prompt, user_prompt):
 
                 if attempt >= MAX_RETRIES:
                     raise RuntimeError(
-                        "Groq rate limit exceeded after all retries. "
-                        + error_text
+                        "Groq rate limit exceeded after all retries; "
+                        "provider details were withheld."
                     )
 
                 wait_time = get_retry_wait(response, attempt)
@@ -208,8 +208,8 @@ def ask_ai(system_prompt, user_prompt):
 
                 if attempt >= MAX_RETRIES:
                     raise RuntimeError(
-                        f"Groq server error: {response.status_code} "
-                        f"{response.text[:1000]}"
+                        f"Groq server error: HTTP {response.status_code}; "
+                        "provider details were withheld."
                     )
 
                 wait_time = min(2 ** (attempt + 1), 20)
@@ -229,9 +229,8 @@ def ask_ai(system_prompt, user_prompt):
 
             if not response.ok:
                 raise RuntimeError(
-                    f"Groq API HTTP error: "
-                    f"{response.status_code} "
-                    f"{response.text[:1500]}"
+                    f"Groq API HTTP error: {response.status_code}; "
+                    "provider details were withheld."
                 )
 
             # ------------------------------------------
@@ -327,7 +326,8 @@ def ask_ai(system_prompt, user_prompt):
 
             if attempt >= MAX_RETRIES:
                 raise RuntimeError(
-                    f"Groq connection error: {error}"
+                    "Groq connection failed after all retries; "
+                    "connection details were withheld."
                 )
 
             wait_time = min(2 ** (attempt + 1), 20)
