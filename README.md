@@ -145,6 +145,8 @@ The workflow runs `task_manager.submit_task()` with read-only repository permiss
 
 A successful GitHub Actions run means the workflow completed; it does **not** automatically mean every department completed its mission or that its output is factually correct. Download and inspect the task-report artifact and each manager's result.
 
+Each saved task record also contains an `organization_audit` and `overall_status`. This independent read-only layer checks that every routed department returned a matching result, required specialist/reviewer gates passed, expected deliverables are present, and safety/approval flags remain within bounds. A failed check sets `overall_status` to `REVIEW_REQUIRED` without rewriting the original department outputs. Even a structural PASS keeps `content_alignment_status: HUMAN_REVIEW_REQUIRED`: only a human can decide whether the work truly satisfies the CEO's intent and whether consequential actions may proceed.
+
 ## How to write a good CEO task
 
 Give agents enough context to do useful work. A good request normally includes:
