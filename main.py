@@ -1,4 +1,3 @@
-
 from task_manager import submit_task
 from config import APP_NAME, APP_VERSION, DEPARTMENTS
 
@@ -23,6 +22,54 @@ def show_header():
     print("  [ON] Unauthorized pentesting blocked")
 
     print("\n" + "=" * 60)
+
+
+def display_manager_result(item):
+    """Print manager output without assuming every department has a message field."""
+
+    department = str(item.get("department", "unknown")).upper()
+    status = str(item.get("status", "UNKNOWN"))
+
+    print(f"\n{department}: {status}")
+
+    message = item.get("message")
+    if message:
+        print(message)
+
+    summary = item.get("summary")
+    if isinstance(summary, dict):
+        selected = summary.get("selected_specialists")
+        completed = summary.get("completed_specialists")
+        failed = summary.get("failed_specialists")
+
+        if any(value is not None for value in (selected, completed, failed)):
+            print(
+                "Specialists — "
+                f"selected: {selected if selected is not None else 'n/a'}, "
+                f"completed: {completed if completed is not None else 'n/a'}, "
+                f"failed: {failed if failed is not None else 'n/a'}"
+            )
+
+    specialist_results = item.get("specialist_results", [])
+    if isinstance(specialist_results, list):
+        for specialist in specialist_results:
+            if not isinstance(specialist, dict):
+                continue
+
+            name = specialist.get("name") or specialist.get("specialist") or "Specialist"
+            specialist_status = specialist.get("status", "UNKNOWN")
+            print(f"  - {name}: {specialist_status}")
+
+            detail = (
+                specialist.get("report")
+                or specialist.get("message")
+                or specialist.get("error")
+            )
+            if detail:
+                print(f"    {detail}")
+
+    if not message and not summary and not specialist_results:
+        print("No detailed report was returned by this manager.")
 
 
 def start():
@@ -59,13 +106,10 @@ def start():
             print("\nMANAGER RESULTS:")
 
             for item in result["results"]:
-                print(
-                    f"\n{item['department'].upper()}: "
-                    f"{item['status']}"
-                )
-                print(item["message"])
+                display_manager_result(item)
 
-            print("\nTASK REGISTERED SUCCESSFULLY.")
+            print("\nTASK RECORD SAVED.")
+            print("Review each department status before approving any next step.")
 
         except KeyboardInterrupt:
             print("\nSystem interrupted.")
