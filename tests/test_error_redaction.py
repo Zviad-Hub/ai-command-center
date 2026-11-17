@@ -223,12 +223,17 @@ class ManagerErrorRedactionTests(unittest.TestCase):
         self.assertNotIn(SECRET_DETAIL, repr(result))
         self.assertIn("provider details were withheld", result["message"])
 
-    def test_technical_manager_provider_exception_is_redacted(self):
+    def test_technical_manager_provider_exception_uses_safe_advisory_fallback(self):
         with patch.object(technical_manager, "ask_ai", side_effect=RuntimeError(SECRET_DETAIL)):
             result = technical_manager.run_technical_manager("Plan a code review")
-        self.assertEqual(result["status"], "ERROR")
+        self.assertEqual(result["status"], "PLAN_CREATED")
+        self.assertEqual(result["planning_method"], "SAFE_RULE_BASED_FALLBACK")
+        self.assertTrue(result["requires_ceo_approval"])
+        self.assertFalse(result["execution_authorized"])
+        self.assertIn("planning_error_code", result)
         self.assertNotIn(SECRET_DETAIL, repr(result))
-        self.assertEqual(result["error"], "TECHNICAL_PLANNING_FAILED")
+        self.assertNotIn(SECRET_DETAIL, result["message"])
+        self.assertNotIn(SECRET_DETAIL, result["planning_warning"])
 
     def test_technical_agent_provider_exception_is_redacted(self):
         with patch.object(technical_agents, "ask_ai", side_effect=RuntimeError(SECRET_DETAIL)):
