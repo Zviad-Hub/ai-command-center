@@ -281,7 +281,7 @@ def compliance_auditor(task, media):
         "request", "task",
     }
     topic_terms = []
-    for term in re.findall(r"[^\\W_]+", str(topic_line or "").casefold(), flags=re.UNICODE):
+    for term in re.findall(r"[^\W_]+", str(topic_line or "").casefold(), flags=re.UNICODE):
         if term not in stopwords and len(term) > 1 and term not in topic_terms:
             topic_terms.append(term)
 
@@ -324,8 +324,8 @@ def compliance_auditor(task, media):
     )
 
     # REQUESTED LANGUAGE — Georgian requests must not silently receive English narration.
-    if re.search(r"[\\u10A0-\\u10FF]", task_text):
-        language_passed = bool(re.search(r"[\\u10A0-\\u10FF]", narration))
+    if re.search(r"[\u10A0-\u10FF]", task_text):
+        language_passed = bool(re.search(r"[\u10A0-\u10FF]", narration))
         checks.append(
             check_result(
                 "Narration language",
