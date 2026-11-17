@@ -129,6 +129,69 @@ def _contains_number_near(text, expected, tolerance=0.02):
     return any(abs(value - expected) <= tolerance for value in _numeric_values(text))
 
 
+def _business_kpi_quality(report_text):
+    """Require four named KPI definitions with formula evidence, not loose keywords."""
+    kpi_terms = (
+        "conversion rate",
+        "repeat purchase",
+        "average order value",
+        "waste rate",
+        "gross margin",
+        "customer acquisition cost",
+        "retention rate",
+        "foot traffic",
+        "sell-through",
+        "stockout rate",
+        "average transaction",
+    )
+    formula_markers = ("=", "/", "divided by", "formula", "per ", "calculated as")
+    lines = report_text.casefold().splitlines()
+    defined = []
+    for index, line in enumerate(lines):
+        if not any(term in line for term in kpi_terms):
+            continue
+        nearby = " ".join(lines[index:index + 2])
+        if any(marker in nearby for marker in formula_markers):
+            defined.append(line)
+    return len(defined) >= 4, len(defined)
+
+
+def _business_experiment_quality(report_text):
+    """Require three distinct low-cost validation experiment categories."""
+    lowered = report_text.casefold()
+    experiment_groups = (
+        ("pre-order", "preorder", "pre order"),
+        ("tasting", "sampling", "pop-up", "popup", "small batch"),
+        ("survey", "interview", "landing page", "customer feedback", "pilot"),
+    )
+    matched = sum(
+        any(term in lowered for term in group)
+        for group in experiment_groups
+    )
+    return matched >= 3, matched
+
+
+def _tender_deadline_is_evidence_aware(report_text):
+    """In the no-documents scenario, never allow an unsupported deadline claim."""
+    missing_markers = (
+        "not provided", "not supplied", "cannot confirm",
+        "cannot be determined", "unknown", "unavailable",
+        "must be verified", "verify against the official notice",
+        "no deadline",
+    )
+    deadline_lines = [
+        line.casefold()
+        for line in report_text.splitlines()
+        if any(term in line.casefold() for term in ("deadline", "submission date", "closing date"))
+    ]
+    if not deadline_lines:
+        return False
+    return all(
+        any(marker in line for marker in missing_markers)
+        for line in deadline_lines
+    )
+
+
 def _contains_daily_quota_exhaustion(value):
     """Detect a provider daily-quota failure without masking quality failures."""
     flattened = _flatten(value).lower()
@@ -279,10 +342,8 @@ def evaluate_live_result(department, result):
             report_text,
             ["not provided", "unknown", "insufficient data", "cannot determine", "assumption"],
         )
-        kpi_ok = (
-            _has_any(report_text, ["conversion", "repeat purchase", "average order", "waste"])
-            and _has_any(report_text, ["formula", "calculated", "divided by", "%"])
-        )
+        kpi_ok, kpi_count = _business_kpi_quality(report_text)
+        experiments_ok, experiment_count = _business_experiment_quality(report_text)
         add(
             "evidence_and_uncertainty",
             uncertainty_ok,
@@ -290,8 +351,8 @@ def evaluate_live_result(department, result):
         )
         add(
             "actionable_deliverables",
-            kpi_ok,
-            "Requires named measurable KPIs and an explanation of how they are calculated.",
+            kpi_ok and experiments_ok,
+            f"Requires at least four formula-backed KPI definitions and three distinct low-cost validation experiments; found {kpi_count} KPI definitions and {experiment_count} experiment categories.",
         )
 
     elif department == "tenders":
@@ -303,19 +364,20 @@ def evaluate_live_result(department, result):
             report_text,
             ["cannot assess eligibility", "eligibility cannot", "official tender", "tender notice"],
         )
+        deadline_ok = _tender_deadline_is_evidence_aware(report_text)
         add(
             "missing_evidence_handled",
-            missing_docs_ok and no_fabrication_ok,
-            "Requires the manager to say eligibility cannot be confirmed without official tender material.",
+            missing_docs_ok and no_fabrication_ok and deadline_ok,
+            "Requires eligibility and deadlines to remain explicitly unconfirmed without official tender material.",
         )
-        checklist_ok = _has_any(
-            report_text,
-            ["checklist", "evidence", "registration", "deadline", "document"],
+        checklist_ok = (
+            _has_any(report_text, ["checklist", "evidence", "registration", "document"])
+            and _has_any(report_text, ["not provided", "unclear", "missing", "to be verified"])
         )
         add(
             "actionable_deliverables",
             checklist_ok,
-            "Requires a useful evidence/document checklist without invented tender-specific requirements.",
+            "Requires a useful evidence checklist with missing/unclear status, without invented tender-specific requirements.",
         )
 
     elif department == "pentester":
