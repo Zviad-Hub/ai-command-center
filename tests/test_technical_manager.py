@@ -28,14 +28,16 @@ class TechnicalManagerTests(unittest.TestCase):
         self.assertIn("Technical Department Manager", args[0])
         self.assertIn("CEO TASK:", args[1])
         self.assertEqual(result["status"], "PLAN_CREATED")
+        self.assertEqual(result["planning_method"], "AI_MANAGER")
         self.assertEqual(
             result["selected_specialists"][0]["specialist"],
             "backend_developer"
         )
         self.assertFalse(result["execution_authorized"])
+        self.assertTrue(result["requires_ceo_approval"])
 
     @patch("technical_manager.ask_ai")
-    def test_discards_unknown_specialists_and_empty_missions(self, ask_ai_mock):
+    def test_uses_safe_fallback_for_unknown_or_empty_specialist_assignments(self, ask_ai_mock):
         ask_ai_mock.return_value = json.dumps({
             "selected_specialists": [
                 {
@@ -49,18 +51,40 @@ class TechnicalManagerTests(unittest.TestCase):
             ]
         })
 
-        result = run_technical_manager("Test the project.")
+        result = run_technical_manager("Review the backend API.")
 
-        self.assertEqual(result["status"], "REVIEW_REQUIRED")
-        self.assertEqual(result["selected_specialists"], [])
+        self.assertEqual(result["status"], "PLAN_CREATED")
+        self.assertEqual(result["planning_method"], "SAFE_RULE_BASED_FALLBACK")
+        self.assertEqual(
+            [item["specialist"] for item in result["selected_specialists"]],
+            ["backend_developer", "qa_engineer"]
+        )
+        self.assertTrue(result["planning_warning"])
+        self.assertFalse(result["execution_authorized"])
+        self.assertTrue(result["requires_ceo_approval"])
 
     @patch("technical_manager.ask_ai")
-    def test_reports_ai_failure_without_authorizing_execution(self, ask_ai_mock):
+    def test_uses_safe_fallback_for_malformed_ai_json(self, ask_ai_mock):
+        ask_ai_mock.return_value = "I will prepare a plan, but not JSON."
+
+        result = run_technical_manager("Review the frontend UI.")
+
+        self.assertEqual(result["status"], "PLAN_CREATED")
+        self.assertEqual(result["planning_method"], "SAFE_RULE_BASED_FALLBACK")
+        self.assertEqual(
+            [item["specialist"] for item in result["selected_specialists"]],
+            ["frontend_developer", "qa_engineer"]
+        )
+        self.assertFalse(result["execution_authorized"])
+
+    @patch("technical_manager.ask_ai")
+    def test_provider_failure_does_not_masquerade_as_fallback_success(self, ask_ai_mock):
         ask_ai_mock.side_effect = RuntimeError("provider unavailable")
 
         result = run_technical_manager("Review the project.")
 
         self.assertEqual(result["status"], "ERROR")
+        self.assertEqual(result["error"], "TECHNICAL_PLANNING_FAILED")
         self.assertFalse(result["execution_authorized"])
         self.assertTrue(result["requires_ceo_approval"])
 
