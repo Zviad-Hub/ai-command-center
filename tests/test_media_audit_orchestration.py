@@ -52,6 +52,16 @@ class MediaAuditOrchestrationTests(unittest.TestCase):
             patch("task_manager.load_tasks", return_value=[]),
             patch("task_manager.save_tasks") as save,
             patch("task_manager.os.getenv", return_value=""),
+            patch("task_manager.run_semantic_alignment_audit", return_value={
+                "status": "PASS",
+                "task_coverage": "COMPLETE",
+                "summary": "All requested items are represented.",
+                "missing_requirements": [],
+                "unsupported_claims": [],
+                "contradictions": [],
+                "evidence_gaps": [],
+                "human_review_required": True,
+            }),
         ):
             record = submit_task("Create a short video about the test topic.")
 
