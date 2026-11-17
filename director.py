@@ -185,9 +185,9 @@ def detect_departments(task):
     # "არ გაუშვა Media და Pentester" / "Media და Pentester არ გაუშვა".
     def explicitly_excluded(*aliases):
         negation = (
-            r"(?:არ\\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|"
-            r"გააქტიურო(?:თ)?)|do\\s+not\\s+run|don't\\s+run|"
-            r"exclude|skip|not\\s+run)"
+            r"(?:არ\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|"
+            r"გააქტიურო(?:თ)?)|do\s+not\s+run|don't\s+run|"
+            r"exclude|skip|not\s+run)"
         )
         name = r"(?:%s)" % "|".join(re.escape(alias) for alias in aliases)
         before = re.search(negation + r".{0,60}" + name, text)
