@@ -15,7 +15,7 @@ GROQ_MODEL = os.getenv(
 
 MAX_RETRIES = 4
 MAX_LENGTH_RETRIES = 2
-FALLBACK_MAX_RETRIES = 2
+FALLBACK_MAX_RETRIES = 3
 MAX_COMPLETION_TOKEN_CAP = int(os.getenv("AI_MAX_COMPLETION_TOKEN_CAP", "65536"))
 REQUEST_TIMEOUT = (10, 120)
 
@@ -153,9 +153,9 @@ def _ask_fallback_provider(system_prompt, user_prompt, token_limit, config):
 
         retry_after = response.headers.get("Retry-After")
         try:
-            wait_time = min(max(float(retry_after), 1), 15) if retry_after else min(2 ** (attempt + 1), 8)
+            wait_time = min(max(float(retry_after), 1), 30) if retry_after else min(5 * (2 ** attempt), 20)
         except (TypeError, ValueError):
-            wait_time = min(2 ** (attempt + 1), 8)
+            wait_time = min(5 * (2 ** attempt), 20)
         time.sleep(wait_time)
 
     if response is None:
