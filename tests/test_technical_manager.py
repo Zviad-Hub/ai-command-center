@@ -84,7 +84,7 @@ class TechnicalManagerTests(unittest.TestCase):
         result = run_technical_manager("Review the project.")
 
         self.assertEqual(result["status"], "ERROR")
-        self.assertEqual(result["error"], "TECHNICAL_PLANNING_PROVIDER_FAILED")
+        self.assertEqual(result["error"], "TECHNICAL_PLANNING_FAILED")
         self.assertFalse(result["execution_authorized"])
         self.assertTrue(result["requires_ceo_approval"])
 
