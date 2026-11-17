@@ -72,7 +72,7 @@ def extract_narration(text):
     pattern = (
         r"(?im)^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
         r"(?:\*\*)?(?:SCRIPT|NARRATION)"
-        r"(?:\s*\([^)]*\))?\s*:\s*(?:\*\*)?\s*"
+        r"(?:\s*\([^)]*\))?\s*:?\s*(?:\*\*)?\s*"
         r"(.*?)"
         r"(?=^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
         r"(?:\*\*)?VISUAL DIRECTIONS\s*:|"
@@ -307,6 +307,14 @@ def build_error_result(task, stage, error, partial=None):
         "department": "media",
         "status": "ERROR",
         "failed_stage": stage,
+        "error_type": type(error).__name__,
+        "error_code": (
+            "SCRIPTWRITER_OUTPUT_UNPARSEABLE"
+            if stage == "Scriptwriter" and "narration" in str(error).lower()
+            else "SCRIPTWRITER_EMPTY_OUTPUT"
+            if stage == "Scriptwriter" and "empty" in str(error).lower()
+            else f"{stage.upper().replace(' ', '_')}_FAILED"
+        ),
         "message": f"{stage} failed: {str(error)}",
         "original_ceo_topic": task,
         "concept": partial.get("concept", ""),
@@ -500,9 +508,40 @@ Count the narration words before returning.
     result = result.strip()
     validation = validate_script(result)
 
+    # Models sometimes omit the colon or use a Markdown heading. The parser
+    # accepts both forms; if narration is still absent, make one bounded
+    # format-only repair attempt before failing the stage.
+    if not validation["narration_found"]:
+        repair_prompt = """
+Reformat the supplied response as a complete historical YouTube Shorts script.
+Do not add, remove, or alter historical claims. Do not invent facts.
+Preserve the exact CEO topic and original narration wording wherever possible.
+Return these exact sections, with a colon after each heading:
+VIDEO TITLE:
+EXACT TOPIC:
+HOOK:
+SCRIPT:
+VISUAL DIRECTIONS:
+FACTS TO VERIFY:
+The SCRIPT section must contain the spoken narration. Include all six timestamped
+visual scenes if they exist in the supplied response. If the original response
+contains no narration, say NO NARRATION PROVIDED rather than inventing one.
+"""
+        repaired = ask_ai(
+            repair_prompt,
+            "CEO ORIGINAL REQUEST:\n" + str(task)
+            + "\n\nORIGINAL SCRIPTWRITER RESPONSE:\n" + result
+        )
+        if isinstance(repaired, str) and repaired.strip():
+            repaired = repaired.strip()
+            repaired_validation = validate_script(repaired)
+            if repaired_validation["narration_found"]:
+                result = repaired
+                validation = repaired_validation
+
     if not validation["narration_found"]:
         raise RuntimeError(
-            "Scriptwriter did not return a readable SCRIPT section."
+            "Scriptwriter response contained no extractable narration after one format-repair attempt."
         )
 
     print("[SCRIPTWRITER] Narration words:", validation["narration_word_count"])
