@@ -26,7 +26,11 @@ class ManagerErrorRedactionTests(unittest.TestCase):
     def test_manager_console_does_not_log_raw_user_mission(self):
         output = io.StringIO()
         private_mission = "CONFIDENTIAL_CUSTOMER_PLAN_91f3"
-        with contextlib.redirect_stdout(output):
+        department_module = types.ModuleType("department_agents")
+        department_module.run_department_workflow = lambda department, task, context=None: {
+            "department": department, "status": "COMPLETED"
+        }
+        with patch.dict(sys.modules, {"department_agents": department_module}), contextlib.redirect_stdout(output):
             result = DepartmentManager("finance").receive_task(private_mission)
 
         self.assertNotIn(private_mission, output.getvalue())
