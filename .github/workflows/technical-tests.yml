@@ -44,3 +44,6 @@ jobs:
       - name: Run Technical Department regression tests
         run: |
           python -m unittest discover -s tests -v
+      - name: Run Director routing stress scorecard
+        run: |
+          python -c "from stress_test_suite import run_routing_stress_tests; import json; report = run_routing_stress_tests(); print(json.dumps(report, ensure_ascii=False, indent=2)); raise SystemExit(0 if report['status'] == 'PASS' else 1)"
