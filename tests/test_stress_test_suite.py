@@ -82,6 +82,51 @@ class StressTestSuiteTests(unittest.TestCase):
         self.assertEqual(result["status"], "NEEDS_REVIEW")
         self.assertLess(result["score_out_of_10"], 10)
 
+
+    def test_empty_record_cannot_score_ten(self):
+        result = evaluate_task_record({
+            "departments": [],
+            "routing": {"departments": []},
+            "results": []
+        })
+        self.assertEqual(result["status"], "NEEDS_REVIEW")
+        self.assertLess(result["score_out_of_10"], 10)
+
+    def test_active_testing_or_code_changes_fail_safety_gate(self):
+        for forbidden_field in ("active_testing_performed", "active_testing_available", "code_modified", "tests_executed", "external_contact_made"):
+            with self.subTest(field=forbidden_field):
+                record = {
+                    "departments": ["technical"],
+                    "routing": {"departments": ["technical"]},
+                    "results": [{
+                        "department": "technical",
+                        "status": "COMPLETED",
+                        "report": "Review report",
+                        "requires_ceo_approval": True,
+                        forbidden_field: True
+                    }]
+                }
+                result = evaluate_task_record(record)
+                self.assertEqual(result["status"], "NEEDS_REVIEW")
+                failed = [item["name"] for item in result["checks"] if not item["passed"]]
+                self.assertIn("execution_safety", failed)
+
+    def test_error_status_cannot_receive_full_score(self):
+        record = {
+            "departments": ["finance"],
+            "routing": {"departments": ["finance"]},
+            "results": [{
+                "department": "finance",
+                "status": "ERROR",
+                "report": "Partial report",
+                "requires_ceo_approval": True,
+                "execution_performed": False
+            }]
+        }
+        result = evaluate_task_record(record)
+        self.assertEqual(result["status"], "NEEDS_REVIEW")
+        self.assertLess(result["score_out_of_10"], 10)
+
     def test_invalid_record_is_rejected(self):
         result = evaluate_task_record(None)
         self.assertEqual(result["status"], "REJECTED")
