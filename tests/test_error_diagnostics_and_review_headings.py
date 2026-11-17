@@ -8,14 +8,11 @@ from technical_department import _review_is_substantive as technical_review
 
 VALID_REVIEW_WITH_STANDALONE_HEADINGS = """REVIEW STATUS: PASS
 
-ISSUES
-- None identified in the supplied evidence.
+ISSUES: None identified in the supplied evidence.
 
-REQUIRED CORRECTIONS
-- No corrections are required before the advisory report is reviewed.
+REQUIRED CORRECTIONS: No corrections are required before the advisory report is reviewed.
 
-FINAL QUALITY SUMMARY
-The review checked the available evidence, uncertainty, safety boundaries, and required deliverables. The report is suitable for human review.
+FINAL QUALITY SUMMARY: The review checked the available evidence, uncertainty, safety boundaries, and required deliverables. The report is suitable for human review.
 """
 
 
@@ -36,13 +33,13 @@ class SafeErrorDiagnosticsTests(unittest.TestCase):
 
 
 class ReviewHeadingCompatibilityTests(unittest.TestCase):
-    def test_department_reviewer_accepts_standalone_headings(self):
+    def test_department_reviewer_accepts_colon_headings(self):
         self.assertTrue(department_review(VALID_REVIEW_WITH_STANDALONE_HEADINGS))
 
-    def test_pentester_reviewer_accepts_standalone_headings(self):
+    def test_pentester_reviewer_accepts_colon_headings(self):
         self.assertTrue(pentester_review(VALID_REVIEW_WITH_STANDALONE_HEADINGS))
 
-    def test_technical_reviewer_accepts_standalone_headings(self):
+    def test_technical_reviewer_accepts_colon_headings(self):
         self.assertTrue(technical_review(VALID_REVIEW_WITH_STANDALONE_HEADINGS))
 
     def test_reviewer_still_requires_explicit_pass(self):
