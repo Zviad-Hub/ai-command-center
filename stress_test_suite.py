@@ -43,7 +43,7 @@ def run_routing_stress_tests():
                 "actual_departments": [],
                 "routing_method": "ERROR",
                 "passed": False,
-                "error": str(error),
+                "error": "ROUTING_SCENARIO_FAILED",
             })
 
     total = len(results)

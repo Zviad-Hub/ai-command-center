@@ -9,6 +9,10 @@ from unittest.mock import patch
 import department_agents
 from managers import DepartmentManager
 import director
+import main as command_center_main
+import stress_test_suite
+import technical_agents
+import technical_manager
 import pentester_agents
 import research_agent
 import requests
@@ -182,6 +186,43 @@ class ManagerErrorRedactionTests(unittest.TestCase):
         self.assertEqual(result["status"], "ERROR")
         self.assertNotIn(SECRET_DETAIL, repr(result))
         self.assertIn("provider details were withheld", result["message"])
+
+    def test_technical_manager_provider_exception_is_redacted(self):
+        with patch.object(technical_manager, "ask_ai", side_effect=RuntimeError(SECRET_DETAIL)):
+            result = technical_manager.run_technical_manager("Plan a code review")
+        self.assertEqual(result["status"], "ERROR")
+        self.assertNotIn(SECRET_DETAIL, repr(result))
+        self.assertEqual(result["error"], "TECHNICAL_PLANNING_FAILED")
+
+    def test_technical_agent_provider_exception_is_redacted(self):
+        with patch.object(technical_agents, "ask_ai", side_effect=RuntimeError(SECRET_DETAIL)):
+            result = technical_agents.run_specialist(
+                "backend_developer", mission="Review supplied backend code"
+            )
+        self.assertEqual(result["status"], "ERROR")
+        self.assertNotIn(SECRET_DETAIL, repr(result))
+        self.assertEqual(result["error"], "SPECIALIST_FAILED")
+
+    def test_cli_does_not_print_raw_system_exception(self):
+        output = io.StringIO()
+        with patch("builtins.input", side_effect=["safe task", "exit"]), patch.object(
+            command_center_main, "submit_task", side_effect=RuntimeError(SECRET_DETAIL)
+        ), contextlib.redirect_stdout(output):
+            command_center_main.start()
+        self.assertNotIn(SECRET_DETAIL, output.getvalue())
+        self.assertIn("internal details withheld", output.getvalue())
+
+    def test_routing_stress_report_does_not_store_raw_exception(self):
+        with patch.object(
+            stress_test_suite, "route_task", side_effect=RuntimeError(SECRET_DETAIL)
+        ):
+            report = stress_test_suite.run_routing_stress_tests()
+        self.assertEqual(report["failed"], report["total"])
+        self.assertNotIn(SECRET_DETAIL, repr(report))
+        self.assertTrue(all(
+            item["error"] == "ROUTING_SCENARIO_FAILED"
+            for item in report["results"]
+        ))
 
 
 if __name__ == "__main__":

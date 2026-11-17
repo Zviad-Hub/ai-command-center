@@ -121,7 +121,7 @@ def start():
             break
 
         except Exception as error:
-            print("\nSYSTEM ERROR:", str(error))
+            print("\nSYSTEM ERROR: internal details withheld.")
 
 
 if __name__ == "__main__":

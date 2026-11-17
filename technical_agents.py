@@ -185,7 +185,7 @@ NEXT STEPS:
             "specialist": specialist_id,
             "specialist_name": specialist_name,
             "status": "ERROR",
-            "error": str(error),
+            "error": "SPECIALIST_FAILED",
             "execution_performed": False,
             "code_modified": False,
             "tests_executed": False,
