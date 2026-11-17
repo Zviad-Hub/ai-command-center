@@ -180,14 +180,24 @@ def detect_departments(task):
         "ბიზნესის განვითარ"
     ]
 
-    # Explicit exclusions must override keyword matches. This prevents a
-    # diagnostic request saying "do not run Media" from launching Media.
-    media_excluded = bool(re.search(
-        r"(?:\bmedia\b.{0,40}\b(?:do not run|don't run|exclude|skip|not run)\b"
-        r"|\b(?:do not run|don't run|exclude|skip|not run)\b.{0,40}\bmedia\b"
-        r"|\bmedia\s+არ\s+(?:გაუშვა|გაუშვათ|ჩართო|გაუშვას))",
-        text,
-    ))
+    # Explicit exclusions override keyword matches in both word orders.
+    # Support Georgian and English commands such as:
+    # "არ გაუშვა Media და Pentester" / "Media და Pentester არ გაუშვა".
+    def explicitly_excluded(*aliases):
+        negation = (
+            r"(?:არ\\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|"
+            r"გააქტიურო(?:თ)?)|do\\s+not\\s+run|don't\\s+run|"
+            r"exclude|skip|not\\s+run)"
+        )
+        name = r"(?:%s)" % "|".join(re.escape(alias) for alias in aliases)
+        before = re.search(negation + r".{0,60}" + name, text)
+        after = re.search(name + r".{0,60}" + negation, text)
+        return bool(before or after)
+
+    media_excluded = explicitly_excluded("media", "მედია")
+    pentester_excluded = explicitly_excluded(
+        "pentester", "pentest", "პენტესტერი", "პენტესტ"
+    )
 
     # MEDIA ALWAYS GETS AN INDEPENDENT AUDIT when it is actually requested.
     if not media_excluded and contains_any(text, media_keywords):
@@ -209,7 +219,7 @@ def detect_departments(task):
     if contains_any(text, finance_keywords):
         selected.append("finance")
 
-    if contains_any(text, pentester_keywords):
+    if not pentester_excluded and contains_any(text, pentester_keywords):
         selected.append("pentester")
 
     if contains_any(text, technical_keywords):
