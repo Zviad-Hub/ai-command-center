@@ -204,7 +204,7 @@ def run_technical_manager(task):
             "manager": "Technical Manager",
             "status": "ERROR",
             "message": "Technical planning provider call failed.",
-            "error": "TECHNICAL_PLANNING_PROVIDER_FAILED",
+            "error": "TECHNICAL_PLANNING_FAILED",
             "selected_specialists": [],
             "requires_ceo_approval": True,
             "execution_authorized": False,
