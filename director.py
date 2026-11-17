@@ -180,14 +180,25 @@ def detect_departments(task):
         "ბიზნესის განვითარ"
     ]
 
-    # Explicit exclusions must override keyword matches. This prevents a
-    # diagnostic request saying "do not run Media" from launching Media.
-    media_excluded = bool(re.search(
-        r"(?:\bmedia\b.{0,40}\b(?:do not run|don't run|exclude|skip|not run)\b"
-        r"|\b(?:do not run|don't run|exclude|skip|not run)\b.{0,40}\bmedia\b"
-        r"|\bmedia\s+არ\s+(?:გაუშვა|გაუშვათ|ჩართო|გაუშვას))",
-        text,
-    ))
+    # Explicit exclusions are evaluated inside the same sentence/clause.
+    # This supports "არ გაუშვა Media და Pentester" without accidentally
+    # excluding a department mentioned in a previous sentence.
+    excluded_departments = set()
+    for clause in re.split(r"[\n.!?;]+", text):
+        has_exclusion = bool(re.search(
+            r"(?:არ\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|გააქტიურო(?:თ)?)"
+            r"|do\s+not\s+run|don't\s+run|exclude|skip|not\s+run)",
+            clause,
+        ))
+        if not has_exclusion:
+            continue
+        if re.search(r"\bmedia\b|\bმედია\b", clause):
+            excluded_departments.add("media")
+        if re.search(r"\b(?:pentester|pentest)\b|პენტესტ(?:ერი)?", clause):
+            excluded_departments.add("pentester")
+
+    media_excluded = "media" in excluded_departments
+    pentester_excluded = "pentester" in excluded_departments
 
     # MEDIA ALWAYS GETS AN INDEPENDENT AUDIT when it is actually requested.
     if not media_excluded and contains_any(text, media_keywords):
@@ -209,7 +220,7 @@ def detect_departments(task):
     if contains_any(text, finance_keywords):
         selected.append("finance")
 
-    if contains_any(text, pentester_keywords):
+    if not pentester_excluded and contains_any(text, pentester_keywords):
         selected.append("pentester")
 
     if contains_any(text, technical_keywords):

@@ -39,5 +39,25 @@ class DirectorRoutingTests(unittest.TestCase):
         self.assertEqual(result["routing_method"], "RULE_BASED")
 
 
+    def test_georgian_exclusion_before_department_names(self):
+        departments = detect_departments(
+            "მომეცი მოკლე პასუხი ქართულად: დაადასტურე, რომ AI პროვაიდერი მუშაობს. "
+            "არ გაუშვა Media და Pentester."
+        )
+        self.assertNotIn("media", departments)
+        self.assertNotIn("pentester", departments)
+
+    def test_georgian_exclusion_after_department_names(self):
+        departments = detect_departments("Media და Pentester არ გაუშვა")
+        self.assertNotIn("media", departments)
+        self.assertNotIn("pentester", departments)
+
+    def test_english_exclusions_override_keyword_matches(self):
+        departments = detect_departments("Media and Pentester: do not run either.")
+        self.assertNotIn("media", departments)
+        self.assertNotIn("pentester", departments)
+
+
+
 if __name__ == "__main__":
     unittest.main()
