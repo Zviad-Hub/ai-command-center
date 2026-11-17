@@ -197,7 +197,7 @@ def evaluate_live_result(department, result):
     status = str(result.get("status", "")).upper()
     specialist_reports = result.get("specialist_reports", {})
     specialist_results = result.get("specialist_results", [])
-    if isinstance(specialist_reports, dict):
+    if isinstance(specialist_reports, dict) and specialist_reports:
         specialist_count = len(specialist_reports)
     elif isinstance(specialist_results, list):
         specialist_count = sum(
