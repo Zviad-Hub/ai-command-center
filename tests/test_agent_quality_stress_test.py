@@ -158,7 +158,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         result = evaluate_live_result("tenders", {
             "status": "COMPLETED",
             "specialist_reports": {"a": "eligibility", "b": "documents", "c": "pricing"},
-            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware.",
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware and avoids unsupported tender claims.",
             "quality_review_passed": True,
             "report": report,
             "requires_ceo_approval": True,
@@ -177,7 +177,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         result = evaluate_live_result("tenders", {
             "status": "COMPLETED",
             "specialist_reports": {"a": "eligibility", "b": "documents", "c": "pricing"},
-            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware.",
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware and avoids unsupported tender claims.",
             "quality_review_passed": True,
             "report": report,
             "requires_ceo_approval": True,
@@ -261,6 +261,65 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertLess(result["score_out_of_10"], 10)
         failed = [item["name"] for item in result["checks"] if not item["passed"]]
         self.assertIn("calculation_accuracy", failed)
+
+    def test_live_scorecard_rejects_prose_only_and_duplicate_review_sections(self):
+        invalid_reviews = [
+            (
+                "REVIEW STATUS: PASS\nThe reviewer mentioned issues, required corrections, "
+                "and final quality summary but did not provide separate sections."
+            ),
+            (
+                "REVIEW STATUS: PASS\nISSUES:\nREQUIRED CORRECTIONS:\n"
+                "FINAL QUALITY SUMMARY: The report is complete and evidence-aware."
+            ),
+            (
+                "REVIEW STATUS: PASS\nISSUES: None.\nISSUES: Duplicate.\n"
+                "REQUIRED CORRECTIONS: None.\n"
+                "FINAL QUALITY SUMMARY: The report is complete and evidence-aware."
+            ),
+            (
+                "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None.\n"
+                "FINAL QUALITY SUMMARY: Looks good."
+            ),
+        ]
+
+        for review in invalid_reviews:
+            with self.subTest(review=review):
+                result = evaluate_live_result("finance", {
+                    "status": "COMPLETED",
+                    "specialist_reports": {"a": "one", "b": "two", "c": "three"},
+                    "quality_review": review,
+                    "quality_review_passed": True,
+                    "report": (
+                        "Revenue 2160 GEL; variable cost 840 GEL; contribution "
+                        "1320 GEL; operating result -2880 GEL before tax. Tax not provided."
+                    ),
+                    "requires_ceo_approval": True,
+                })
+                failed = [item["name"] for item in result["checks"] if not item["passed"]]
+                self.assertIn("manager_and_quality_gate", failed)
+
+    def test_live_scorecard_accepts_only_explicit_structured_review(self):
+        review = (
+            "REVIEW STATUS: PASS\n"
+            "ISSUES: No unsupported claims were identified in the supplied evidence.\n"
+            "REQUIRED CORRECTIONS: None; calculations and uncertainty are represented.\n"
+            "FINAL QUALITY SUMMARY: The report is internally consistent, evidence-aware and advisory."
+        )
+        result = evaluate_live_result("finance", {
+            "status": "COMPLETED",
+            "specialist_reports": {"a": "one", "b": "two", "c": "three"},
+            "quality_review": review,
+            "quality_review_passed": True,
+            "report": (
+                "Revenue 2160 GEL; variable cost 840 GEL; contribution "
+                "1320 GEL; operating result -2880 GEL before tax. Tax not provided."
+            ),
+            "requires_ceo_approval": True,
+        })
+        passed = [item for item in result["checks"] if item["name"] == "manager_and_quality_gate"]
+        self.assertEqual(len(passed), 1)
+        self.assertTrue(passed[0]["passed"])
 
     def test_reviewer_pass_requires_substantive_sections(self):
         result = evaluate_live_result("finance", {
