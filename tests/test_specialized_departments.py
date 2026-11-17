@@ -24,7 +24,7 @@ class SpecializedDepartmentTests(unittest.TestCase):
             "Arithmetic review: inputs are incomplete.",
             "Risk review: tax treatment requires local professional review.",
             "Budget scenarios: revenue assumptions are unverified.",
-            "EXECUTIVE SUMMARY\nA sample budget analysis.",
+            "EXECUTIVE SUMMARY\nINPUTS\nCALCULATIONS\nASSUMPTIONS\nRISKS\nRECOMMENDATIONS\nMISSING INFORMATION\nA sample budget analysis.",
             PASS_REVIEW
         ]
         research_mock.return_value = {
@@ -59,7 +59,7 @@ class SpecializedDepartmentTests(unittest.TestCase):
             "Eligibility: official notice not supplied.",
             "Documents: cannot confirm without attachments.",
             "Pricing: no quantities or pricing schedule supplied.",
-            "TENDER OVERVIEW\nDocuments to verify.",
+            "TENDER OVERVIEW\nELIGIBILITY\nMANDATORY DOCUMENTS\nDEADLINES\nEVALUATION CRITERIA\nCOMPLIANCE MATRIX\nRISKS AND GAPS\nQUESTIONS\nDRAFT RESPONSE PLAN\nMISSING MATERIAL\nDocuments to verify.",
             PASS_REVIEW
         ]
         research_mock.return_value = {
@@ -148,6 +148,55 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self.assertEqual(ai_mock.call_count, 3)
         self.assertFalse(result["execution_performed"])
 
+
+    @patch("department_agents._research_context")
+    @patch("department_agents.ask_ai")
+    def test_reviewer_one_line_pass_is_not_accepted(self, ai_mock, research_mock):
+        ai_mock.side_effect = [
+            "Financial specialist findings.",
+            "Risk specialist findings.",
+            "Budget specialist findings.",
+            "EXECUTIVE SUMMARY\nINPUTS\nCALCULATIONS\nASSUMPTIONS\nRISKS\nRECOMMENDATIONS\nMISSING INFORMATION\nComplete finance report.",
+            "REVIEW STATUS: PASS",
+        ]
+        research_mock.return_value = {"status": "NOT_CONFIGURED", "sources": []}
+
+        result = run_department_workflow("finance", "Review a budget.")
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["report"], "")
+        self.assertFalse(result.get("quality_review_passed", False))
+
+    @patch("department_agents._research_context")
+    @patch("department_agents.ask_ai")
+    def test_incomplete_tender_report_is_rejected_even_with_reviewer_pass(
+        self, ai_mock, research_mock
+    ):
+        ai_mock.side_effect = [
+            "Eligibility findings.",
+            "Compliance findings.",
+            "Pricing risk findings.",
+            "TENDER OVERVIEW\nELIGIBILITY\nMANDATORY DOCUMENTS\nA partial report.",
+            PASS_REVIEW,
+        ]
+        research_mock.return_value = {"status": "NOT_CONFIGURED", "sources": []}
+
+        result = run_department_workflow("tenders", "Review tender documents.")
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["report"], "")
+        self.assertIn("deadlines", result["missing_report_sections"])
+        self.assertIn("compliance matrix", result["missing_report_sections"])
+
+    def test_substantive_reviewer_requires_all_sections(self):
+        from department_agents import _review_is_substantive
+
+        self.assertTrue(_review_is_substantive(PASS_REVIEW))
+        self.assertFalse(_review_is_substantive("REVIEW STATUS: PASS"))
+        self.assertFalse(_review_is_substantive(
+            "REVIEW STATUS: NEEDS_REVISION\nISSUES: Missing evidence."
+        ))
+
     def test_empty_department_task_is_rejected(self):
         result = run_department_workflow("finance", " ")
         self.assertEqual(result["status"], "REJECTED")
@@ -165,7 +214,7 @@ class SpecializedDepartmentTests(unittest.TestCase):
             "Market evidence review.",
             "Strategy review.",
             "Operations review.",
-            "Business analysis.",
+            "EXECUTIVE SUMMARY\nBUSINESS CONTEXT\nANALYSIS\nOPTIONS AND TRADE-OFFS\nRISKS\nRECOMMENDATIONS\nKPIS\nMISSING INFORMATION\nBusiness analysis.",
             PASS_REVIEW
         ]
         research_mock.return_value = {
