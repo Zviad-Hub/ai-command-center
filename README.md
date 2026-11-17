@@ -25,9 +25,9 @@ The normal task flow is:
 
 1. **CEO (you):** describe the outcome you want, the scope, constraints and expected deliverables.
 2. **AI Director:** analyzes the request and routes it to one or more departments. The current implementation uses keyword rules first and an AI fallback when no department is detected.
-3. **Department Manager:** receives the task and runs the department-specific workflow.
+3. **Department Manager:** receives its own Director-generated mission, not just a copy of the generic CEO request.
 4. **Specialists:** where implemented, perform their assigned work and return individual results.
-5. **Task Manager:** collects department results and saves a task record in `tasks.json`.
+5. **Task Manager:** preserves the original CEO request, passes prior department results to later managers, and records the complete task result in `tasks.json`.
 6. **CEO:** reviews the result and decides whether to approve any consequential next step.
 
 A department being selected does not mean every requested real-world action is authorized or has been completed. Check each result's `status`, `message`, approval flags and evidence.
@@ -139,9 +139,9 @@ You can submit a task without running Python locally:
 8. Start the workflow and wait for it to finish.
 9. Open the run to inspect its logs and result.
 
-The current workflow runs `task_manager.submit_task()` and saves `tasks.json` back to the repository. It currently has write permission to repository contents for that history update. Review workflow changes carefully before changing permissions or running untrusted code.
+The current workflow runs `task_manager.submit_task()` with read-only repository permissions. It uploads `tasks.json` as the `ai-command-center-task-report` artifact (available from the workflow run) for 14 days. It does not push generated task history into a source branch.
 
-A successful GitHub Actions run means the workflow completed; it does **not** automatically mean every department completed its mission or that its output is factually correct. Read the saved task record and manager results.
+A successful GitHub Actions run means the workflow completed; it does **not** automatically mean every department completed its mission or that its output is factually correct. Download and inspect the task-report artifact and each manager's result.
 
 ## How to write a good CEO task
 
@@ -264,7 +264,7 @@ Wait for separate written authorization and CEO approval.
 
 ## Task history
 
-Each submitted task is stored in `tasks.json` with fields including:
+Each submitted task is stored locally in `tasks.json`. In GitHub Actions, this file is uploaded as a workflow artifact named `ai-command-center-task-report` and retained for 14 days. The record includes:
 
 - `id`: short task identifier
 - `created_at`: UTC timestamp
@@ -301,7 +301,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. Department coverage, routing, specialist capabilities and automated tests are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 14 automated tests across Director routing, Task Manager orchestration, Technical Manager planning and Technical Department execution gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
