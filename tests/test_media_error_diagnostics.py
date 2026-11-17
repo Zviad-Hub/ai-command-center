@@ -36,14 +36,14 @@ class SafeErrorDiagnosticsTests(unittest.TestCase):
         self.assertIn("Groq daily quota", result["message"])
         self.assertFalse(result["publication_approved"])
 
-    def test_unknown_runtime_failure_keeps_stage_fallback(self):
+    def test_unclassified_runtime_failure_uses_safe_provider_fallback(self):
         result = build_error_result(
             "Create a historical short.",
             "Creative Strategist",
             RuntimeError("Unexpected internal failure."),
         )
 
-        self.assertEqual(result["error_code"], "CREATIVE_STRATEGIST_FAILED")
+        self.assertEqual(result["error_code"], "CREATIVE_STRATEGIST_PROVIDER_REQUEST_FAILED")
 
 
 if __name__ == "__main__":
