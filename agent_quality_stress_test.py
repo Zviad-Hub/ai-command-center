@@ -179,11 +179,13 @@ def _tender_deadline_is_evidence_aware(report_text):
         "must be verified", "verify against the official notice",
         "no deadline",
     )
-    deadline_lines = [
-        line.casefold()
-        for line in report_text.splitlines()
-        if any(term in line.casefold() for term in ("deadline", "submission date", "closing date"))
-    ]
+    deadline_lines = []
+    for raw_line in report_text.splitlines():
+        line = raw_line.casefold().strip().strip("*#:- ")
+        if line in ("deadline", "deadlines", "submission date", "closing date"):
+            continue
+        if any(term in line for term in ("deadline", "submission date", "closing date")):
+            deadline_lines.append(line)
     if not deadline_lines:
         return False
     return all(
