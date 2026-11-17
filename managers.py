@@ -22,7 +22,7 @@ class DepartmentManager:
                     "department": "pentester",
                     "status": "REVIEW_REQUIRED",
                     "message": "Pentester workflow failed safely.",
-                    "error": str(error),
+                    "error": "WORKFLOW_FAILED",
                     "report": "",
                     "requires_ceo_approval": True,
                     "execution_authorized": False,
@@ -40,7 +40,7 @@ class DepartmentManager:
                 return {
                     "department": "media",
                     "status": "ERROR",
-                    "message": str(error),
+                    "message": "Department workflow failed safely; internal error details were withheld.",
                     "execution_performed": False
                 }
 
