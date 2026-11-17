@@ -1,6 +1,7 @@
 import json
 
 from ai_brain import ask_ai
+from error_diagnostics import safe_error_code
 
 
 TECHNICAL_SPECIALISTS = {
@@ -198,13 +199,14 @@ def run_technical_manager(task):
 
     try:
         response = ask_ai(TECHNICAL_MANAGER_PROMPT, user_prompt)
-    except Exception:
+    except Exception as error:
         return {
             "department": "technical",
             "manager": "Technical Manager",
             "status": "ERROR",
             "message": "Technical planning provider call failed.",
             "error": "TECHNICAL_PLANNING_FAILED",
+            "error_code": safe_error_code(error),
             "selected_specialists": [],
             "requires_ceo_approval": True,
             "execution_authorized": False,

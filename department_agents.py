@@ -1,5 +1,36 @@
+def _research_context(task, department):
+    """Research is optional evidence gathering, never proof by itself."""
+
+    if not os.getenv("TAVILY_API_KEY"):
+        return {
+            "status": "NOT_CONFIGURED",
+            "sources": [],
+            "warning": "TAVILY_API_KEY is not configured; no web research was performed."
+        }
+
+    try:
+        result = run_research(task)
+
+        if not isinstance(result, dict):
+            return {
+                "status": "ERROR",
+                "sources": [],
+                "warning": "Research returned an invalid result."
+            }
+
+        return result
+
+    except Exception as error:
+        return {
+            "status": "ERROR",
+            "sources": [],
+            "warning": "Research failed; internal error details were withheld."
+        }
+
+
 import os
 
+from error_diagnostics import safe_error_code
 from ai_brain import ask_ai
 from research_agent import run_research
 
@@ -258,41 +289,10 @@ Your first line MUST be exactly one of:
 REVIEW STATUS: PASS
 REVIEW STATUS: NEEDS_REVISION
 
-Then provide ISSUES, REQUIRED CORRECTIONS, and FINAL QUALITY SUMMARY.
+Then provide exactly these standalone headings, each followed by a colon: ISSUES:, REQUIRED CORRECTIONS:, and FINAL QUALITY SUMMARY:. Put the section content after each heading.
 Use NEEDS_REVISION if any material issue remains or evidence is insufficient
 to support a material claim.
 """
-
-
-def _research_context(task, department):
-    """Research is optional evidence gathering, never proof by itself."""
-
-    if not os.getenv("TAVILY_API_KEY"):
-        return {
-            "status": "NOT_CONFIGURED",
-            "sources": [],
-            "warning": "TAVILY_API_KEY is not configured; no web research was performed."
-        }
-
-    try:
-        result = run_research(task)
-
-        if not isinstance(result, dict):
-            return {
-                "status": "ERROR",
-                "sources": [],
-                "warning": "Research returned an invalid result."
-            }
-
-        return result
-
-    except Exception as error:
-        return {
-            "status": "ERROR",
-            "sources": [],
-            "warning": "Research failed; internal error details were withheld."
-        }
-
 
 def _format_research(research):
     sources = research.get("sources", [])
@@ -390,7 +390,8 @@ def run_department_workflow(department, task, context=None):
         except Exception as error:
             specialist_failures.append({
                 "specialist": specialist_id,
-                "error": "SPECIALIST_FAILED"
+                "error": "SPECIALIST_FAILED",
+                "error_code": safe_error_code(error),
             })
 
     base_result = {
@@ -505,5 +506,6 @@ Review the draft independently. The report must remain advisory only.
             "status": "REVIEW_REQUIRED",
             "message": "The department could not prepare and independently approve a reliable report.",
             "error": "DEPARTMENT_WORKFLOW_FAILED",
+            "error_code": safe_error_code(error),
             "report": ""
         }
