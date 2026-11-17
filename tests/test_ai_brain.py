@@ -230,5 +230,41 @@ class AskAITests(unittest.TestCase):
         self.assertNotIn("private provider detail", str(raised.exception))
 
 
+    @patch.dict(os.environ, {
+        "GROQ_API_KEY": "primary-key", "GEMINI_API_KEY": "gemini-test-key",
+        "AI_FALLBACK_API_URL": "https://openrouter.ai/api/v1/chat/completions",
+        "AI_FALLBACK_API_KEY": "openrouter-test-key", "AI_FALLBACK_MODEL": "openrouter/auto",
+    })
+    @patch("ai_brain.requests.post")
+    def test_openrouter_is_used_after_gemini_daily_quota_exhaustion(self, post):
+        groq = Mock(status_code=429, ok=False, text='{"error":"daily quota exhausted"}')
+        gemini = Mock(status_code=429, ok=False, text='{"error":"daily quota exhausted"}')
+        post.side_effect = [groq, gemini, _response("OpenRouter recovered")]
+        self.assertEqual(ai_brain.ask_ai("system prompt", "user prompt"), "OpenRouter recovered")
+        self.assertEqual(post.call_count, 3)
+        self.assertIn("api.groq.com", post.call_args_list[0].args[0])
+        self.assertIn("generativelanguage.googleapis.com", post.call_args_list[1].args[0])
+        self.assertEqual(post.call_args_list[2].args[0], "https://openrouter.ai/api/v1/chat/completions")
+        self.assertEqual(post.call_args_list[2].kwargs["headers"]["Authorization"], "Bearer openrouter-test-key")
+        self.assertEqual(post.call_args_list[2].kwargs["json"]["model"], "openrouter/auto")
+
+    @patch.dict(os.environ, {
+        "GROQ_API_KEY": "primary-key", "GEMINI_API_KEY": "gemini-test-key",
+        "AI_FALLBACK_API_URL": "https://openrouter.ai/api/v1/chat/completions",
+        "AI_FALLBACK_API_KEY": "openrouter-test-key", "AI_FALLBACK_MODEL": "openrouter/auto",
+    })
+    @patch("ai_brain.requests.post")
+    def test_fallback_chain_reports_safe_exhaustion(self, post):
+        groq = Mock(status_code=429, ok=False, text='{"error":"daily quota exhausted"}')
+        gemini = Mock(status_code=429, ok=False, text='{"error":"daily quota exhausted"}')
+        router = Mock(status_code=402, ok=False, text='{"error":"private billing detail"}')
+        post.side_effect = [groq, gemini, router]
+        with self.assertRaisesRegex(RuntimeError, "All configured fallback providers failed") as raised:
+            ai_brain.ask_ai("system prompt", "user prompt")
+        self.assertIn("Gemini fallback provider daily quota", str(raised.exception))
+        self.assertIn("OpenRouter fallback provider HTTP error: 402", str(raised.exception))
+        self.assertNotIn("private billing detail", str(raised.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
