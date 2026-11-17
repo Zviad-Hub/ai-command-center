@@ -1,5 +1,434 @@
 [
     {
+        "id": "7fb19c86",
+        "created_at": "2026-11-17T08:03:41.092522+00:00",
+        "task": "TECHNICAL DEPARTMENT — FIRST INDEPENDENT STRESS TEST  You are receiving this task as a normal customer request.  I want to build a small task management web application.  Requirements: 1. Users must be able to create, edit and delete tasks. 2. Each task must have a title, description, status and deadline. 3. Tasks must be stored in a database. 4. The application must have a REST API. 5. The system must validate user input. 6. The application must include automated tests. 7. The architecture must support future expansion.  Your mission:  - Analyze the requirements. - Select the appropriate technical specialists. - Ask the System Architect to propose the architecture. - Ask Backend and Database Engineers to design the backend and data model. - Ask Frontend Developer to propose the interface. - Ask QA Engineer to prepare a testing strategy. - Ask Code Reviewer to independently evaluate the proposed solution. - Ask DevOps Engineer to recommend deployment architecture. - Ask Security Engineer to identify defensive security risks.  STRICT RULES: - Each specialist must return an individual report. - Identify missing information and technical risks. - Do not invent completed tests. - Do not claim that code was executed. - Do not modify files or deploy anything. - Do not perform active security testing. - Return one consolidated technical report.  CEO approval is required before implementation.",
+        "analysis": "დავალება გაანალიზებულია. დეპარტამენტები შეირჩა დავალების შინაარსის მიხედვით.",
+        "departments": [
+            "media",
+            "audit",
+            "technical"
+        ],
+        "requires_ceo_approval": true,
+        "results": [
+            {
+                "department": "media",
+                "status": "ERROR",
+                "failed_stage": "Scriptwriter",
+                "message": "Scriptwriter failed: Groq daily quota has been exhausted. Wait for the quota reset or check your Groq plan.",
+                "original_ceo_topic": "TECHNICAL DEPARTMENT — FIRST INDEPENDENT STRESS TEST  You are receiving this task as a normal customer request.  I want to build a small task management web application.  Requirements: 1. Users must be able to create, edit and delete tasks. 2. Each task must have a title, description, status and deadline. 3. Tasks must be stored in a database. 4. The application must have a REST API. 5. The system must validate user input. 6. The application must include automated tests. 7. The architecture must support future expansion.  Your mission:  - Analyze the requirements. - Select the appropriate technical specialists. - Ask the System Architect to propose the architecture. - Ask Backend and Database Engineers to design the backend and data model. - Ask Frontend Developer to propose the interface. - Ask QA Engineer to prepare a testing strategy. - Ask Code Reviewer to independently evaluate the proposed solution. - Ask DevOps Engineer to recommend deployment architecture. - Ask Security Engineer to identify defensive security risks.  STRICT RULES: - Each specialist must return an individual report. - Identify missing information and technical risks. - Do not invent completed tests. - Do not claim that code was executed. - Do not modify files or deploy anything. - Do not perform active security testing. - Return one consolidated technical report.  CEO approval is required before implementation.",
+                "concept": "EXACT TOPIC:\nTECHNICAL DEPARTMENT — FIRST INDEPENDENT STRESS TEST  You are receiving this task as a normal customer request.  I want to build a small task management web application.  Requirements: 1. Users must be able to create, edit and delete tasks. 2. Each task must have a title, description, status and deadline. 3. Tasks must be stored in a database. 4. The application must have a REST API. 5. The system must validate user input. 6. The application must include automated tests. 7. The architecture must support future expansion.  Your mission:  - Analyze the requirements. - Select the appropriate technical specialists. - Ask the System Architect to propose the architecture. - Ask Backend and Database Engineers to design the backend and data model. - Ask Frontend Developer to propose the interface. - Ask QA Engineer to prepare a testing strategy. - Ask Code Reviewer to independently evaluate the proposed solution. - Ask DevOps Engineer to recommend deployment architecture. - Ask Security Engineer to identify defensive security risks.  STRICT RULES: - Each specialist must return an individual report. - Identify missing information and technical risks. - Do not invent completed tests. - Do not claim that code was executed. - Do not modify files or deploy anything. - Do not perform active security testing. - Return one consolidated technical report.  CEO approval is required before implementation.\n\nVIDEO CONCEPT:\n**Exact Topic**  \nTECHNICAL DEPARTMENT — FIRST INDEPENDENT STRESS TEST – Request to design a small task‑management web application (create/edit/delete tasks, title + description + status + deadline, DB storage, REST API, input validation, automated tests, expandable architecture).\n\n**Video Concept**  \nA “Behind‑the‑Scenes Sprint” short that walks viewers through the *real‑world coordination* of multiple specialists to turn the CEO’s checklist into a concrete technical blueprint—showing the rapid exchange of reports, highlighted gaps, and the final consolidated plan ready for CEO sign‑off.\n\n**Hook**  \n“Ever wonder how a single customer request becomes a full‑blown, multi‑discipline tech plan in under a day? Watch the stress‑test of our Technical Department in 60 seconds!”\n\n**Key Questions to Investigate**  \n1. Which specialists are essential for each requirement (e.g., Backend vs. Database vs. Security)?  \n2. What missing information does the CEO’s brief leave (auth, user roles, scalability metrics, deadline formats)?  \n3. What are the top technical risks (validation edge cases, API versioning, test coverage gaps, deployment bottlenecks)?  \n4. How can the architecture stay “future‑proof” for added features (e.g., collaboration, notifications)?\n\n**Supported Historical Details** *(from supplied sources)*  \n- Lovable’s no‑code builder can generate a custom task‑management app with authentication and real‑time data, illustrating a rapid‑prototyping path.【1†L1-L8】  \n- Knack’s guide outlines assigning tasks to users and role‑based visibility, confirming the need for per‑user access control.【2†L1-L7】  \n- A DEV Community post (Jun 7 2025) discusses backend design for a task‑management web app, showing the community’s recent interest in such projects.【4†L1-L6】  \n- GitHub repo “task‑management‑database‑mysql” provides a ready‑made MySQL schema for users, tasks, and activities, useful for the data‑model specialist.【8†L1-L7】\n\n**Uncertain Details**  \n- Exact performance targets or load expectations for the “stress test” (no numbers provided).  \n- Specific security standards the Security Engineer must enforce (e.g., OWASP level, GDPR compliance).  \n- Preferred tech stack (Node/Express, Django, etc.) – only implied by MERN tutorial video, not confirmed.  \n- Whether the CEO expects user authentication to be built or leveraged from an existing SSO solution.\n\nHOOK:\nInvestigate the central historical mystery using evidence rather than assumptions.\n\nKEY QUESTIONS TO INVESTIGATE:\nWhich details are supported by the supplied historical evidence, and which remain uncertain?\n\nSUPPORTED HISTORICAL DETAILS:\nUse only details directly supported by supplied research.\n\nUNCERTAIN DETAILS:\nClaims without sufficient supplied evidence require further verification.",
+                "script": "",
+                "edited_script": "",
+                "initial_fact_check": "",
+                "fact_check": "",
+                "research": {
+                    "status": "COMPLETED",
+                    "original_ceo_topic": "TECHNICAL DEPARTMENT — FIRST INDEPENDENT STRESS TEST  You are receiving this task as a normal customer request.  I want to build a small task management web application.  Requirements: 1. Users must be able to create, edit and delete tasks. 2. Each task must have a title, description, status and deadline. 3. Tasks must be stored in a database. 4. The application must have a REST API. 5. The system must validate user input. 6. The application must include automated tests. 7. The architecture must support future expansion.  Your mission:  - Analyze the requirements. - Select the appropriate technical specialists. - Ask the System Architect to propose the architecture. - Ask Backend and Database Engineers to design the backend and data model. - Ask Frontend Developer to propose the interface. - Ask QA Engineer to prepare a testing strategy. - Ask Code Reviewer to independently evaluate the proposed solution. - Ask DevOps Engineer to recommend deployment architecture. - Ask Security Engineer to identify defensive security risks.  STRICT RULES: - Each specialist must return an individual report. - Identify missing information and technical risks. - Do not invent completed tests. - Do not claim that code was executed. - Do not modify files or deploy anything. - Do not perform active security testing. - Return one consolidated technical report.  CEO approval is required before implementation.",
+                    "extracted_topic": "TECHNICAL DEPARTMENT — FIRST INDEPENDENT STRESS TEST  You are receiving this task as a normal customer request.  I want to build a small task management web application.  Requirements: 1. Users must be able to create, edit and delete tasks. 2. Each task must have a title, description, status and deadline. 3. Tasks must be stored in a database. 4. T",
+                    "query": "TECHNICAL DEPARTMENT — FIRST INDEPENDENT STRESS TEST  You are receiving this task as a normal customer request.  I want to build a small task management web application.  Requirements: 1. Users must be able to create, edit and delete tasks. 2. Each task must have a title, description, status and deadline. 3. Tasks must be stored in a database. 4. T reliable sources authoritative records official documentation primary evidence",
+                    "source_count": 15,
+                    "full_page_count": 10,
+                    "snippet_count": 5,
+                    "sources": [
+                        {
+                            "title": "How to Build a Task Management App in Hours | Lovable",
+                            "url": "https://lovable.dev/guides/how-to-build-a-task-management-app",
+                            "domain": "lovable.dev",
+                            "content": "[Log in](/login?redirect=%2Fguides%2Fhow-to-build-a-task-management-app)[Get started](/signup?redirect=%2Fguides%2Fhow-to-build-a-task-management-app)\n\n[Log in](/login?redirect=%2Fguides%2Fhow-to-build-a-task-management-app)[Get started](/signup?redirect=%2Fguides%2Fhow-to-build-a-task-management-app)\n\nPublished March 25, 2026 in Use Case Pages\n\n# How to Build a Task Management App\n\n![How to Build a Task Management App](https://lovable.dev/cdn-cgi/image/width=3840,f=auto,fit=scale-down,quality=95/https://assets.lovable.dev/content/guides/thumbnails/how-to-build-a-task-management-app.jpg)\n\nAuthor: Lovable Team at Lovable\n\nOff-the-shelf tools can get you part of the way there. For many teams and independent builders, though, they still force compromises on the features that matter most. So the default becomes an off-the-shelf tool, [Asana](https://asana.com/), [Trello](https://trello.com/), [ClickUp](https://clickup.com/), that almost fits the workflow but never matches it exactly.\n\nThere's another path between those two extremes. With Lovable, an AI-powered no-code builder, you can build a fully custom, deployable task management web application with authentication, real-time data, and role-based permissions in an afternoon, without hiring a developer. This guide walks through the process we use to take task managers from idea to production in a single session.\n\n## **What Your Task Management Web Application Actually Needs**\n\nA production-ready task management web application ",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.5607639,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "How to Build a Task Management App",
+                            "url": "https://docs.knack.com/v3/docs/add-assignments-to-your-app",
+                            "domain": "docs.knack.com",
+                            "content": "For AI agents: the docs index is at https://docs.knack.com/v3/llms.txt. Append .md to any documentation page URL to get its markdown version.\n\n[Jump to Content](#content)\n\n[Home](/v3/)[Documentation](/v3/docs)[Developer Documentation](/v3/reference)\n\n---\n\n[Home](/v3/)[Log In](/login?redirect_uri=/docs/add-assignments-to-your-app)[![Knack](https://files.readme.io/34ca59be00c47fa9e3c0ecac7195151c52a625a5661cfbda289ee7311d113a7f-knack-logo_1.png)](/v3)\n\n[Log In](/login?redirect_uri=/v3/docs/add-assignments-to-your-app)\n\n\n\n1. How-To Guides\n2. [App Walkthroughs](/v3/docs/app-walkthroughs)\n\n# How to Build a Task Management App\n\n### Use Case\n\nImagine you have a system where users can be assigned to individual records. These assigned records can then be made visible only to the specific user.\n\nThis can be useful in various situations, such as task management. For instance, supervisors can assign tasks to employees, ensuring that each employee only sees and acts upon their assigned tasks.\n\nUsers can also be assigned to user roles. Those roles can then be used to specify what information and functionality users have access to.\n\n### Requirements\n\nTo implement this workflow into your app, you must **[activate users and configure user settings for page logins and user roles.](/docs/about-users#/)**\n\nIf this your first time creating an app, you'll need to know some basics about adding tables, fields, pages, and views. You can start by learning from our \\*\\*[Builder Basics section](/docs/gu",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.47172514,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Web-Based Task Management System Guide | PDF",
+                            "url": "https://www.scribd.com/document/732285235/project-idea",
+                            "domain": "scribd.com",
+                            "content": "Develop a web-based task management system that allows users to create, manage, and track their tasks and to-do lists. Design the database schema to store",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.40368438,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "[Backend Desing] Task Management Web application - DEV Community",
+                            "url": "https://dev.to/shelner/backend-desing-task-management-web-application-248p",
+                            "domain": "dev.to",
+                            "content": "![DEV Community](https://media2.dev.to/dynamic/image/quality=100/https://dev-to-uploads.s3.amazonaws.com/uploads/logos/resized_logo_UQww2soKuUsjaOGNB38o.png)\n\n## DEV Community\n\n![](https://assets.dev.to/assets/heart-plus-active-9ea3b22f2bc311281db911d416166c5f430636e76b15cd5df6b3b841d830eefa.svg)\n![](https://assets.dev.to/assets/sparkle-heart-5f9bee3767e18deb1bb725290cb151c25234768a0e9a2bd39370c382d02920cf.svg)\n![](https://assets.dev.to/assets/multi-unicorn-b44d6f8c23cdd00964192bedc38af3e82463978aa611b4365bd33a0f1f4f3e97.svg)\n![](https://assets.dev.to/assets/exploding-head-daceb38d627e6ae9b730f36a1e390fca556a4289d5a41abb2c35068ad3e2c4b5.svg)\n![](https://assets.dev.to/assets/raised-hands-74b2099fd66a39f2d7eed9305ee0f4553df0eb7b4f11b01b6b1b499973048fe5.svg)\n![](https://assets.dev.to/assets/fire-f60e7a582391810302117f987b22a8ef04a2fe0df7e3258a5f49332df1cec71e.svg)\n![Shelner](https://media2.dev.to/dynamic/image/width=50,height=50,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F2973489%2Fa63ff6f9-693f-468d-bab4-dce2b028a01e.jpg)\n\nPosted on Jun 7, 2025\n\n![](https://assets.dev.to/assets/sparkle-heart-5f9bee3767e18deb1bb725290cb151c25234768a0e9a2bd39370c382d02920cf.svg)\n![](https://assets.dev.to/assets/multi-unicorn-b44d6f8c23cdd00964192bedc38af3e82463978aa611b4365bd33a0f1f4f3e97.svg)\n![](https://assets.dev.to/assets/exploding-head-daceb38d627e6ae9b730f36a1e390fca556a4289d5a41abb2c35068ad3e2c4b5.svg)\n![](ht",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.397646,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Task Mangement Web Application - Figma",
+                            "url": "https://www.figma.com/community/file/1410860801881811417/task-mangement-web-application",
+                            "domain": "figma.com",
+                            "content": "Task Creation and Organization: Users can create tasks, set deadlines, and categorize them into projects or lists. Tasks can be organized by priority,",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.39140594,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Design a Task Management Application",
+                            "url": "https://medium.com/@ankitviddya/design-a-task-management-application-5140afb60a11",
+                            "domain": "medium.com",
+                            "content": "[Sitemap](https://medium.com/sitemap/sitemap.xml)\n\n[Open in app](https://play.google.com/store/apps/details?id=com.medium.reader&referrer=utm_source%3DmobileNavBar&source=---top_nav_layout_nav-------------------------------------------)\n\nSign up\n\n[Sign in](https://medium.com/m/signin?operation=login&redirect=https%3A%2F%2Fmedium.com%2F%40ankitviddya%2Fdesign-a-task-management-application-5140afb60a11&source=post_page---top_nav_layout_nav-----------------------global_nav--------------------)\n\n[](https://medium.com/?source=---top_nav_layout_nav-------------------------------------------)\n\nGet app\n\n[Write](https://medium.com/m/signin?operation=register&redirect=https%3A%2F%2Fmedium.com%2Fnew-story&source=---top_nav_layout_nav-----------------------new_post_topnav--------------------)\n\n[Search](https://medium.com/search?source=---top_nav_layout_nav-------------------------------------------)\n\nSign up\n\n[Sign in](https://medium.com/m/signin?operation=login&redirect=https%3A%2F%2Fmedium.com%2F%40ankitviddya%2Fdesign-a-task-management-application-5140afb60a11&source=post_page---top_nav_layout_nav-----------------------global_nav--------------------)\n\n![Image 1: Unknown user](https://miro.medium.com/v2/resize:fill:64:64/1*dmbNkD5D-u45r44go_cf0g.png)\n\n1.   [System requirements](https://medium.com/?source=post_page-----5140afb60a11-----------------------------------------#21b0 \"System requirements\")\n2.   [Functional:](https://medium.com/?source=post_page-----5140afb60a11----------------",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.3720488,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Microsoft Access Task Management Database. Design and Build Your Own! To Do List. Link to Customers.",
+                            "url": "https://www.youtube.com/watch?v=Rak01ZCf5Ck",
+                            "domain": "youtube.com",
+                            "content": "# Microsoft Access Task Management Database. Design and Build Your Own! To Do List. Link to Customers.\n## Channel: Computer Learning Zone (verified)\n254K subscribers\n493 likes\n\n### Description\n71,455 views\nPosted: 2022-03-09\nIn this video, I'm going to teach you how to build your own task management database in Microsoft Access. We will add all of the standard fields: description, notes, date created, date due, date closed, priority, and what customer it's for. We'll make buttons to show all tasks vs. open tasks only. \n\nWalter from Amarillo, Texas (a Platinum Member) asks: I would love it if you could show us how to build a task management database. I have a million things on my \"to do\" list. I need help organizing them based on priority, due date, what customer they're for, and that kind of stuff. If you could show me how to make buttons to show just the open tasks or ALL the tasks, that would be great too. Oh, and a search box! Thanks.\n\nSilver Members and up get access to an Extended Cut of this video. Members will learn how to get rid of the queries and replace them with SQL directly in the button code. We'll also create buttons we can click on to sort by various fields: date due, priority, or description. We'll also make a search box that will look for keywords in the description or notes fields and filter the results accordingly.\n\nMEMBERS VIDEO: \n   • Task Management MEMBERS ONLY EXTENDED CUT ...  \n\nBECOME A MEMBER:\nYouTube:    / @599cd  \nor My Site: https://599cd.com/TH",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.33906123,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - tutorials24x7/task-management-database-mysql: The Task Management Database Design in MySQL to manage the Users, Tasks, and Activities. · GitHub",
+                            "url": "https://github.com/tutorials24x7/task-management-database-mysql",
+                            "domain": "github.com",
+                            "content": "[Skip to content](#start-of-content)   \n \n \n\n## Navigation Menu\n\n[Sign in](/login?return_to=https%3A%2F%2Fgithub.com%2Ftutorials24x7%2Ftask-management-database-mysql)\n\nAppearance settings\n\n[Sign in](/login?return_to=https%3A%2F%2Fgithub.com%2Ftutorials24x7%2Ftask-management-database-mysql)\n\n[Sign up](/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E&source=header-repo&source_repo=tutorials24x7%2Ftask-management-database-mysql)\n\nAppearance settings\n\nYou signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert\n\n{{ message }}\n\n## Repository navigation\n\n \n\n![tutorials24x7](https://avatars.githubusercontent.com/u/13129460?s=60&v=4)\n\n**[task-management-database-mysql](/tutorials24x7/task-management-database-mysql)**\n\nPublic\n\n* [Notifications](/login?return_to=%2Ftutorials24x7%2Ftask-management-database-mysql)You must be signed in to change notification settings\n* [Fork2 (2)](/login?return_to=%2Ftutorials24x7%2Ftask-management-database-mysql)\n* [Star4 (4)](/login?return_to=%2Ftutorials24x7%2Ftask-management-database-mysql)You must be signed in to star a repository\n\n## About\n\nThe Task Management Database Design in MySQL to manage the Users, Tasks, and Activities.\n\n### Resources\n\n[Readme](#readme-ov-file)\n\n[MIT license](#MIT-1-ov-file)\n\n[Activity](/tutorials24x7/",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.3348069,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Let's build a basic task manager in 30 minutes",
+                            "url": "https://www.youtube.com/watch?v=bD1HjmCp5hY",
+                            "domain": "youtube.com",
+                            "content": "# Let's build a basic task manager in 30 minutes\n## Channel: A Better Computer\n39.8K subscribers\n222 likes\n\n### Description\n6,734 views\nPosted: 2025-03-07\nApple developer account info https://developer.apple.com/\nCursor editor ($20/month) https://www.cursor.com/\n\nNo promo codes or affiliate links, just a workflow I've used to make some cool personal things.\n\nFollow A Better Computer on Mastodon at https://isfeeling.social/@abc\n\nFollow Matt:\nMastodon: https://isfeeling.social/@matt\nBlog: https://birchtree.me\n\nI use ls.graphics to make all my device mock ups. Check them out here https://ls.graphics/?via=matt\n\n### Transcript\n[0:00] hey everybody welcome back to better computer my name is Matt and today we're going to do something a little different for the channel we're going to build a basic app together and we're going to do\n[0:07] that using cursor which uh previously I called the most transformative app I've used um in a long time and so we're\n[0:15] going to use this to build an app uh for iOS and I haven't tested this already to see if it'll work but it should work and\n[0:23] we're just going to try it out so we're going to open up xcode for the record I'm not going to show you how to install xcode how to sign up for an Apple account how to install cursor it's it's\n[0:32] normal stuff links in the description for both of them but let's go ahead and create a new project from the ground up um we're going to make a iOS well let's\n[0:41] do a multiplatform app why not and what",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.31848517,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Watch Me Build a Task Management App Live | Part I | Frontend Project | GeeksforGeeks",
+                            "url": "https://www.youtube.com/watch?v=qw5_epRJPps",
+                            "domain": "youtube.com",
+                            "content": "# Watch Me Build a Task Management App Live | Part I | Frontend Project | GeeksforGeeks\n## Channel: GeeksforGeeks (verified)\n1.24M subscribers\n\n### Description\n2,897 views\nPosted: 2024-08-17\nWatch Part I here:    • Video  \n\nBuild your dream task management app from scratch! 🚀 Join Viraj as he create a powerful task management application using the MERN stack. Learn how to structure your project, implement user authentication, and design a user-friendly interface. \nLet's tackle real-world challenges together and build something amazing!\n\n#mernstack #taskmanagement #frontend #backend #nodejs #react #mongodb #coding #tutorial #webdevelopment #programming #jira \n\nViraj Mentor\ngithub.com/virajj014\nhttps://www.linkedin.com/in/harshal-j...\n\nIntroduction of JIRA\nhttps://www.geeksforgeeks.org/introdu...\n\nTop 10 Front-End Web Development Projects For Beginners\nhttps://www.geeksforgeeks.org/top-10-...\n\nExplore Premium LIVE and Online Courses : \nhttps://practice.geeksforgeeks.org/co...\n\nFollow us for more fun, knowledge and resources:\n\n📱 Download GeeksforGeeks' Official App: https://geeksforgeeksapp.page.link/gf...\n\n💬 Twitter-   / geeksforgeeks   \n\n 🧑‍💼 LinkedIn-   / geeksforgeeks  \n\n📷 Instagram- https://www.instagram.com/geeks_for_g... \n\n💌 Telegram- https://t.me/s/geeksforgeeks_official \n\nAlso, Subscribe if you haven't already! :)\n\n#GeeksforGeeks #Learntocode #gfg \nMERN stack\nfrontend development\ntask management app\nlive coding\ntutorial\nweb development\nprogramming\nreact\nnode js\nmongodb\n",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.31048527,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Task Management Web App Project Overview | PDF - Scribd",
+                            "url": "https://www.scribd.com/document/974486506/2210990937-Vansh-Jangra-pptx",
+                            "domain": "scribd.com",
+                            "content": "The document presents a project on a web-based Task Management Application aimed at improving productivity through efficient task",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.2859698,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "ayushman1024/TASK-Management-System: Spring Boot ... - GitHub",
+                            "url": "https://github.com/ayushman1024/TASK-Management-System",
+                            "domain": "github.com",
+                            "content": "Task management system is a demonstration web application developed for team project works where users can manage various tasks within a team easily.",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.2656899,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "12 Best Task Management Software Reviewed",
+                            "url": "https://tmetric.com/best-software/best-task-management-software",
+                            "domain": "tmetric.com",
+                            "content": "# 12 Best Task Management Software for Agencies\n\nThere are many task management tools on the market. This guide compares top tools that help streamline workflows, improve team collaboration, and keep projects on track - so agencies can deliver work faster, stay organized, and scale more efficiently.\n\nBy [Dereck Mushingairi](https://www.linkedin.com/in/derrick-t-mushi-7481b7147/) | February 22, 2026\n\nFor most agency teams, the workday starts the same way: a browser full of tabs, each representing a different piece of a project that should feel connected—but never quite does.\n\nTasks live in one tool, updates surface in another, feedback gets buried in chat threads, and the real project status exists mostly as an educated guess. Work moves forward, but clarity lags behind.\n\nThis is exactly where modern task management software makes a difference. In this guide, we review the best task management tools for agencies, focusing on teams working across Asana, Notion, Jira, Google Workspace, Slack, and ClickUp.\n\nRead on to see which platforms actually give teams the unified task visibility today’s agency workflows require.\n\n## How we selected these tools\n\nOur selection process was practical and hands-on. We started by reviewing real feedback from agency teams on G2, Capterra, and industry forums to understand where each tool excels—and where it falls short.\n\nNext, we tested each platform directly. We created sample projects, assigned tasks and dependencies, and ran full workflows to e",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.24689633,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Designing a Flexible Task Management Database",
+                            "url": "https://www.sqlservercentral.com/articles/designing-a-flexible-task-management-database",
+                            "domain": "sqlservercentral.com",
+                            "content": "In this article by Jamie Voss, he shows the methodology he used to develop his task management database.",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.24617071,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "I Tried 10 Task Management Software: Here's What Works In 2026",
+                            "url": "https://thedigitalprojectmanager.com/tools/best-task-management-software",
+                            "domain": "thedigitalprojectmanager.com",
+                            "content": "[![The Digital Project Manager](https://thedigitalprojectmanager.com/cdn-cgi/image/format=auto,quality=82,onerror=redirect/wp-content/uploads/2024/02/dpm-logo@2x.png)The Digital Project Manager](https://thedigitalprojectmanager.com/)Work Smarter. Deliver Faster. Lead Better.\n\nPopular insights\n\n [Best Project Management Software](/tools/best-project-management-software/)   [PPM Tools](/tools/ppm-tools/)   [Mind Mapping Software](/tools/mind-mapping-software/)\n\n[Find Your ToolOpens new window](https://findyourtool.thedigitalprojectmanager.com/)\n\n[![](data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCc+PC9zdmc+) Add as a preferred source on Google Opens new window](https://www.google.com/preferences/source?q=thedigitalprojectmanager.com)   [Find Your Tool](https://findyourtool.thedigitalprojectmanager.com/)   [Find Your Tool](https://findyourtool.thedigitalprojectmanager.com/)\n\n\n\n[Task Management](https://thedigitalprojectmanager.com/productivity/task-management/)\n\n# I Tried 10 Task Management Software: Here’s What Works In 2026\n\n[![ben aston headshot](https://thedigitalprojectmanager.com/cdn-cgi/image/format=auto,quality=82,onerror=redirect,width=100,fit=scale-down/wp-content/uploads/2025/12/Ben-Aston-1_800x800-00498.jpg)](https://thedigitalprojectmanager.com/author/benaston/)\n\nBy\n\nBen Aston\n\nBen Aston Founder/CEO, Black and White Zebra\n\nI'm the founder of The Digital Project Manager, drawing on 20+ years leading digital pro",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.24310297,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        }
+                    ],
+                    "warning": "Research results are evidence candidates. A preferred domain does not prove a claim. URLs have not been independently verified. Fact-check every claim against supplied content."
+                },
+                "narration_word_count": 0,
+                "validation": {},
+                "publication_approved": false,
+                "specialists": [
+                    "Research Agent",
+                    "Creative Strategist"
+                ],
+                "warnings": [
+                    "Pipeline stopped during: Scriptwriter.",
+                    "Previously completed work has been preserved.",
+                    "CEO review is required.",
+                    "Publication is not approved."
+                ]
+            },
+            {
+                "department": "audit",
+                "status": "REVIEW_REQUIRED",
+                "auditors": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "checks": [
+                            {
+                                "check": "Topic preservation",
+                                "passed": false,
+                                "details": "The original Roanoke Lost Colony topic must be preserved."
+                            },
+                            {
+                                "check": "Narration word count",
+                                "passed": false,
+                                "details": "Detected 0 words; required 125-140."
+                            },
+                            {
+                                "check": "Six visual scenes",
+                                "passed": false,
+                                "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                            },
+                            {
+                                "check": "Required content sections",
+                                "passed": false,
+                                "details": "Missing: video title, script, visual directions, facts to verify"
+                            },
+                            {
+                                "check": "Narration completeness",
+                                "passed": false,
+                                "details": "Final narration must be present."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "checks": [
+                            {
+                                "check": "Source verification",
+                                "passed": false,
+                                "details": "Sources: 15; valid URLs: 15; statuses: ['NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED']. URL structure does not prove source verification."
+                            },
+                            {
+                                "check": "Fact-check report present",
+                                "passed": false,
+                                "details": "Fact-check report is missing or empty."
+                            },
+                            {
+                                "check": "Fact-check statuses present",
+                                "passed": false,
+                                "details": "No explicit VERIFIED, NEEDS SOURCE or CONTRADICTED statuses found."
+                            },
+                            {
+                                "check": "Fact-check coverage",
+                                "passed": false,
+                                "details": "At least one explicitly VERIFIED claim is required."
+                            },
+                            {
+                                "check": "Unsupported claims",
+                                "passed": false,
+                                "details": "Cannot pass: fact-check report or explicit statuses are missing."
+                            },
+                            {
+                                "check": "Contradiction detection",
+                                "passed": false,
+                                "details": "Cannot pass: fact-check report or explicit statuses are missing."
+                            },
+                            {
+                                "check": "URL structure",
+                                "passed": true,
+                                "details": "No malformed URLs detected."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "checks": [
+                            {
+                                "check": "Department identity",
+                                "passed": true,
+                                "details": "Received department: media"
+                            },
+                            {
+                                "check": "Media review status",
+                                "passed": false,
+                                "details": "Received status: ERROR"
+                            },
+                            {
+                                "check": "Publication safety",
+                                "passed": true,
+                                "details": "Media must never approve its own publication."
+                            },
+                            {
+                                "check": "Result structure",
+                                "passed": true,
+                                "details": "Media result must be a dictionary."
+                            },
+                            {
+                                "check": "Research data structure",
+                                "passed": true,
+                                "details": "Research results must be present."
+                            },
+                            {
+                                "check": "Specialist output",
+                                "passed": true,
+                                "details": "Received 2 specialists."
+                            }
+                        ],
+                        "passed": false
+                    }
+                ],
+                "summary": {
+                    "total_checks": 18,
+                    "passed_checks": 6,
+                    "failed_checks": 12
+                },
+                "failed_checks": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Topic preservation",
+                        "passed": false,
+                        "details": "The original Roanoke Lost Colony topic must be preserved."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration word count",
+                        "passed": false,
+                        "details": "Detected 0 words; required 125-140."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Six visual scenes",
+                        "passed": false,
+                        "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Required content sections",
+                        "passed": false,
+                        "details": "Missing: video title, script, visual directions, facts to verify"
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration completeness",
+                        "passed": false,
+                        "details": "Final narration must be present."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Source verification",
+                        "passed": false,
+                        "details": "Sources: 15; valid URLs: 15; statuses: ['NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED']. URL structure does not prove source verification."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Fact-check report present",
+                        "passed": false,
+                        "details": "Fact-check report is missing or empty."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Fact-check statuses present",
+                        "passed": false,
+                        "details": "No explicit VERIFIED, NEEDS SOURCE or CONTRADICTED statuses found."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Fact-check coverage",
+                        "passed": false,
+                        "details": "At least one explicitly VERIFIED claim is required."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Unsupported claims",
+                        "passed": false,
+                        "details": "Cannot pass: fact-check report or explicit statuses are missing."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Contradiction detection",
+                        "passed": false,
+                        "details": "Cannot pass: fact-check report or explicit statuses are missing."
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "check": "Media review status",
+                        "passed": false,
+                        "details": "Received status: ERROR"
+                    }
+                ],
+                "publication_approved": false,
+                "final_decision": "CEO_APPROVAL_REQUIRED",
+                "message": "აუდიტმა აღმოაჩინა პრობლემები. მასალა საჭიროებს შესწორებას ან დამატებით მტკიცებულებებს."
+            },
+            {
+                "department": "technical",
+                "status": "REVIEW_REQUIRED",
+                "manager_plan": {
+                    "department": "technical",
+                    "manager": "Technical Manager",
+                    "status": "ERROR",
+                    "message": "Technical planning failed.",
+                    "error": "ask_ai() missing 1 required positional argument: 'user_prompt'",
+                    "selected_specialists": [],
+                    "requires_ceo_approval": true,
+                    "execution_authorized": false
+                },
+                "specialist_results": [],
+                "requires_ceo_approval": true,
+                "execution_authorized": false
+            }
+        ]
+    },
+    {
         "id": "347e7063",
         "created_at": "2026-11-17T07:48:56.656566+00:00",
         "task": "FINAL CEO STRESS TEST — MEDIA + AUDIT + TECHNICAL  Create exactly ONE English YouTube Shorts video about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. TOPIC LOCK: - Roanoke Lost Colony is the ONLY topic. - Never replace, expand, or change the topic. - Create exactly ONE video concept and ONE video script.  2. VIDEO: - Duration: exactly 60 seconds. - Narration: 125–140 English words. - Exactly six visual scenes. - Required timestamps, exactly once and in order:   0:00-0:10   0:10-0:20   0:20-0:30   0:30-0:40   0:40-0:50   0:50-1:00  3. HISTORICAL ACCURACY: - Never invent historical facts, dates, numbers, names, quotations, or events. - Use supplied research evidence only. - Distinguish documented facts from unresolved theories. - Do not present speculation as fact. - Mark unsupported claims NEEDS SOURCE. - Do not claim that a URL or search snippet proves a historical claim.  4. REQUIRED SCRIPT SECTIONS: - VIDEO TITLE - EXACT TOPIC - HOOK - SCRIPT - VISUAL DIRECTIONS - FACTS TO VERIFY  5. MEDIA DEPARTMENT: - Run research. - Create one concept. - Write the script. - Perform quality editing. - Perform initial fact-checking. - Correct unsupported claims using evidence. - Perform final independent fact-checking. - Preserve completed work if a later stage fails. - Return exact errors and warnings.  6. AUDIT DEPARTMENT: - Independently audit the Media result. - Check exact topic, narration word count, six scenes, timestamps, required sections, research, source verification, and fact-check report. - Missing or empty fact-check reports MUST FAIL. - Missing claim statuses MUST FAIL. - NEEDS SOURCE and CONTRADICTED claims MUST be reported. - Never approve publication automatically.  7. TECHNICAL DEPARTMENT: - Inspect Media and Audit integration. - Check data flow, result structures, failure handling, and publication safety. - Do not modify files. - Report concrete defects and recommendations.  8. FINAL CEO REPORT: Return: - Media status. - Audit status. - Technical status. - Number of completed specialists. - Narration word count. - Visual scene count. - Source verification results. - Fact-check status counts. - Every failed audit check. - Every technical integration issue. - Final recommendation.  IMPORTANT: Do not fake successful checks. Do not mark unverified sources as verified. Do not hide errors. Do not approve publication. CEO approval is mandatory.  This is the final integration stress test. Do not introduce unrelated features or change the architecture.",
