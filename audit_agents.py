@@ -1,4 +1,5 @@
 
+import math
 import re
 from urllib.parse import urlparse
 
@@ -240,26 +241,72 @@ def collect_sources(media):
 def compliance_auditor(task, media):
     checks = []
 
-    task_text = str(task).lower()
-    media_text = get_media_text(media).lower()
+    task_text = str(task or "").casefold()
+    concept_text = str(media.get("concept", "") or "")
+    final_script = extract_final_script(media).casefold()
 
-    # TOPIC PRESERVATION
+    # TOPIC PRESERVATION — derive the subject from this task's own concept.
+    topic_line = None
+    concept_lines = concept_text.splitlines()
+    for index, line in enumerate(concept_lines):
+        heading = re.match(
+            r"^\\s*(?:[-*]\\s*)?(?:#{1,6}\\s*)?(?:\\*\\*)?EXACT TOPIC\\s*:?[ \\t]*(?:\\*\\*)?\\s*(.*)$",
+            line,
+            re.IGNORECASE,
+        )
+        if not heading:
+            continue
+        topic_line = heading.group(1).strip(" *")
+        if not topic_line:
+            for candidate in concept_lines[index + 1:]:
+                candidate = candidate.strip()
+                if candidate and not re.match(r"^[A-Z][A-Z ]+:$", candidate):
+                    topic_line = candidate
+                    break
+        break
 
-    required_topic_terms = [
-        "roanoke",
-        "colony"
+    stopwords = {
+        "a", "an", "the", "and", "or", "of", "to", "in", "on", "at", "by",
+        "from", "for", "with", "without", "about", "into", "as", "is", "are",
+        "was", "were", "be", "do", "does", "did", "not", "no", "any", "all",
+        "create", "make", "write", "produce", "prepare", "generate", "develop",
+        "video", "short", "script", "narration", "visual", "directions", "scene",
+        "scenes", "exact", "topic", "concept", "hook", "key", "questions",
+        "investigate", "research", "fact", "check", "checks", "claim", "claims",
+        "source", "sources", "supplied", "provided", "evidence", "verified",
+        "verification", "supported", "historical", "details", "uncertain",
+        "include", "must", "should", "would", "could", "please", "using", "use",
+        "based", "only", "one", "two", "three", "four", "five", "six", "125",
+        "140", "words", "minute", "minutes", "exactly", "original", "ceo",
+        "request", "task",
+    }
+    topic_terms = []
+    for term in re.findall(r"[a-z0-9]+", str(topic_line or "").casefold()):
+        if term not in stopwords and len(term) > 1 and term not in topic_terms:
+            topic_terms.append(term)
+
+    matched_terms = [
+        term for term in topic_terms
+        if re.search(rf"\\b{re.escape(term)}\\b", task_text)
+        and re.search(rf"\\b{re.escape(term)}\\b", final_script)
     ]
-
-    topic_passed = all(
-        term in task_text and term in media_text
-        for term in required_topic_terms
+    required_matches = max(1, math.ceil(len(topic_terms) * 0.6))
+    topic_passed = (
+        bool(topic_terms)
+        and len(matched_terms) >= required_matches
     )
 
     checks.append(
         check_result(
             "Topic preservation",
             topic_passed,
-            "The original Roanoke Lost Colony topic must be preserved."
+            (
+                f"Matched {len(matched_terms)} of {len(topic_terms)} key topic terms "
+                "from the concept's EXACT TOPIC in both the original task and final script; "
+                f"{required_matches} required."
+                if topic_terms
+                else "The media concept did not provide an extractable EXACT TOPIC."
+            )
         )
     )
 
