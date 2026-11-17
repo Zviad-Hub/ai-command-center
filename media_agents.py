@@ -36,7 +36,6 @@ def extract_narration(text):
         return ""
 
     narration = match.group(1).strip()
-
     narration = re.sub(r"\*\*|__", "", narration)
 
     return narration
@@ -49,72 +48,48 @@ def count_words(text):
     )
 
 
-def count_visual_scenes(text):
+def extract_visual_section(text):
 
     text = str(text or "")
 
-    section = re.search(
+    return re.search(
         r"^\s*\*{0,2}VISUAL DIRECTIONS\s*:\*{0,2}\s*"
         r"(.*?)(?=^\s*\*{0,2}(?:FACTS TO VERIFY|FACT CHECK|"
         r"EDITOR REVIEW|PROBLEMS|CORRECTIONS|FACTS STILL NEEDING)"
-        r"\b)",
+        r"\b|$(?![\s\S]))",
         text,
         re.IGNORECASE | re.MULTILINE | re.DOTALL
     )
 
-    if not section:
 
-        section = re.search(
-            r"^\s*\*{0,2}VISUAL DIRECTIONS\s*:\*{0,2}\s*(.*)$",
-            text,
-            re.IGNORECASE | re.MULTILINE | re.DOTALL
-        )
+def count_visual_scenes(text):
+
+    section = extract_visual_section(text)
 
     if not section:
         return 0
-
-    content = section.group(1)
 
     return len(
         re.findall(
             r"(?m)^\s*(?:[-*]\s*)?"
             r"(?:0:00-0:10|0:10-0:20|0:20-0:30|"
             r"0:30-0:40|0:40-0:50|0:50-1:00)\b",
-            content
+            section.group(1)
         )
     )
 
 
 def check_timestamps(text):
 
-    text = str(text or "")
-
-    section = re.search(
-        r"^\s*\*{0,2}VISUAL DIRECTIONS\s*:\*{0,2}\s*"
-        r"(.*?)(?=^\s*\*{0,2}(?:FACTS TO VERIFY|FACT CHECK|"
-        r"EDITOR REVIEW|PROBLEMS|CORRECTIONS|FACTS STILL NEEDING)"
-        r"\b)",
-        text,
-        re.IGNORECASE | re.MULTILINE | re.DOTALL
-    )
-
-    if not section:
-
-        section = re.search(
-            r"^\s*\*{0,2}VISUAL DIRECTIONS\s*:\*{0,2}\s*(.*)$",
-            text,
-            re.IGNORECASE | re.MULTILINE | re.DOTALL
-        )
+    section = extract_visual_section(text)
 
     if not section:
         return False
 
-    content = section.group(1)
-
     found = re.findall(
         r"(?m)^\s*(?:[-*]\s*)?"
         r"(\d:\d{2}-\d:\d{2})\b",
-        content
+        section.group(1)
     )
 
     return found == REQUIRED_TIMESTAMPS
@@ -142,13 +117,6 @@ def is_refusal(text):
 
 
 def serialize_research(research, max_chars=14000):
-
-    """
-    Pass actual supplied research content to downstream agents.
-
-    Never convert candidate sources into verified sources.
-    Never claim that a URL was independently opened.
-    """
 
     if not isinstance(research, dict):
         return "INVALID RESEARCH DATA"
@@ -180,6 +148,7 @@ def serialize_research(research, max_chars=14000):
     ]
 
     used = sum(len(item) for item in output)
+    included_sources = 0
 
     for index, source in enumerate(sources, start=1):
 
@@ -217,19 +186,21 @@ def serialize_research(research, max_chars=14000):
             f"{'-' * 40}\n"
         )
 
-        if used + len(block) > max_chars:
+        remaining = max_chars - used
 
-            remaining = max_chars - used
+        if remaining <= 300:
+            break
 
-            if remaining > 300:
-                output.append(block[:remaining])
-
+        if len(block) > remaining:
+            output.append(block[:remaining])
+            included_sources += 1
             break
 
         output.append(block)
         used += len(block)
+        included_sources += 1
 
-    if len(output) <= 10:
+    if included_sources == 0:
         output.append("No usable source excerpts were supplied.")
 
     return "\n".join(output)
@@ -250,6 +221,23 @@ def validate_script(text):
         "visual_scene_count_passed": scenes == 6,
         "timestamps_passed": timestamps_ok
     }
+
+
+def has_usable_research(research):
+
+    if not isinstance(research, dict):
+        return False
+
+    sources = research.get("sources", [])
+
+    if not isinstance(sources, list):
+        return False
+
+    return any(
+        isinstance(source, dict)
+        and str(source.get("content", "")).strip()
+        for source in sources
+    )
 
 
 def build_error_result(task, stage, error, partial=None):
@@ -278,10 +266,12 @@ def build_error_result(task, stage, error, partial=None):
             "narration_word_count",
             0
         ),
+        "validation": partial.get("validation", {}),
         "publication_approved": False,
         "specialists": partial.get("specialists", []),
         "warnings": [
-            "The Media Department did not complete all stages.",
+            f"Pipeline stopped during: {stage}.",
+            "Previously completed work has been preserved.",
             "CEO review is required.",
             "Publication is not approved."
         ]
@@ -513,10 +503,15 @@ EDITOR REVIEW:
 PROBLEMS:
 CORRECTIONS:
 EDITED SCRIPT:
-FACTS STILL NEEDING VERIFICATION:
+
+Inside EDITED SCRIPT, include these exact headings:
+
+SCRIPT:
+VISUAL DIRECTIONS:
 
 The EDITED SCRIPT must contain the complete narration
 and all six timestamped visual directions.
+Also include FACTS TO VERIFY after the visual directions.
 """
 
     user_prompt = (
@@ -560,6 +555,11 @@ MANDATORY:
 - Keep uncertainty labels.
 - Preserve all six visual scenes and timestamps.
 - Do not add another concept or script.
+
+Inside the complete corrected script use these exact headings:
+
+SCRIPT:
+VISUAL DIRECTIONS:
 
 Return the COMPLETE corrected edited script.
 Do not omit any section.
@@ -729,9 +729,15 @@ REMOVED UNSUPPORTED CLAIMS:
 RETAINED SUPPORTED CLAIMS:
 EDITED SCRIPT:
 
+Inside EDITED SCRIPT, use these exact headings:
+
+SCRIPT:
+VISUAL DIRECTIONS:
+
 The EDITED SCRIPT must contain:
 - One complete narration.
 - Exactly six timestamped visual scenes.
+- FACTS TO VERIFY after the visual directions.
 """
 
     user_prompt = (
@@ -795,12 +801,17 @@ def run_media_department(task):
             "sources": []
         },
         "narration_word_count": 0,
+        "validation": {},
         "specialists": []
     }
 
+    stage = "Initialization"
+
     try:
 
-        # STEP 1: RESEARCH FIRST
+        # STEP 1: RESEARCH
+
+        stage = "Research Agent"
 
         print("\n[MEDIA] Step 1: Research Agent started...")
 
@@ -808,27 +819,44 @@ def run_media_department(task):
 
         if not isinstance(research, dict):
 
-            research = {
-                "status": "ERROR",
-                "message": "Research Agent returned invalid data.",
-                "sources": []
-            }
+            raise RuntimeError(
+                "Research Agent returned invalid data."
+            )
 
         partial["research"] = research
 
-        print(
-            "[MEDIA] Research status:",
-            research.get("status")
+        research_status = str(
+            research.get("status", "UNKNOWN")
+        ).upper()
+
+        source_count = len(
+            research.get("sources", [])
+            if isinstance(research.get("sources", []), list)
+            else []
         )
 
-        print(
-            "[MEDIA] Sources collected:",
-            research.get("source_count", 0)
-        )
+        print("[MEDIA] Research status:", research_status)
+        print("[MEDIA] Sources collected:", source_count)
 
         partial["specialists"].append("Research Agent")
 
+        if research_status in ("ERROR", "NO_RESULTS"):
+
+            raise RuntimeError(
+                "Research Agent did not produce usable research. "
+                f"Research status: {research_status}. "
+                + str(research.get("message", ""))
+            )
+
+        if not has_usable_research(research):
+
+            raise RuntimeError(
+                "Research Agent supplied no usable source content."
+            )
+
         # STEP 2: CREATIVE STRATEGIST
+
+        stage = "Creative Strategist"
 
         print("\n[MEDIA] Step 2: Creative Strategist started...")
 
@@ -839,6 +867,8 @@ def run_media_department(task):
 
         # STEP 3: SCRIPTWRITER
 
+        stage = "Scriptwriter"
+
         print("\n[MEDIA] Step 3: Scriptwriter started...")
 
         script = scriptwriter(task, concept, research)
@@ -848,6 +878,8 @@ def run_media_department(task):
 
         # STEP 4: QUALITY EDITOR
 
+        stage = "Quality Editor"
+
         print("\n[MEDIA] Step 4: Quality Editor started...")
 
         edited_script = quality_editor(task, script)
@@ -856,6 +888,8 @@ def run_media_department(task):
         partial["specialists"].append("Quality Editor")
 
         # STEP 5: INITIAL FACT CHECK
+
+        stage = "Initial Fact-Checker"
 
         print("\n[MEDIA] Step 5: Initial Fact-Checker started...")
 
@@ -868,7 +902,9 @@ def run_media_department(task):
         partial["initial_fact_check"] = initial_fact_check
         partial["specialists"].append("Independent Fact-Checker")
 
-        # STEP 6: EVIDENCE-BASED EDITOR
+        # STEP 6: EVIDENCE EDITOR
+
+        stage = "Evidence-Based Editor"
 
         print("\n[MEDIA] Step 6: Evidence-Based Editor started...")
 
@@ -884,6 +920,8 @@ def run_media_department(task):
 
         # STEP 7: FINAL FACT CHECK
 
+        stage = "Final Fact-Checker"
+
         print("\n[MEDIA] Step 7: Final Fact-Checker started...")
 
         final_fact_check = fact_checker(
@@ -893,12 +931,17 @@ def run_media_department(task):
         )
 
         partial["fact_check"] = final_fact_check
+        partial["specialists"].append("Final Fact-Checker")
 
         print("\n[MEDIA] Final fact-check completed.")
 
         # STEP 8: FINAL VALIDATION
 
+        stage = "Final Validation"
+
         validation = validate_script(evidence_edited_script)
+
+        partial["validation"] = validation
 
         narration_words = validation["narration_word_count"]
 
@@ -906,10 +949,11 @@ def run_media_department(task):
 
         warnings = []
 
-        if research.get("status") != "COMPLETED":
+        if research_status != "COMPLETED":
 
             warnings.append(
-                "Research did not complete with full-page extracts."
+                "Research was partial and did not complete "
+                "with full-page extracts."
             )
 
         if not validation["word_count_passed"]:
@@ -934,6 +978,18 @@ def run_media_department(task):
 
             warnings.append(
                 "Final narration could not be extracted."
+            )
+
+        if "NEEDS SOURCE" in final_fact_check.upper():
+
+            warnings.append(
+                "Final fact-check identified claims needing sources."
+            )
+
+        if "CONTRADICTED" in final_fact_check.upper():
+
+            warnings.append(
+                "Final fact-check identified contradicted claims."
             )
 
         print("\n" + "=" * 55)
@@ -967,13 +1023,15 @@ def run_media_department(task):
     except Exception as error:
 
         print(
-            "\n[MEDIA] ERROR during production:",
-            str(error)
+            "\n[MEDIA] ERROR during stage:",
+            stage
         )
+
+        print("[MEDIA] ERROR details:", str(error))
 
         return build_error_result(
             task,
-            "Media production pipeline",
+            stage,
             error,
             partial
         )
