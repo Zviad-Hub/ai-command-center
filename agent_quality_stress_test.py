@@ -140,8 +140,26 @@ def evaluate_live_result(department, result):
             "issues": ["Department returned a non-object result."],
         }
 
-    report_text = _flatten(result)
+    # Score the manager's final deliverable, not the union of all agent text.
+    # Otherwise a correct specialist calculation could hide a wrong final report.
+    report_text = _flatten(result.get("report", ""))
     checks = []
+
+    def substantive_review(value):
+        review_text = str(value or "").strip()
+        lines = review_text.splitlines()
+        if not lines or lines[0].strip().upper() != "REVIEW STATUS: PASS":
+            return False
+        lowered = review_text.lower()
+        required_sections = (
+            "issues",
+            "required corrections",
+            "final quality summary",
+        )
+        return (
+            len(review_text) >= 100
+            and all(section in lowered for section in required_sections)
+        )
 
     def add(name, passed, detail):
         checks.append({
@@ -177,13 +195,13 @@ def evaluate_live_result(department, result):
     if department in ("finance", "business", "tenders"):
         review = str(result.get("quality_review", ""))
         reviewer_passed = (
-            review.strip().upper().startswith("REVIEW STATUS: PASS")
+            substantive_review(review)
             and result.get("quality_review_passed") is True
         )
     elif department == "pentester":
         review = str(result.get("independent_review", ""))
         reviewer_passed = (
-            review.strip().upper().startswith("REVIEW STATUS: PASS")
+            substantive_review(review)
             and status in ("PREPARATION_ONLY", "PASSIVE_REVIEW_ONLY")
         )
     else:
