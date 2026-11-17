@@ -230,7 +230,7 @@ def submit_task(ceo_task):
         "results": results,
         "organization_audit": organization_audit,
         "overall_status": (
-            "COMPLETED"
+            "READY_FOR_HUMAN_REVIEW"
             if organization_audit["status"] == "PASS"
             else "REVIEW_REQUIRED"
         ),
