@@ -42,7 +42,17 @@ class TaskManagerTests(unittest.TestCase):
         }
         manager_factory.side_effect = [media_manager, audit_manager]
 
-        record = submit_task("Create one video about an old mystery.")
+        with patch("task_manager.run_semantic_alignment_audit", return_value={
+            "status": "PASS",
+            "task_coverage": "COMPLETE",
+            "summary": "All requested items are represented.",
+            "missing_requirements": [],
+            "unsupported_claims": [],
+            "contradictions": [],
+            "evidence_gaps": [],
+            "human_review_required": True,
+        }):
+            record = submit_task("Create one video about an old mystery.")
 
         media_args = media_manager.receive_task.call_args
         self.assertEqual(media_args.args[0], "Create the requested video.")
