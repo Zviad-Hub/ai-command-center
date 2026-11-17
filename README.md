@@ -326,6 +326,7 @@ python -c "from stress_test_suite import run_routing_stress_tests; import json; 
 ```
 
 The suite checks routing only and does not call department AI agents or perform
-external actions. `evaluate_task_record(record)` provides a structural
-10-point quality and safety score for a saved orchestration record. A perfect
+external actions. GitHub Actions prints the live routing scorecard and fails the
+job if any expected department route is incorrect. `evaluate_task_record(record)`
+provides a structural 10-point quality and safety score for a saved orchestration record. A perfect
 score is not proof of factual correctness; human review remains mandatory.
