@@ -134,19 +134,31 @@ class ManagerErrorRedactionTests(unittest.TestCase):
     def test_technical_manager_exception_is_redacted(self):
         plan = {
             "status": "PLANNED",
-            "selected_specialists": [{"id": "backend_developer", "name": "Backend Developer", "mission": "Review supplied code"}],
+            "selected_specialists": [
+                {"id": "backend_developer", "name": "Backend Developer", "mission": "Review supplied code"},
+                {"id": "qa_engineer", "name": "QA Engineer", "mission": "Review test evidence"},
+            ],
             "execution_plan": ["Review supplied code"],
             "testing_strategy": ["Propose tests only"],
         }
-        specialist = {
-            "specialist": "backend_developer",
-            "specialist_name": "Backend Developer",
-            "status": "COMPLETED",
-            "report": "Evidence-based findings",
-            "execution_performed": False,
-        }
+        specialists = [
+            {
+                "specialist": "backend_developer",
+                "specialist_name": "Backend Developer",
+                "status": "COMPLETED",
+                "report": "Backend API validation and error handling reliability need evidence review.",
+                "execution_performed": False,
+            },
+            {
+                "specialist": "qa_engineer",
+                "specialist_name": "QA Engineer",
+                "status": "COMPLETED",
+                "report": "QA testing coverage and edge-case validation should be added.",
+                "execution_performed": False,
+            },
+        ]
         with patch.object(technical_department, "run_technical_manager", return_value=plan), patch.object(
-            technical_department, "run_specialist", return_value=specialist
+            technical_department, "run_specialist", side_effect=specialists
         ), patch.object(
             technical_department, "ask_ai", side_effect=RuntimeError(SECRET_DETAIL)
         ):
