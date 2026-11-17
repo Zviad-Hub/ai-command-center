@@ -15,8 +15,17 @@ def safe_error_code(error):
         return "PROVIDER_TIMEOUT"
     if "connection failed" in message or "connection error" in message:
         return "PROVIDER_CONNECTION_ERROR"
-    if "empty response" in message or "no choices" in message:
+    if (
+        "empty response" in message
+        or "empty output" in message
+        or "returned empty" in message
+        or "no choices" in message
+    ):
         return "PROVIDER_EMPTY_RESPONSE"
+    if "refused the task" in message or "refusal" in message:
+        return "PROVIDER_REFUSAL"
+    if "api_key is missing" in message or "api key is missing" in message:
+        return "PROVIDER_CONFIGURATION_ERROR"
     if "truncated" in message or "token limit" in message:
         return "PROVIDER_RESPONSE_TRUNCATED"
     if isinstance(error, (ValueError, TypeError)):

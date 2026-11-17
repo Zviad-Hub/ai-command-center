@@ -2,6 +2,7 @@
 import re
 
 from ai_brain import ask_ai
+from error_diagnostics import safe_error_code
 from research_agent import run_research
 
 
@@ -313,7 +314,11 @@ def build_error_result(task, stage, error, partial=None):
             if stage == "Scriptwriter" and "narration" in str(error).lower()
             else "SCRIPTWRITER_EMPTY_OUTPUT"
             if stage == "Scriptwriter" and "empty" in str(error).lower()
-            else f"{stage.upper().replace(' ', '_')}_FAILED"
+            else (
+                f"{stage.upper().replace(' ', '_')}_{safe_error_code(error)}"
+                if safe_error_code(error) != "AGENT_PROCESSING_ERROR"
+                else f"{stage.upper().replace(' ', '_')}_FAILED"
+            )
         ),
         "message": f"{stage} failed: {str(error)}",
         "original_ceo_topic": task,
