@@ -41,13 +41,13 @@ class TechnicalDepartmentTests(unittest.TestCase):
                 "specialist": "backend_developer",
                 "specialist_name": "Backend Developer",
                 "status": "COMPLETED",
-                "report": "The supplied notes describe API error handling.",
+                "report": "The supplied backend API notes describe error handling and reliability risks.",
             },
             {
                 "specialist": "qa_engineer",
                 "specialist_name": "QA Engineer",
                 "status": "COMPLETED",
-                "report": "Recommend unit and integration tests.",
+                "report": "QA testing coverage review: recommend unit and integration tests with edge-case validation.",
             },
         ]
         ask_ai_mock.side_effect = [
@@ -61,6 +61,7 @@ class TechnicalDepartmentTests(unittest.TestCase):
         )
 
         self.assertEqual(result["status"], "COMPLETED")
+        self.assertEqual(result["specialist_quality_validation"]["status"], "PASS")
         self.assertEqual(specialist_mock.call_count, 2)
         self.assertEqual(ask_ai_mock.call_count, 2)
         self.assertIn("MANAGER SYNTHESIS:", result["report"])
@@ -98,13 +99,13 @@ class TechnicalDepartmentTests(unittest.TestCase):
                 "specialist": "backend_developer",
                 "specialist_name": "Backend Developer",
                 "status": "COMPLETED",
-                "report": "BACKEND EVIDENCE: Retry behavior is not documented.",
+                "report": "BACKEND EVIDENCE: API retry behavior and error handling reliability are not documented; evidence is missing.",
             },
             {
                 "specialist": "qa_engineer",
                 "specialist_name": "QA Engineer",
                 "status": "COMPLETED",
-                "report": "QA EVIDENCE: No failure-mode test cases were supplied.",
+                "report": "QA EVIDENCE: No failure-mode test cases or regression coverage were supplied; edge-case validation is missing.",
             },
         ]
         manager_draft = (
@@ -225,7 +226,7 @@ class TechnicalDepartmentTests(unittest.TestCase):
         specialist_mock.return_value = {
             "specialist": "qa_engineer",
             "status": "COMPLETED",
-            "report": "Reviewed the supplied test notes.",
+            "report": "QA testing coverage review: reviewed supplied test notes and identified edge-case validation gaps.",
         }
         ask_ai_mock.side_effect = [
             "Draft report.",
@@ -296,7 +297,7 @@ class TechnicalDepartmentTests(unittest.TestCase):
         specialist_mock.return_value = {
             "specialist": "qa_engineer",
             "status": "COMPLETED",
-            "report": "Reviewed test plan.",
+            "report": "QA testing coverage review: reviewed test plan, regression coverage and edge-case validation.",
         }
         ask_ai_mock.side_effect = RuntimeError("Provider unavailable.")
 
@@ -349,6 +350,34 @@ class TechnicalDepartmentTests(unittest.TestCase):
             ["ERROR", "NOT_RUN", "NOT_RUN"],
         )
         self.assertEqual(result["report"], "")
+        self.assertFalse(result["execution_authorized"])
+
+
+    @patch("technical_department.ask_ai")
+    @patch("technical_department.run_specialist")
+    @patch("technical_department.run_technical_manager")
+    def test_runtime_specialist_validator_blocks_manager_on_generic_output(
+        self, manager_mock, specialist_mock, ask_ai_mock
+    ):
+        manager_mock.return_value = {
+            "status": "PLAN_CREATED",
+            "selected_specialists": [
+                {"specialist": "qa_engineer", "mission": "Review test coverage."}
+            ],
+        }
+        specialist_mock.return_value = {
+            "specialist": "qa_engineer",
+            "status": "COMPLETED",
+            "report": "Done.",
+        }
+
+        result = run_technical_department("Review test coverage.")
+
+        ask_ai_mock.assert_not_called()
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["report"], "")
+        self.assertEqual(result["specialist_quality_validation"]["status"], "REVIEW_REQUIRED")
+        self.assertTrue(result["specialist_quality_validation"]["issues"])
         self.assertFalse(result["execution_authorized"])
 
 
