@@ -101,7 +101,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "requires_ceo_approval": True,
             "execution_performed": False,
         })
-        self.assertEqual(result["score_out_of_10"], 10)
+        self.assertEqual(result["score_out_of_10"], 10, result["checks"])
 
     def test_finance_rejects_wrong_arithmetic(self):
         result = evaluate_live_result("finance", {
