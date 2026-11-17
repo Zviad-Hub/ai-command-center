@@ -39,7 +39,7 @@ A department being selected does not mean every requested real-world action is a
 | **Media** | Runs the media production pipeline for content tasks. | Content must be independently checked before publication. |
 | **Audit** | Reviews the preceding Media result when one is available. | The current manager expects a Media result; a standalone audit request may return `REVIEW_REQUIRED`. |
 | **Technical** | Creates a technical plan and assigns selected specialist agents for analysis and reports. | The specialist workflow is advisory: it does not currently edit project files, execute tests or deploy code. |
-| **Pentester** | Receives cybersecurity requests and applies a safety gate. | Active testing is currently blocked by the manager. Do not treat task submission as authorization or as a completed security test. |
+| **Pentester** | Runs four defensive specialists (scope/authorization, web security, infrastructure security, vulnerability/risk) followed by a Pentester Manager and an independent Security Quality Reviewer. | Passive analysis and planning only. No scanning, probing, target connections, exploit generation or active penetration testing. A supplied scope/reference is not verified authorization. |
 | **Finance** | Produces an AI-assisted advisory report with calculations, assumptions, risks and missing inputs; can attach optional Tavily research candidates. | No transactions, payments, investments or accounting-system changes. Professional review may be needed for regulated advice. |
 | **Tenders** | Prepares tender-analysis reports, eligibility/document checklists, compliance gaps and draft response plans. | Does not submit bids or contact contracting authorities. Actual tender documents are required for a specific compliance assessment. |
 | **Business** | Produces strategy reports, options, trade-offs, risks and measurable KPI recommendations, with optional research candidates. | Does not commit funds, sign agreements, contact third parties or execute business actions. |
@@ -252,15 +252,14 @@ Do not submit the tender or contact the contracting authority.
 ### Cybersecurity assessment
 
 ```text
-Prepare a passive security review plan for assets that I own
-or am explicitly authorized to assess.
-Identify the written scope, permitted methods, exclusions
-and evidence required.
-Do not scan, exploit, access or modify any system.
-Wait for separate written authorization and CEO approval.
+Review the supplied architecture, application code and configuration.
+Separate observed evidence from assumptions.
+Identify likely risks, severity, confidence and remediation steps.
+List the exact scope and written authorization evidence still required.
+Do not scan, probe, connect to, exploit or modify any system.
 ```
 
-**Note:** The current Pentester manager blocks active testing. A task prompt alone cannot unlock it.
+**Note:** Pentester runs four defensive specialist analyses, creates a manager report, and sends it to an independent security reviewer. The report is released only after an explicit review PASS. This workflow is passive-only and cannot perform an active penetration test, even if scope or an authorization reference is supplied. Human scope review and separate CEO approval remain mandatory for any future active-testing capability.
 
 ## Task history
 
@@ -280,7 +279,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 - **Human CEO remains in control.** AI output is advice or prepared work until reviewed.
 - Never put API keys, passwords, tokens or private credentials in prompts.
 - Do not ask agents to access systems, accounts or data you do not own or have permission to use.
-- Pentesting requires a defined authorized scope and explicit approval; the current Pentester manager blocks active testing.
+- Pentester performs passive analysis only. Written authorization and exact scope require human verification; separate CEO approval is required for any future active testing. The current workflow cannot perform active testing.
 - Do not publish media, submit tenders, make payments, contact third parties, merge code or deploy to production without the required explicit approval.
 - Do not treat a plan, `RECEIVED`, `COMPLETED` or successful workflow run as automatic permission for a consequential action.
 - Verify important facts, calculations, citations and code independently.
@@ -295,13 +294,13 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 | No expected department selected | Review the Director's `routing` record. Use explicit task language and department-specific terms. |
 | Audit says no Media result is available | The current Audit workflow expects a Media result earlier in the same task. |
 | Technical result is `REVIEW_REQUIRED` | Inspect the manager plan, selected specialists and error details. A plan is not an implementation approval. |
-| Finance, Business or Tenders returns `RECEIVED` | These departments are placeholders while their specialist workflows are being built. |
-| Pentester returns `BLOCKED` | This is the current safety behavior; active testing is not enabled. |
+| Finance, Business or Tenders returns `REVIEW_REQUIRED` | Inspect the AI/provider error, missing inputs and research warning. These workflows produce advisory reports only. |
+| Pentester returns `PREPARATION_ONLY` or `PASSIVE_REVIEW_ONLY` | The department has prepared a defensive analysis only. Check the independent review and scope gaps; no active testing was performed. |
 | GitHub Actions fails | Open the failed run, inspect the first failing step and its logs, and confirm dependencies and repository secrets are configured. Do not expose secret values in logs. |
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 23 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department execution gates, CEO console report rendering, and Finance/Business/Tenders advisory workflows. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 29 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department execution gates, CEO console report rendering, Finance/Business/Tenders advisory workflows, and Pentester specialist/reviewer safety gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
