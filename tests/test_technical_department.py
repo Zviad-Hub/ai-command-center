@@ -108,6 +108,8 @@ class TechnicalDepartmentTests(unittest.TestCase):
 
         report = result["report"]
         self.assertIn("TECHNICAL DEPARTMENT — FINAL REPORT", report)
+        self.assertIn("\nSTATUS: COMPLETED", report)
+        self.assertNotIn("\\n", report)
         self.assertIn("Recommend unit, integration, and edge-case tests.", report)
         self.assertIn("No source files were directly loaded or inspected", report)
         self.assertIn("No tests were executed", report)
