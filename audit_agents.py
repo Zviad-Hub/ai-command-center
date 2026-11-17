@@ -324,7 +324,7 @@ def compliance_auditor(task, media):
     )
 
     # REQUESTED LANGUAGE — Georgian requests must not silently receive English narration.
-    if re.search(r"[\u10A0-\u10FF]", task_text) or re.search(r"\\bgeorgian\\b|ქართულ", task_text):
+    if re.search(r"[\u10A0-\u10FF]", task_text) or re.search(r"\bgeorgian\b|ქართულ", task_text):
         language_passed = bool(re.search(r"[\u10A0-\u10FF]", narration))
         checks.append(
             check_result(
