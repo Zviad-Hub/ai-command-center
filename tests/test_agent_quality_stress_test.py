@@ -55,6 +55,37 @@ class AgentQualityStressTestTests(unittest.TestCase):
         ])
         self.assertNotIn("provider details", repr(result["diagnostics"]))
 
+    def test_structured_manager_daily_quota_code_is_blocked(self):
+        result = evaluate_live_result("technical", {
+            "status": "REVIEW_REQUIRED",
+            "manager_plan": {
+                "status": "ERROR",
+                "error_code": "PROVIDER_DAILY_QUOTA_EXHAUSTED",
+            },
+            "specialist_results": [],
+            "report": "",
+        })
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIsNone(result["score_out_of_10"])
+        self.assertEqual(
+            result["blocked_reason"],
+            "PROVIDER_DAILY_QUOTA_EXHAUSTED",
+        )
+
+    def test_structured_specialist_daily_quota_code_is_blocked(self):
+        result = evaluate_live_result("business", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_reports": {},
+            "specialist_failures": [{
+                "specialist": "market_analyst",
+                "error": "SPECIALIST_FAILED",
+                "error_code": "PROVIDER_DAILY_QUOTA_EXHAUSTED",
+            }],
+            "report": "",
+        })
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIsNone(result["score_out_of_10"])
+
     def test_non_object_result_is_rejected(self):
         result = evaluate_live_result("finance", None)
         self.assertEqual(result["score_out_of_10"], 0)
