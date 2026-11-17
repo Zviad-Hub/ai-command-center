@@ -6,6 +6,8 @@ on:
       - "technical_manager.py"
       - "stress_test_suite.py"
       - "README.md"
+      - "requirements.txt"
+      - ".github/dependabot.yml"
       - "technical_department.py"
       - "technical_agents.py"
       - "department_agents.py"
