@@ -48,8 +48,8 @@ def _build_final_report(task, plan, specialist_results, context_data, status):
     lines.extend([
         "",
         "EVIDENCE LIMITATIONS:",
-        "- No source files were directly loaded or inspected by this workflow.",
-        "- Specific file paths, verified defects, and actual test results cannot be claimed from the supplied information alone.",
+        "- Repository files were not independently fetched or opened by this workflow; specialists can analyze only source material included in the supplied task or context.",
+        "- Repository state, file paths, and test outcomes are not independently verified unless explicit evidence is included in the supplied material.",
     ])
     if missing_items:
         lines.append("- Missing or unavailable inputs: " + ", ".join(missing_items) + ".")
