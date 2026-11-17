@@ -78,7 +78,7 @@ class TaskManagerTests(unittest.TestCase):
         self.assertEqual(len(record["results"]), 2)
         self.assertEqual(record["organization_audit"]["status"], "PASS")
         self.assertEqual(record["overall_status"], "READY_FOR_HUMAN_REVIEW")
-        self.assertEqual(record["organization_audit"]["content_alignment_status"], "HUMAN_REVIEW_REQUIRED")
+        self.assertEqual(record["organization_audit"]["content_alignment_status"], "AI_REVIEW_PASS_HUMAN_REVIEW_REQUIRED")
         self.assertTrue(record["human_review_required"])
         save_mock.assert_called_once()
 
