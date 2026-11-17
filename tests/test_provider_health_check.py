@@ -22,12 +22,21 @@ class ProviderHealthCheckTests(unittest.TestCase):
         self.assertEqual(result["status"], "NOT_CONFIGURED")
         post.assert_not_called()
 
-    def test_success(self):
+    def test_success_uses_small_but_reasonable_token_budget(self):
         post = Mock(return_value=self.response(200))
         result = check_provider("gemini", "https://example.invalid", "secret", "model", "max_tokens", post)
         self.assertEqual(result["status"], "PASS")
-        self.assertEqual(post.call_args.kwargs["json"]["max_tokens"], 8)
+        self.assertEqual(post.call_args.kwargs["json"]["max_tokens"], 64)
         self.assertEqual(post.call_args.kwargs["timeout"], 12)
+
+    def test_groq_uses_production_reasoning_settings(self):
+        post = Mock(return_value=self.response(200))
+        result = check_provider("groq", "https://example.invalid", "secret", "model", "max_completion_tokens", post)
+        payload = post.call_args.kwargs["json"]
+        self.assertEqual(result["status"], "PASS")
+        self.assertEqual(payload["max_completion_tokens"], 64)
+        self.assertEqual(payload["reasoning_effort"], "low")
+        self.assertIs(payload["include_reasoning"], False)
 
     def test_daily_quota(self):
         post = Mock(return_value=self.response(429, text="Daily quota exceeded"))
@@ -64,11 +73,27 @@ class ProviderHealthCheckTests(unittest.TestCase):
             "TIMEOUT",
         )
 
-    def test_invalid_success_payload(self):
+    def test_no_choices_is_classified_safely(self):
         post = Mock(return_value=self.response(200, body={"choices": []}))
         self.assertEqual(
             check_provider("gemini", "https://example.invalid", "secret", "model", "max_tokens", post)["status"],
-            "INVALID_RESPONSE",
+            "NO_CHOICES",
+        )
+
+    def test_empty_content_is_classified_safely(self):
+        post = Mock(return_value=self.response(200, body={"choices": [{"message": {"content": ""}}]}))
+        self.assertEqual(
+            check_provider("gemini", "https://example.invalid", "secret", "model", "max_tokens", post)["status"],
+            "EMPTY_CONTENT",
+        )
+
+    def test_truncated_response_is_classified_safely(self):
+        post = Mock(return_value=self.response(200, body={
+            "choices": [{"message": {"content": ""}, "finish_reason": "length"}]
+        }))
+        self.assertEqual(
+            check_provider("groq", "https://example.invalid", "secret", "model", "max_completion_tokens", post)["status"],
+            "TRUNCATED_RESPONSE",
         )
 
 
