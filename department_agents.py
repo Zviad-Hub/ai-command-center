@@ -377,8 +377,10 @@ def run_department_workflow(department, task, context=None):
     research_text = _format_research(research)
     specialist_reports = {}
     specialist_failures = []
+    specialist_not_run = []
+    specialist_ids = list(SPECIALISTS[department])
 
-    for specialist_id in SPECIALISTS[department]:
+    for index, specialist_id in enumerate(specialist_ids):
         try:
             specialist_reports[specialist_id] = _call_specialist(
                 department,
@@ -388,17 +390,31 @@ def run_department_workflow(department, task, context=None):
                 research_text
             )
         except Exception as error:
+            error_code = safe_error_code(error)
             specialist_failures.append({
                 "specialist": specialist_id,
                 "error": "SPECIALIST_FAILED",
-                "error_code": safe_error_code(error),
+                "error_code": error_code,
             })
+            # A daily quota exhaustion is terminal for this run. Do not spend
+            # more requests on specialists that cannot succeed until reset.
+            if error_code == "PROVIDER_DAILY_QUOTA_EXHAUSTED":
+                specialist_not_run = [
+                    {
+                        "specialist": remaining_id,
+                        "status": "NOT_RUN",
+                        "reason": "Daily provider quota was exhausted; no request was attempted.",
+                    }
+                    for remaining_id in specialist_ids[index + 1:]
+                ]
+                break
 
     base_result = {
         "department": department,
         "manager": f"{department.title()} Department Manager",
         "specialist_reports": specialist_reports,
         "specialist_failures": specialist_failures,
+        "specialist_not_run": specialist_not_run,
         "research_status": research.get("status", "UNKNOWN"),
         "sources": research.get("sources", [])[:12],
         "research_warning": (

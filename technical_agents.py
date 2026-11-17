@@ -1,5 +1,6 @@
 
 from ai_brain import ask_ai
+from error_diagnostics import safe_error_code
 
 
 # ==================================================
@@ -186,6 +187,7 @@ NEXT STEPS:
             "specialist_name": specialist_name,
             "status": "ERROR",
             "error": "SPECIALIST_FAILED",
+            "error_code": safe_error_code(error),
             "execution_performed": False,
             "code_modified": False,
             "tests_executed": False,

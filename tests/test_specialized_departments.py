@@ -379,5 +379,33 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self.assertTrue(result["quality_review_passed"])
 
 
+    @patch("department_agents._research_context")
+    @patch("department_agents.ask_ai")
+    def test_daily_quota_exhaustion_stops_remaining_specialist_calls(
+        self, ai_mock, research_mock
+    ):
+        ai_mock.side_effect = RuntimeError("Groq daily quota has been exhausted.")
+        research_mock.return_value = {"status": "NOT_CONFIGURED", "sources": []}
+
+        result = run_department_workflow("finance", "Review a budget.")
+
+        self.assertEqual(ai_mock.call_count, 1)
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(
+            result["specialist_failures"][0]["error_code"],
+            "PROVIDER_DAILY_QUOTA_EXHAUSTED",
+        )
+        self.assertEqual(
+            [item["specialist"] for item in result["specialist_not_run"]],
+            ["risk_controller", "budget_planner"],
+        )
+        self.assertTrue(all(
+            item["status"] == "NOT_RUN"
+            for item in result["specialist_not_run"]
+        ))
+        self.assertEqual(result["report"], "")
+
+
+
 if __name__ == "__main__":
     unittest.main()
