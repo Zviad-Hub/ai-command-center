@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import tempfile
 import uuid
 from datetime import datetime, timezone
@@ -9,12 +10,39 @@ from director import route_task
 from managers import get_manager
 
 
-TASKS_FILE = Path(
-    os.getenv(
-        "AI_COMMAND_CENTER_TASKS_FILE",
-        Path(__file__).resolve().with_name("tasks.json"),
-    )
-)
+def _default_tasks_file():
+    """Return an OS-appropriate private application-data path."""
+    override = os.getenv("AI_COMMAND_CENTER_TASKS_FILE", "").strip()
+    if override:
+        return Path(os.path.expandvars(os.path.expanduser(override)))
+
+    if sys.platform == "win32":
+        base = os.getenv("LOCALAPPDATA") or os.getenv("APPDATA")
+        if base:
+            data_dir = Path(base)
+        else:
+            data_dir = Path.home() / "AppData" / "Local"
+        return data_dir / "AI Command Center" / "tasks.json"
+
+    if sys.platform == "darwin":
+        return (
+            Path.home()
+            / "Library"
+            / "Application Support"
+            / "AI Command Center"
+            / "tasks.json"
+        )
+
+    state_home = os.getenv("XDG_STATE_HOME")
+    data_dir = Path(state_home) if state_home else Path.home() / ".local" / "state"
+    return data_dir / "ai-command-center" / "tasks.json"
+
+
+TASKS_FILE = _default_tasks_file()
+
+# Compatibility path for users upgrading from older versions that stored
+# task history beside task_manager.py. The old file is copied, never deleted.
+LEGACY_TASKS_FILE = Path(__file__).resolve().with_name("tasks.json")
 
 VALID_DEPARTMENTS = [
     "media",
@@ -27,15 +55,9 @@ VALID_DEPARTMENTS = [
 ]
 
 
-def load_tasks():
-    """Load task history without silently discarding a damaged history file."""
-    path = Path(TASKS_FILE)
-
-    if not path.exists():
-        return []
-
+def _read_tasks_file(path):
     try:
-        with path.open("r", encoding="utf-8") as file:
+        with Path(path).open("r", encoding="utf-8") as file:
             data = json.load(file)
     except json.JSONDecodeError as error:
         raise RuntimeError(
@@ -57,16 +79,33 @@ def load_tasks():
     return data
 
 
+def load_tasks():
+    """Load private task history, migrating a legacy local file when present."""
+    path = Path(TASKS_FILE)
+
+    if path.exists():
+        return _read_tasks_file(path)
+
+    legacy_path = Path(LEGACY_TASKS_FILE)
+    if legacy_path != path and legacy_path.exists():
+        legacy_tasks = _read_tasks_file(legacy_path)
+        save_tasks(legacy_tasks)
+        return legacy_tasks
+
+    return []
+
+
 def save_tasks(tasks):
-    """Atomically replace task history so an interrupted write cannot truncate it."""
+    """Atomically save task history in the private application-data directory."""
     if not isinstance(tasks, list):
         raise ValueError("Task history must be a list.")
 
     path = Path(TASKS_FILE)
-    path.parent.mkdir(parents=True, exist_ok=True)
     temporary_path = None
 
     try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+
         with tempfile.NamedTemporaryFile(
             mode="w",
             encoding="utf-8",
@@ -160,8 +199,7 @@ def submit_task(ceo_task):
                 }
 
         except Exception:
-            # Avoid copying provider exceptions or request details into the
-            # persistent task log; diagnostics belong in controlled logs.
+            # Avoid persisting raw provider exceptions or request details.
             result = {
                 "department": department,
                 "status": "ERROR",
