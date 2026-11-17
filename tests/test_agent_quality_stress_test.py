@@ -280,9 +280,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "status": "COMPLETED",
             "specialist_reports": {"a": "one", "b": "two", "c": "three"},
             "quality_review": (
-                "REVIEW STATUS: PASS\\n"
-                "ISSUES: No material issues found.\\n"
-                "REQUIRED CORRECTIONS: None; calculations and evidence were checked.\\n"
+                "REVIEW STATUS: PASS\n"
+                "ISSUES: No material issues found.\n"
+                "REQUIRED CORRECTIONS: None; calculations and evidence were checked.\n"
                 "FINAL QUALITY SUMMARY: The report is internally consistent and advisory."
             ),
             "quality_review_passed": True,
