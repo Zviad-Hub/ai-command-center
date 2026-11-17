@@ -220,8 +220,8 @@ class SpecializedDepartmentTests(unittest.TestCase):
             "SPECIALIST_GAMMA: Forecast assumptions are unverified.",
         ]
         manager_draft = (
-            "EXECUTIVE SUMMARY\\nINPUTS\\nCALCULATIONS\\nASSUMPTIONS\\n"
-            "RISKS\\nRECOMMENDATIONS\\nMISSING INFORMATION\\n"
+            "EXECUTIVE SUMMARY\nINPUTS\nCALCULATIONS\nASSUMPTIONS\n"
+            "RISKS\nRECOMMENDATIONS\nMISSING INFORMATION\n"
             "Manager synthesis: figures remain provisional."
         )
         ai_mock.side_effect = specialist_outputs + [manager_draft, PASS_REVIEW]
