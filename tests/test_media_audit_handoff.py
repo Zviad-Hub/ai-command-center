@@ -29,10 +29,7 @@ class MediaAuditManagerHandoffTests(unittest.TestCase):
         with patch("audit_agents.run_audit", return_value=expected) as audit:
             result = get_manager("audit").receive_task(
                 "Audit the finished media package.",
-                context={"previous_results": [
-                    {"department": "finance", "status": "COMPLETED"},
-                    media_result,
-                ]},
+                context={"previous_results": [media_result]},
             )
         audit.assert_called_once_with("Audit the finished media package.", media_result)
         self.assertEqual(result, expected)
