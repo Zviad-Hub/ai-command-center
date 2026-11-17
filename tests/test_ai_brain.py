@@ -205,6 +205,30 @@ class AskAITests(unittest.TestCase):
             1200,
         )
 
+    @patch.dict(os.environ, {
+        "GROQ_API_KEY": "primary-key",
+        "GEMINI_API_KEY": "gemini-test-key",
+    })
+    @patch("ai_brain.time.sleep")
+    @patch("ai_brain.requests.post")
+    def test_gemini_fallback_uses_bounded_longer_backoff_for_persistent_503(self, post, sleep):
+        quota = Mock()
+        quota.status_code = 429
+        quota.ok = False
+        quota.text = '{"error":"daily quota exhausted"}'
+        unavailable = Mock()
+        unavailable.status_code = 503
+        unavailable.ok = False
+        unavailable.text = '{"error":"private provider detail must not escape"}'
+        post.side_effect = [quota, unavailable, unavailable, unavailable, unavailable]
+
+        with self.assertRaisesRegex(RuntimeError, "HTTP error: 503") as raised:
+            ai_brain.ask_ai("system prompt", "user prompt")
+
+        self.assertEqual(post.call_count, 5)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list], [5, 10, 20])
+        self.assertNotIn("private provider detail", str(raised.exception))
+
 
 if __name__ == "__main__":
     unittest.main()
