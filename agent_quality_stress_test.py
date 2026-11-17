@@ -234,8 +234,8 @@ def evaluate_live_result(department, result):
         plan = result.get("manager_plan", {})
         report_format_ok = (
             report_text.startswith("TECHNICAL DEPARTMENT — FINAL REPORT")
-            and "\\nSTATUS:" in report_text
-            and "\\\\n" not in report_text
+            and "\nSTATUS:" in report_text
+            and "\\n" not in report_text
             and "EVIDENCE LIMITATIONS:" in report_text
             and "EXECUTION AND APPROVAL:" in report_text
         )
