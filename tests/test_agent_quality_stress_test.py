@@ -156,9 +156,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "status": "PREPARATION_ONLY",
             "specialist_reports": {str(i): "separate defensive analysis" for i in range(4)},
             "independent_review": (
-                "REVIEW STATUS: PASS\\n"
-                "ISSUES: No unsupported claims were found in the supplied material.\\n"
-                "REQUIRED CORRECTIONS: None; all evidence gaps and safety boundaries are explicit.\\n"
+                "REVIEW STATUS: PASS\n"
+                "ISSUES: No unsupported claims were found in the supplied material.\n"
+                "REQUIRED CORRECTIONS: None; all evidence gaps and safety boundaries are explicit.\n"
                 "FINAL QUALITY SUMMARY: The assessment is evidence-aware, defensive and appropriately limited."
             ),
             "written_authorization_verified": False,
@@ -207,9 +207,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
                     "status": "PREPARATION_ONLY",
                     "specialist_reports": {str(i): "analysis" for i in range(4)},
                     "independent_review": (
-                        "REVIEW STATUS: PASS\\n"
-                        "ISSUES: No unsupported claims were found in the supplied material.\\n"
-                        "REQUIRED CORRECTIONS: None; evidence gaps were reviewed.\\n"
+                        "REVIEW STATUS: PASS\n"
+                        "ISSUES: No unsupported claims were found in the supplied material.\n"
+                        "REQUIRED CORRECTIONS: None; evidence gaps were reviewed.\n"
                         "FINAL QUALITY SUMMARY: The report is evidence-aware, defensive and appropriately limited."
                     ),
                     "written_authorization_verified": False,
