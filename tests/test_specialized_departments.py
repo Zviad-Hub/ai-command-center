@@ -209,6 +209,47 @@ class SpecializedDepartmentTests(unittest.TestCase):
 
         self.assertTrue(_review_is_substantive(PASS_REVIEW))
 
+    @patch("department_agents._research_context")
+    @patch("department_agents.ask_ai")
+    def test_manager_and_reviewer_receive_all_specialist_evidence(
+        self, ai_mock, research_mock
+    ):
+        specialist_outputs = [
+            "SPECIALIST_ALPHA: Revenue inputs are incomplete.",
+            "SPECIALIST_BETA: Liquidity risk requires sensitivity analysis.",
+            "SPECIALIST_GAMMA: Forecast assumptions are unverified.",
+        ]
+        manager_draft = (
+            "EXECUTIVE SUMMARY\nINPUTS\nCALCULATIONS\nASSUMPTIONS\n"
+            "RISKS\nRECOMMENDATIONS\nMISSING INFORMATION\n"
+            "Manager synthesis: figures remain provisional."
+        )
+        ai_mock.side_effect = specialist_outputs + [manager_draft, PASS_REVIEW]
+        research_mock.return_value = {
+            "status": "NOT_CONFIGURED",
+            "sources": [],
+            "warning": "No research key."
+        }
+
+        result = run_department_workflow(
+            "finance",
+            "Review the supplied monthly operating budget.",
+            context={"original_task": "Assess financial viability."}
+        )
+
+        manager_prompt = ai_mock.call_args_list[3].args[1]
+        reviewer_prompt = ai_mock.call_args_list[4].args[1]
+
+        for evidence in specialist_outputs:
+            with self.subTest(evidence=evidence):
+                self.assertIn(evidence, manager_prompt)
+                self.assertIn(evidence, reviewer_prompt)
+
+        self.assertIn(manager_draft, reviewer_prompt)
+        self.assertIn("Review the supplied monthly operating budget.", reviewer_prompt)
+        self.assertEqual(result["status"], "COMPLETED")
+        self.assertTrue(result["quality_review_passed"])
+
     def test_substantive_reviewer_requires_all_sections(self):
         from department_agents import _review_is_substantive
 
