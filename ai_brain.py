@@ -2,6 +2,7 @@
 import os
 import re
 import time
+from urllib.parse import urlsplit
 import requests
 
 
@@ -87,6 +88,78 @@ def is_daily_limit_error(response_text):
     return any(item in text for item in indicators)
 
 
+def _fallback_provider_config():
+    """Return a fully configured OpenAI-compatible fallback, or None."""
+    url = os.getenv("AI_FALLBACK_API_URL", "").strip()
+    key = os.getenv("AI_FALLBACK_API_KEY", "").strip()
+    model = os.getenv("AI_FALLBACK_MODEL", "").strip()
+    if not (url and key and model):
+        return None
+    parsed_url = urlsplit(url)
+    if parsed_url.scheme != "https" or not parsed_url.netloc:
+        raise RuntimeError("AI fallback endpoint must be a valid HTTPS URL.")
+    token_field = os.getenv("AI_FALLBACK_TOKEN_FIELD", "max_tokens").strip()
+    if token_field not in {"max_tokens", "max_completion_tokens"}:
+        raise RuntimeError("AI fallback token field configuration is invalid.")
+    return url, key, model, token_field
+
+
+def _ask_fallback_provider(system_prompt, user_prompt, token_limit, config):
+    """Make one bounded request to an explicitly configured compatible provider."""
+    url, key, model, token_field = config
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": str(system_prompt)},
+            {"role": "user", "content": str(user_prompt)},
+        ],
+        token_field: token_limit,
+    }
+    try:
+        response = requests.post(
+            url,
+            headers={
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=REQUEST_TIMEOUT,
+        )
+    except requests.exceptions.Timeout as error:
+        raise RuntimeError("Fallback AI provider timed out; provider details were withheld.") from error
+    except requests.exceptions.RequestException as error:
+        raise RuntimeError("Fallback AI provider connection failed; provider details were withheld.") from error
+
+    if response.status_code == 429:
+        if is_daily_limit_error(response.text[:2000]):
+            raise RuntimeError("Fallback AI provider daily quota is exhausted.")
+        raise RuntimeError("Fallback AI provider rate limit exceeded; provider details were withheld.")
+    if not response.ok:
+        raise RuntimeError(
+            f"Fallback AI provider HTTP error: {response.status_code}; provider details were withheld."
+        )
+
+    try:
+        result = response.json()
+        choices = result.get("choices", [])
+        content = choices[0].get("message", {}).get("content", "") if choices else ""
+    except (ValueError, TypeError, IndexError, AttributeError) as error:
+        raise RuntimeError("Fallback AI provider returned an invalid response.") from error
+
+    if not isinstance(content, str) or not content.strip():
+        raise RuntimeError("Fallback AI provider returned an empty response.")
+    if choices[0].get("finish_reason") == "length":
+        raise RuntimeError("Fallback AI provider response was truncated; provider details were withheld.")
+
+    usage = result.get("usage", {})
+    completion_tokens = usage.get("completion_tokens", "unknown") if isinstance(usage, dict) else "unknown"
+    print(
+        "[AI BRAIN] Fallback provider response received successfully. "
+        f"Token limit: {token_limit}. Completion tokens: {completion_tokens}."
+    )
+    return content.strip()
+
+
 def get_retry_wait(response, attempt):
 
     wait_time = None
@@ -126,9 +199,16 @@ def get_retry_wait(response, attempt):
 def ask_ai(system_prompt, user_prompt):
 
     api_key = os.getenv("GROQ_API_KEY")
+    fallback_config = _fallback_provider_config()
 
     if not api_key:
-        raise RuntimeError("GROQ_API_KEY is missing!")
+        if fallback_config:
+            return _ask_fallback_provider(
+                system_prompt, user_prompt,
+                min(detect_token_limit(system_prompt), MAX_COMPLETION_TOKEN_CAP),
+                fallback_config,
+            )
+        raise RuntimeError("GROQ_API_KEY is missing and no fallback AI provider is configured.")
 
     if not str(system_prompt or "").strip():
         raise ValueError("System prompt is empty.")
@@ -181,9 +261,15 @@ def ask_ai(system_prompt, user_prompt):
                 error_text = response.text[:2000]
 
                 if is_daily_limit_error(error_text):
+                    if fallback_config:
+                        print("[AI BRAIN] Groq daily quota exhausted; switching to configured fallback provider.")
+                        return _ask_fallback_provider(
+                            system_prompt, user_prompt, token_limit, fallback_config
+                        )
                     raise RuntimeError(
-                        "Groq daily quota has been exhausted. "
-                        "Wait for the quota reset or check your Groq plan."
+                        "Groq daily quota has been exhausted and no fallback AI provider is configured. "
+                        "Wait for the quota reset or configure AI_FALLBACK_API_URL, "
+                        "AI_FALLBACK_API_KEY and AI_FALLBACK_MODEL."
                     )
 
                 if attempt >= MAX_RETRIES:
