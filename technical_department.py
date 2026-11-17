@@ -1,3 +1,72 @@
+def _build_final_report(task, plan, specialist_results, context_data, status, manager_draft):
+    """Wrap the manager synthesis in explicit, evidence-aware execution boundaries."""
+    lines = [
+        "TECHNICAL DEPARTMENT — FINAL REPORT",
+        "",
+        f"STATUS: {status}",
+        f"TASK: {task}",
+        "",
+        "MANAGER SYNTHESIS:",
+        str(manager_draft or "").strip(),
+        "",
+        "MANAGER PLAN:",
+    ]
+
+    for step in plan.get("execution_plan", []):
+        lines.append(f"- {step}")
+
+    lines.extend(["", "TESTING STRATEGY (PROPOSED; NOT EXECUTED):"])
+    for step in plan.get("testing_strategy", []):
+        lines.append(f"- {step}")
+
+    lines.extend(["", "SPECIALIST FINDINGS:"])
+    if not specialist_results:
+        lines.append("- No specialist analysis was completed.")
+    for item in specialist_results:
+        if not isinstance(item, dict):
+            lines.append(f"- Invalid specialist result: {item!r}")
+            continue
+        name = _specialist_name(item)
+        lines.extend([
+            "",
+            f"{name} — {item.get('status', 'UNKNOWN')}:",
+            str(item.get("report") or item.get("error") or "No written findings were returned.")
+        ])
+
+    context_text = "\n".join(
+        f"{key}: {value}" for key, value in context_data.items()
+    ).lower()
+    missing_markers = ("not provided", "not supplied", "missing", "unavailable")
+    missing_items = [
+        str(key) for key, value in context_data.items()
+        if any(marker in str(value).lower() for marker in missing_markers)
+    ]
+
+    lines.extend([
+        "",
+        "EVIDENCE LIMITATIONS:",
+        "- Repository files were not independently fetched or opened by this workflow; specialists can analyze only source material included in the supplied task or context.",
+        "- Repository state, file paths, and test outcomes are not independently verified unless explicit evidence is included in the supplied material.",
+    ])
+    if missing_items:
+        lines.append("- Missing or unavailable inputs: " + ", ".join(missing_items) + ".")
+    if not context_text:
+        lines.append("- No additional technical context was supplied.")
+
+    lines.extend([
+        "",
+        "EXECUTION AND APPROVAL:",
+        "- No code was modified.",
+        "- No tests were executed; the testing strategy above is a proposal only.",
+        "- No deployment or external system action was performed.",
+        "- CEO approval is required before implementation, execution, or deployment.",
+        "",
+        "RECOMMENDED NEXT STEP:",
+        "Provide any missing repository/source files and relevant logs, then approve a scoped review and test plan before implementation."
+    ])
+    return "\n".join(lines)
+
+
 from ai_brain import ask_ai
 from technical_manager import run_technical_manager
 from technical_agents import run_specialist
