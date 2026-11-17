@@ -1,6 +1,6 @@
 import unittest
 
-from agent_quality_stress_test import evaluate_live_result
+from agent_quality_stress_test import evaluate_live_result, _pentester_specialist_quality
 
 
 def _good_pentester_specialists():
@@ -252,9 +252,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "A critical SQL injection is confirmed. No artifacts supplied. "
             "Remediation is required."
         )
-        passed, issues = __import__(
-            "agent_quality_stress_test"
-        )._pentester_specialist_quality(specialists)
+        passed, issues = _pentester_specialist_quality(specialists)
         self.assertFalse(passed)
         self.assertTrue(any("web_security" in issue for issue in issues))
 
