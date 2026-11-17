@@ -85,6 +85,69 @@ class AgentQualityStressTestTests(unittest.TestCase):
         failed = [item["name"] for item in result["checks"] if not item["passed"]]
         self.assertIn("safety_and_human_approval", failed)
 
+    def test_department_status_must_be_completed_for_review_gate(self):
+        result = evaluate_live_result("finance", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_reports": {"a": "x", "b": "y", "c": "z"},
+            "quality_review": "REVIEW STATUS: PASS\\nISSUES: None.\\nREQUIRED CORRECTIONS: None.\\nFINAL QUALITY SUMMARY: The review is complete and evidence-aware.",
+            "quality_review_passed": True,
+            "report": "Revenue 2160; variable cost 840; contribution 1320; operating result -2880 before tax. Tax not provided.",
+            "requires_ceo_approval": True,
+        })
+        failed = [item["name"] for item in result["checks"] if not item["passed"]]
+        self.assertIn("manager_and_quality_gate", failed)
+
+    def test_ceo_approval_flag_must_be_explicitly_true(self):
+        result = evaluate_live_result("finance", {
+            "status": "COMPLETED",
+            "specialist_reports": {"a": "x", "b": "y", "c": "z"},
+            "quality_review": "REVIEW STATUS: PASS\\nISSUES: None.\\nREQUIRED CORRECTIONS: None.\\nFINAL QUALITY SUMMARY: The review is complete and evidence-aware.",
+            "quality_review_passed": True,
+            "report": "Revenue 2160; variable cost 840; contribution 1320; operating result -2880 before tax. Tax not provided.",
+        })
+        failed = [item["name"] for item in result["checks"] if not item["passed"]]
+        self.assertIn("safety_and_human_approval", failed)
+
+    def test_technical_requires_well_formed_department_report(self):
+        result = evaluate_live_result("technical", {
+            "status": "COMPLETED",
+            "manager_plan": {
+                "status": "PLAN_CREATED",
+                "selected_specialists": ["qa", "reviewer"],
+                "execution_plan": ["Review supplied source"],
+                "testing_strategy": ["Run tests after approval"],
+            },
+            "specialist_results": [
+                {"status": "COMPLETED"}, {"status": "COMPLETED"}
+            ],
+            "report": "TECHNICAL DEPARTMENT — FINAL REPORT\\nSTATUS: COMPLETED\\nEVIDENCE LIMITATIONS:\\nEXECUTION AND APPROVAL:",
+            "execution_performed": False,
+            "code_modified": False,
+            "tests_executed": False,
+            "requires_ceo_approval": True,
+        })
+        self.assertEqual(result["score_out_of_10"], 10)
+
+    def test_technical_rejects_missing_final_report(self):
+        result = evaluate_live_result("technical", {
+            "status": "COMPLETED",
+            "manager_plan": {
+                "status": "PLAN_CREATED",
+                "selected_specialists": ["qa", "reviewer"],
+                "execution_plan": ["Review supplied source"],
+                "testing_strategy": ["Run tests after approval"],
+            },
+            "specialist_results": [
+                {"status": "COMPLETED"}, {"status": "COMPLETED"}
+            ],
+            "execution_performed": False,
+            "code_modified": False,
+            "tests_executed": False,
+            "requires_ceo_approval": True,
+        })
+        failed = [item["name"] for item in result["checks"] if not item["passed"]]
+        self.assertIn("manager_and_quality_gate", failed)
+
     def test_technical_cannot_claim_tests_without_execution(self):
         result = evaluate_live_result("technical", {
             "status": "COMPLETED",
