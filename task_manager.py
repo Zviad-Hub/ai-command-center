@@ -1,13 +1,20 @@
 import json
 import os
+import tempfile
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 
 from director import route_task
 from managers import get_manager
 
 
-TASKS_FILE = "tasks.json"
+TASKS_FILE = Path(
+    os.getenv(
+        "AI_COMMAND_CENTER_TASKS_FILE",
+        Path(__file__).resolve().with_name("tasks.json"),
+    )
+)
 
 VALID_DEPARTMENTS = [
     "media",
@@ -21,27 +28,71 @@ VALID_DEPARTMENTS = [
 
 
 def load_tasks():
-    if not os.path.exists(TASKS_FILE):
+    """Load task history without silently discarding a damaged history file."""
+    path = Path(TASKS_FILE)
+
+    if not path.exists():
         return []
 
     try:
-        with open(TASKS_FILE, "r", encoding="utf-8") as file:
+        with path.open("r", encoding="utf-8") as file:
             data = json.load(file)
+    except json.JSONDecodeError as error:
+        raise RuntimeError(
+            "Task history contains invalid JSON and was left untouched. "
+            "Restore or repair the history file before submitting another task."
+        ) from error
+    except OSError as error:
+        raise RuntimeError(
+            f"Task history could not be read from {path}. "
+            "Check file permissions and available disk space."
+        ) from error
 
-        return data if isinstance(data, list) else []
+    if not isinstance(data, list):
+        raise RuntimeError(
+            "Task history has an invalid format: the root JSON value must be a list. "
+            "The existing file was left untouched."
+        )
 
-    except (json.JSONDecodeError, OSError):
-        return []
+    return data
 
 
 def save_tasks(tasks):
-    with open(TASKS_FILE, "w", encoding="utf-8") as file:
-        json.dump(
-            tasks,
-            file,
-            ensure_ascii=False,
-            indent=4
-        )
+    """Atomically replace task history so an interrupted write cannot truncate it."""
+    if not isinstance(tasks, list):
+        raise ValueError("Task history must be a list.")
+
+    path = Path(TASKS_FILE)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = None
+
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=str(path.parent),
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as file:
+            temporary_path = Path(file.name)
+            json.dump(tasks, file, ensure_ascii=False, indent=4)
+            file.flush()
+            os.fsync(file.fileno())
+
+        os.replace(temporary_path, path)
+        temporary_path = None
+    except (OSError, TypeError, ValueError) as error:
+        raise RuntimeError(
+            f"Task history could not be saved safely to {path}. "
+            "The previous history file was not replaced."
+        ) from error
+    finally:
+        if temporary_path is not None:
+            try:
+                temporary_path.unlink(missing_ok=True)
+            except OSError:
+                pass
 
 
 def submit_task(ceo_task):
@@ -108,11 +159,13 @@ def submit_task(ceo_task):
                     "requires_ceo_approval": True
                 }
 
-        except Exception as error:
+        except Exception:
+            # Avoid copying provider exceptions or request details into the
+            # persistent task log; diagnostics belong in controlled logs.
             result = {
                 "department": department,
                 "status": "ERROR",
-                "message": str(error),
+                "message": "Department execution failed. Check the application logs for details.",
                 "execution_performed": False,
                 "requires_ceo_approval": True
             }
