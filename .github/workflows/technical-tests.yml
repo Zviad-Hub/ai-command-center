@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "technical_manager.py"
+      - "stress_test_suite.py"
+      - "README.md"
       - "technical_department.py"
       - "technical_agents.py"
       - "department_agents.py"
