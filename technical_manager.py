@@ -199,7 +199,7 @@ def run_technical_manager(task):
 
     try:
         response = ask_ai(TECHNICAL_MANAGER_PROMPT, user_prompt)
-    except Exception:
+    except Exception as error:
         return {
             "department": "technical",
             "manager": "Technical Manager",
