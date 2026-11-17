@@ -40,6 +40,7 @@ class SpecializedDepartmentTests(unittest.TestCase):
         )
 
         self.assertEqual(result["status"], "COMPLETED")
+        self.assertEqual(result["specialist_quality_validation"]["status"], "PASS")
         self.assertEqual(len(result["specialist_reports"]), 3)
         self.assertTrue(result["quality_review_passed"])
         self.assertTrue(result["advisory_only"])
@@ -404,6 +405,31 @@ class SpecializedDepartmentTests(unittest.TestCase):
             for item in result["specialist_not_run"]
         ))
         self.assertEqual(result["report"], "")
+
+
+    @patch("department_agents._research_context")
+    @patch("department_agents.ask_ai")
+    def test_independent_specialist_validator_blocks_generic_reports_before_synthesis(
+        self, ai_mock, research_mock
+    ):
+        ai_mock.side_effect = [
+            "Done.",
+            "Looks good.",
+            "All fine.",
+        ]
+        research_mock.return_value = {"status": "NOT_CONFIGURED", "sources": []}
+
+        result = run_department_workflow(
+            "business",
+            "Prepare a business strategy and operational review.",
+        )
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["report"], "")
+        self.assertEqual(result["specialist_quality_validation"]["status"], "REVIEW_REQUIRED")
+        self.assertTrue(result["specialist_quality_validation"]["issues"])
+        self.assertEqual(ai_mock.call_count, 3)
+        self.assertFalse(result["quality_review_passed"] if "quality_review_passed" in result else False)
 
 
 
