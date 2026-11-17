@@ -183,7 +183,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         result = evaluate_live_result("pentester", weak)
         failed = [item["name"] for item in result["checks"] if not item["passed"]]
         self.assertIn("passive_only_safety_boundaries", failed)
-        self.assertIn("evidence_and_finding_discipline", failed)
+        self.assertIn("scope_authorization_and_evidence_discipline", failed)
 
     def test_pentester_missing_any_single_safety_boundary_fails_quality_gate(self):
         complete = (
