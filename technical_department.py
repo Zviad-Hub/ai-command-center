@@ -70,6 +70,7 @@ def _build_final_report(task, plan, specialist_results, context_data, status, ma
 from ai_brain import ask_ai
 from technical_manager import run_technical_manager
 from technical_agents import run_specialist
+from error_diagnostics import safe_error_code
 
 
 TECHNICAL_REPORT_PROMPT = """
@@ -310,6 +311,7 @@ def run_technical_department(task, context=None):
                 "specialist_name": specialist_name,
                 "status": "ERROR",
                 "error": "SPECIALIST_FAILED",
+                "error_code": safe_error_code(error),
                 "execution_performed": False,
             })
 
