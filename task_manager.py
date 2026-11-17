@@ -181,11 +181,16 @@ def submit_task(ceo_task):
     if not isinstance(missions, dict):
         missions = {}
 
-    # STEP 2: Each manager receives its own mission, not a generic copy
-    # of the CEO task. The original request remains available as context.
+    # STEP 2: Execute Audit last so it can independently review every
+    # completed department result, regardless of whether Media was selected.
     results = []
+    execution_order = [item for item in departments if item != "audit"]
+    if "audit" in departments:
+        execution_order.append("audit")
 
-    for department in departments:
+    # Each manager receives its own mission, not a generic copy of the CEO task.
+    # The original request remains available as context.
+    for department in execution_order:
 
         mission = missions.get(department)
         if not isinstance(mission, str) or not mission.strip():

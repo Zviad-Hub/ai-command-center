@@ -805,3 +805,103 @@ def run_audit(task, media_result):
             "მასალა საჭიროებს შესწორებას ან დამატებით მტკიცებულებებს."
         )
     }
+
+
+
+# ==================================================
+# GENERAL ORGANIZATION HANDOFF AUDIT
+# ==================================================
+
+def run_general_audit(task, department_results):
+    """Audit non-media department handoffs when no Media-specific package exists.
+
+    Reuses the deterministic organization contract checks. This avoids treating
+    the absence of a Media artifact as an Audit failure while retaining all
+    department-specific safety and evidence gates.
+    """
+    from organization_quality import _check_department_result
+
+    checks = []
+    entries = department_results if isinstance(department_results, list) else []
+
+    if not str(task or "").strip():
+        checks.append(check_result(
+            "Original CEO task",
+            False,
+            "The original CEO task is missing."
+        ))
+
+    if not entries:
+        checks.append(check_result(
+            "Department handoff availability",
+            False,
+            "No completed department results were supplied for independent audit."
+        ))
+
+    seen_departments = set()
+    for index, result in enumerate(entries):
+        if not isinstance(result, dict):
+            checks.append(check_result(
+                f"Department result {index + 1}",
+                False,
+                "Department result is not a valid object."
+            ))
+            continue
+
+        department = str(result.get("department") or "").strip().lower()
+        if not department or department == "audit":
+            checks.append(check_result(
+                f"Department result {index + 1}",
+                False,
+                "Department identity is missing or invalid for this audit input."
+            ))
+            continue
+
+        if department in seen_departments:
+            checks.append(check_result(
+                f"{department} handoff uniqueness",
+                False,
+                "Duplicate department results were supplied."
+            ))
+            continue
+        seen_departments.add(department)
+
+        issues = _check_department_result(department, result)
+        checks.append(check_result(
+            f"{department} handoff integrity",
+            not issues,
+            "All deterministic department contract checks passed."
+            if not issues
+            else "; ".join(str(issue) for issue in issues[:12])
+        ))
+
+    failed_checks = [item for item in checks if not item["passed"]]
+    auditor = {
+        "auditor": "Organization Handoff Auditor",
+        "checks": checks,
+        "passed": bool(checks) and not failed_checks,
+    }
+    return {
+        "department": "audit",
+        "status": "PASSED_WITH_LIMITATIONS" if checks and not failed_checks else "REVIEW_REQUIRED",
+        "auditors": [auditor],
+        "summary": {
+            "total_checks": len(checks),
+            "passed_checks": len(checks) - len(failed_checks),
+            "failed_checks": len(failed_checks),
+        },
+        "failed_checks": [
+            {"auditor": auditor["auditor"], **item}
+            for item in failed_checks
+        ],
+        "publication_approved": False,
+        "final_decision": "CEO_APPROVAL_REQUIRED",
+        "message": (
+            "დეპარტამენტების გადაბარების შემოწმება დასრულდა; ადამიანური დამტკიცება კვლავ სავალდებულოა."
+            if not failed_checks and checks
+            else "აუდიტმა აღმოაჩინა გადაბარების ან ხარისხის შეუსაბამობები; საჭიროა გადახედვა."
+        ),
+        "requires_ceo_approval": True,
+        "execution_authorized": False,
+        "execution_performed": False,
+    }

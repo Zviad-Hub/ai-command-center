@@ -86,5 +86,58 @@ class AuditDepartmentTests(unittest.TestCase):
         self.assertEqual(result["final_decision"], "CEO_APPROVAL_REQUIRED")
 
 
+    def test_general_audit_accepts_non_media_department_handoffs(self):
+        from audit_agents import run_general_audit
+
+        result = run_general_audit(
+            "Review the technical delivery.",
+            [{
+                "department": "technical",
+                "status": "COMPLETED",
+                "report": "Technical report with architecture, risks and recommendations.",
+                "requires_ceo_approval": True,
+                "execution_authorized": False,
+                "execution_performed": False,
+                "specialist_quality_validation": {"status": "PASS", "issues": []},
+                "quality_review_passed": True,
+            }],
+        )
+
+        self.assertEqual(result["status"], "PASSED_WITH_LIMITATIONS")
+        self.assertEqual(result["summary"]["total_checks"], 1)
+        self.assertEqual(result["summary"]["failed_checks"], 0)
+        self.assertFalse(result["publication_approved"])
+        self.assertEqual(result["final_decision"], "CEO_APPROVAL_REQUIRED")
+
+    def test_general_audit_fails_closed_on_unaccepted_department_status(self):
+        from audit_agents import run_general_audit
+
+        result = run_general_audit(
+            "Review the technical delivery.",
+            [{
+                "department": "technical",
+                "status": "REVIEW_REQUIRED",
+                "report": "Draft technical report.",
+                "requires_ceo_approval": True,
+                "execution_authorized": False,
+                "execution_performed": False,
+                "specialist_quality_validation": {"status": "REVIEW_REQUIRED"},
+                "quality_review_passed": False,
+            }],
+        )
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertGreater(result["summary"]["failed_checks"], 0)
+        self.assertFalse(result["publication_approved"])
+
+    def test_general_audit_requires_department_evidence(self):
+        from audit_agents import run_general_audit
+
+        result = run_general_audit("Review the delivery.", [])
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["summary"]["failed_checks"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

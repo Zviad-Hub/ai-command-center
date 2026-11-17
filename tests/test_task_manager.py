@@ -435,5 +435,58 @@ class TaskManagerTests(unittest.TestCase):
         self.assertTrue(summary["human_review_required"])
 
 
+    def test_audit_is_executed_after_other_departments_even_when_routed_first(self):
+        technical_result = {
+            "department": "technical",
+            "status": "REVIEW_REQUIRED",
+            "report": "Technical findings need review.",
+        }
+        audit_result = {
+            "department": "audit",
+            "status": "REVIEW_REQUIRED",
+            "publication_approved": False,
+            "summary": {"total_checks": 1, "passed_checks": 0, "failed_checks": 1},
+            "final_decision": "CEO_APPROVAL_REQUIRED",
+        }
+        route = {
+            "departments": ["audit", "technical"],
+            "missions": {
+                "audit": "Independently review all department outputs.",
+                "technical": "Review the technical system.",
+            },
+        }
+        with patch("task_manager.route_task", return_value=route), \
+             patch("task_manager.get_manager") as manager_factory, \
+             patch("task_manager.load_tasks", return_value=[]), \
+             patch("task_manager.save_tasks"), \
+             patch("task_manager.audit_organization_task", return_value={
+                 "status": "REVIEW_REQUIRED",
+                 "department_checks": [],
+                 "issues": ["technical review required"],
+             }), \
+             patch("task_manager.run_semantic_alignment_audit", return_value={
+                 "status": "NEEDS_REVISION",
+                 "task_coverage": "PARTIAL",
+                 "summary": "Technical work still needs review.",
+             }):
+            technical_manager = Mock()
+            technical_manager.receive_task.return_value = technical_result
+            audit_manager = Mock()
+            audit_manager.receive_task.return_value = audit_result
+            manager_factory.side_effect = [technical_manager, audit_manager]
+
+            record = submit_task("Review technical system and independently audit it.")
+
+        self.assertEqual(manager_factory.call_count, 2)
+        audit_context = audit_manager.receive_task.call_args.kwargs["context"]
+        self.assertEqual(audit_context["previous_results"], [technical_result])
+        self.assertEqual(record["departments"], ["audit", "technical"])
+        self.assertEqual(
+            [item["department"] for item in record["results"]],
+            ["technical", "audit"],
+        )
+        self.assertEqual(record["overall_status"], "REVIEW_REQUIRED")
+
+
 if __name__ == "__main__":
     unittest.main()

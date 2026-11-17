@@ -150,8 +150,6 @@ def audit_organization_task(original_task, departments, results):
 
     if "media" in expected and "audit" not in expected:
         issues.append("media: independent Audit department was not included in the workflow")
-    if "audit" in expected and "media" not in expected:
-        issues.append("audit: no Media result was selected for the existing Audit workflow")
 
     return {
         "status": "PASS" if not issues else "REVIEW_REQUIRED",
