@@ -173,7 +173,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "report": strong_report,
         }
         result = evaluate_live_result("pentester", base)
-        self.assertEqual(result["score_out_of_10"], 10)
+        self.assertEqual(result["score_out_of_10"], 10, result["checks"])
 
         weak = dict(base)
         weak["report"] = (
