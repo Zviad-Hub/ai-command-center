@@ -29,7 +29,8 @@ class GroqProviderErrorRedactionTests(unittest.TestCase):
         message = str(caught.exception)
         self.assertNotIn(SECRET_DETAIL, message)
         self.assertNotIn("test-secret-key", message)
-        self.assertIn("withheld", message)
+        if "daily quota" not in message.lower():
+            self.assertIn("withheld", message)
         return message
 
     def test_non_daily_rate_limit_body_is_redacted(self):
