@@ -313,3 +313,19 @@ When contributing:
 ---
 
 **Built for a human-led AI organization: the CEO sets the goal, the Director routes the work, departments contribute, and the CEO makes the final decisions.**
+
+
+## Department stress testing
+
+The deterministic Director routing stress suite is available in `stress_test_suite.py`.
+It includes customer-style scenarios for every department and multi-department
+requests. Run it with:
+
+```bash
+python -c "from stress_test_suite import run_routing_stress_tests; import json; print(json.dumps(run_routing_stress_tests(), ensure_ascii=False, indent=2))"
+```
+
+The suite checks routing only and does not call department AI agents or perform
+external actions. `evaluate_task_record(record)` provides a structural
+10-point quality and safety score for a saved orchestration record. A perfect
+score is not proof of factual correctness; human review remains mandatory.
