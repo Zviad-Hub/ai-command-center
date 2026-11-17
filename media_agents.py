@@ -32,7 +32,7 @@ def is_georgian_request(task):
     task_text = str(task or "").casefold()
     return bool(
         re.search(r"[\u10A0-\u10FF]", task_text)
-        or re.search(r"\\bgeorgian\\b|ქართულ", task_text)
+        or re.search(r"\bgeorgian\b|ქართულ", task_text)
     )
 
 
