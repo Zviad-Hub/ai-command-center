@@ -75,7 +75,7 @@ def extract_narration(text):
         r"(?:\s*\([^)]*\))?\s*:?\s*(?:\*\*)?\s*"
         r"(.*?)"
         r"(?=^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
-        r"(?:\*\*)?VISUAL DIRECTIONS\s*:|"
+        r"(?:\*\*)?VISUAL DIRECTIONS\s*:?(?:\*\*)?\s*|"
         r"^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?"
         r"(?:\*\*)?FACTS TO VERIFY\s*:|"
         r"\Z)"
