@@ -86,7 +86,12 @@ class ManagerErrorRedactionTests(unittest.TestCase):
         with patch.object(department_agents, "_research_context", return_value={
             "status": "DISABLED", "sources": [], "warning": ""
         }), patch.object(
-            department_agents, "_call_specialist", return_value="specialist evidence"
+            department_agents, "_call_specialist",
+            side_effect=lambda department, specialist_id, task, context, research_text: {
+                "financial_analyst": "Calculation formula for revenue and costs; inputs and assumptions are incomplete.",
+                "risk_controller": "Risk and liquidity downside sensitivity; mitigation and uncertainty remain.",
+                "budget_planner": "Budget forecast scenarios and cash flow; assumptions and missing inputs remain.",
+            }[specialist_id]
         ), patch.object(
             department_agents, "ask_ai", side_effect=RuntimeError(SECRET_DETAIL)
         ):
