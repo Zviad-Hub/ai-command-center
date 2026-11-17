@@ -1,4 +1,3 @@
-
 import json
 
 from ai_brain import ask_ai
@@ -40,7 +39,6 @@ AVAILABLE SPECIALISTS:
 - database_engineer
 
 IMPORTANT RULES:
-
 - Never invent completed work.
 - Never claim code was tested unless tests were actually executed.
 - Never claim a bug was fixed unless the change was actually made.
@@ -53,6 +51,8 @@ IMPORTANT RULES:
 - Security testing must remain passive unless written authorization
   and separate CEO approval are provided.
 - If the task is unclear, identify what information is missing.
+- Every selected specialist must use an exact ID from the list above.
+- Every selected specialist must have a non-empty, specific mission.
 
 Return ONLY valid JSON using this structure:
 
@@ -118,19 +118,19 @@ def run_technical_manager(task):
             "status": "REJECTED",
             "message": "Technical task is empty.",
             "selected_specialists": [],
-            "requires_ceo_approval": False
+            "requires_ceo_approval": False,
+            "execution_authorized": False
         }
 
-    prompt = f"""
-{TECHNICAL_MANAGER_PROMPT}
-
-CEO TASK:
-{task}
-"""
+    user_prompt = f"CEO TASK:\n{task}"
 
     try:
-        response = ask_ai(prompt)
+        # ask_ai requires separate system and user prompts.
+        response = ask_ai(TECHNICAL_MANAGER_PROMPT, user_prompt)
         result = extract_json(response)
+
+        if not isinstance(result, dict):
+            raise ValueError("Technical Manager response must be a JSON object.")
 
         selected = result.get("selected_specialists", [])
 
@@ -143,36 +143,43 @@ CEO TASK:
             if not isinstance(item, dict):
                 continue
 
-            specialist = str(
-                item.get("specialist", "")
-            ).strip()
+            specialist = str(item.get("specialist", "")).strip()
+            mission = str(item.get("mission", "")).strip()
 
-            if specialist not in TECHNICAL_SPECIALISTS:
+            if specialist not in TECHNICAL_SPECIALISTS or not mission:
                 continue
+
+            deliverables = item.get("deliverables", [])
+            if not isinstance(deliverables, list):
+                deliverables = []
 
             valid_specialists.append({
                 "specialist": specialist,
-                "mission": str(item.get("mission", "")).strip(),
-                "deliverables": item.get("deliverables", [])
-                if isinstance(item.get("deliverables", []), list)
-                else []
+                "mission": mission,
+                "deliverables": [
+                    str(value).strip()
+                    for value in deliverables
+                    if str(value).strip()
+                ]
             })
 
         result["selected_specialists"] = valid_specialists
         result["department"] = "technical"
         result["manager"] = "Technical Manager"
 
+        # A valid specialist plan always uses the status expected
+        # by the Technical Department integration.
+        result["status"] = (
+            "PLAN_CREATED" if valid_specialists else "REVIEW_REQUIRED"
+        )
+
         # Planning alone never authorizes code changes or deployment.
         result["requires_ceo_approval"] = True
-
         result["execution_authorized"] = False
         result["message"] = (
             "Technical plan created. "
             "CEO approval is required before implementation."
         )
-
-        if not valid_specialists:
-            result["status"] = "REVIEW_REQUIRED"
 
         return result
 
