@@ -1,3 +1,5 @@
+import contextlib
+import io
 import os
 import sys
 import types
@@ -6,6 +8,11 @@ from unittest.mock import patch
 
 import department_agents
 from managers import DepartmentManager
+import director
+import pentester_agents
+import research_agent
+import requests
+import technical_department
 
 
 SECRET_DETAIL = "SENSITIVE_PROVIDER_EXCEPTION_TOKEN"
@@ -80,6 +87,101 @@ class ManagerErrorRedactionTests(unittest.TestCase):
         self.assertEqual(result["status"], "ERROR")
         self.assertNotIn(SECRET_DETAIL, repr(result))
         self.assertNotIn(SECRET_DETAIL, result["warning"])
+
+    def test_technical_specialist_exception_is_redacted(self):
+        plan = {
+            "status": "PLANNED",
+            "selected_specialists": [{"id": "backend_developer", "name": "Backend Developer", "mission": "Review supplied code"}],
+            "execution_plan": ["Review supplied code"],
+            "testing_strategy": ["Propose tests only"],
+        }
+        with patch.object(technical_department, "run_technical_manager", return_value=plan), patch.object(
+            technical_department, "run_specialist", side_effect=RuntimeError(SECRET_DETAIL)
+        ):
+            result = technical_department.run_technical_department("Review this code")
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertNotIn(SECRET_DETAIL, repr(result))
+        self.assertEqual(result["specialist_results"][0]["error"], "SPECIALIST_FAILED")
+
+    def test_technical_manager_exception_is_redacted(self):
+        plan = {
+            "status": "PLANNED",
+            "selected_specialists": [{"id": "backend_developer", "name": "Backend Developer", "mission": "Review supplied code"}],
+            "execution_plan": ["Review supplied code"],
+            "testing_strategy": ["Propose tests only"],
+        }
+        specialist = {
+            "specialist": "backend_developer",
+            "specialist_name": "Backend Developer",
+            "status": "COMPLETED",
+            "report": "Evidence-based findings",
+            "execution_performed": False,
+        }
+        with patch.object(technical_department, "run_technical_manager", return_value=plan), patch.object(
+            technical_department, "run_specialist", return_value=specialist
+        ), patch.object(
+            technical_department, "ask_ai", side_effect=RuntimeError(SECRET_DETAIL)
+        ):
+            result = technical_department.run_technical_department("Review this code")
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertNotIn(SECRET_DETAIL, repr(result))
+        self.assertEqual(result["error"], "TECHNICAL_WORKFLOW_FAILED")
+
+    def test_pentester_specialist_exception_is_redacted(self):
+        with patch.object(
+            pentester_agents, "_call_specialist", side_effect=RuntimeError(SECRET_DETAIL)
+        ):
+            result = pentester_agents.run_pentester_department("Review supplied security evidence")
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertNotIn(SECRET_DETAIL, repr(result))
+        self.assertEqual(result["specialist_failures"][0]["error"], "SPECIALIST_FAILED")
+
+    def test_pentester_manager_exception_is_redacted(self):
+        with patch.object(
+            pentester_agents, "_call_specialist", return_value="Evidence-based security review"
+        ), patch.object(
+            pentester_agents, "ask_ai", side_effect=RuntimeError(SECRET_DETAIL)
+        ):
+            result = pentester_agents.run_pentester_department("Review supplied security evidence")
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertNotIn(SECRET_DETAIL, repr(result))
+        self.assertEqual(result["error"], "PENTESTER_WORKFLOW_FAILED")
+
+    def test_director_routing_exception_is_redacted_from_result_and_console(self):
+        output = io.StringIO()
+        with patch.object(
+            director, "ai_route_task", side_effect=RuntimeError(SECRET_DETAIL)
+        ), contextlib.redirect_stdout(output):
+            result = director.route_task("Please coordinate an orchid taxonomy research project")
+
+        self.assertEqual(result["routing_error"], "AI_ROUTING_FAILED")
+        self.assertNotIn(SECRET_DETAIL, repr(result))
+        self.assertNotIn(SECRET_DETAIL, output.getvalue())
+
+    def test_research_http_response_body_is_not_exposed(self):
+        response = requests.Response()
+        response.status_code = 403
+        response.url = research_agent.TAVILY_URL
+        response._content = SECRET_DETAIL.encode("utf-8")
+
+        def fail_http():
+            error = requests.HTTPError("provider error " + SECRET_DETAIL)
+            error.response = response
+            raise error
+
+        response.raise_for_status = fail_http
+        with patch.dict(os.environ, {"TAVILY_API_KEY": "test-key"}), patch.object(
+            research_agent.requests, "post", return_value=response
+        ), contextlib.redirect_stdout(io.StringIO()):
+            result = research_agent.run_research("TOPIC: test")
+
+        self.assertEqual(result["status"], "ERROR")
+        self.assertNotIn(SECRET_DETAIL, repr(result))
+        self.assertIn("provider details were withheld", result["message"])
 
 
 if __name__ == "__main__":
