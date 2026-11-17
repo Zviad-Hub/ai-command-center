@@ -180,24 +180,25 @@ def detect_departments(task):
         "ბიზნესის განვითარ"
     ]
 
-    # Explicit exclusions override keyword matches in both word orders.
-    # Support Georgian and English commands such as:
-    # "არ გაუშვა Media და Pentester" / "Media და Pentester არ გაუშვა".
-    def explicitly_excluded(*aliases):
-        negation = (
-            r"(?:არ\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|"
-            r"გააქტიურო(?:თ)?)|do\s+not\s+run|don't\s+run|"
-            r"exclude|skip|not\s+run)"
-        )
-        name = r"(?:%s)" % "|".join(re.escape(alias) for alias in aliases)
-        before = re.search(negation + r".{0,60}" + name, text)
-        after = re.search(name + r".{0,60}" + negation, text)
-        return bool(before or after)
+    # Explicit exclusions are evaluated inside the same sentence/clause.
+    # This supports "არ გაუშვა Media და Pentester" without accidentally
+    # excluding a department mentioned in a previous sentence.
+    excluded_departments = set()
+    for clause in re.split(r"[\n.!?;]+", text):
+        has_exclusion = bool(re.search(
+            r"(?:არ\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|გააქტიურო(?:თ)?)"
+            r"|do\s+not\s+run|don't\s+run|exclude|skip|not\s+run)",
+            clause,
+        ))
+        if not has_exclusion:
+            continue
+        if re.search(r"\bmedia\b|\bმედია\b", clause):
+            excluded_departments.add("media")
+        if re.search(r"\b(?:pentester|pentest)\b|პენტესტ(?:ერი)?", clause):
+            excluded_departments.add("pentester")
 
-    media_excluded = explicitly_excluded("media", "მედია")
-    pentester_excluded = explicitly_excluded(
-        "pentester", "pentest", "პენტესტერი", "პენტესტ"
-    )
+    media_excluded = "media" in excluded_departments
+    pentester_excluded = "pentester" in excluded_departments
 
     # MEDIA ALWAYS GETS AN INDEPENDENT AUDIT when it is actually requested.
     if not media_excluded and contains_any(text, media_keywords):
