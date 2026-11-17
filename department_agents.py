@@ -470,5 +470,6 @@ Review the draft independently. The report must remain advisory only.
             "status": "REVIEW_REQUIRED",
             "message": "The department could not prepare and independently approve a reliable report.",
             "error": "DEPARTMENT_WORKFLOW_FAILED",
+            "error_code": safe_error_code(error),
             "report": ""
         }
