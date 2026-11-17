@@ -12,7 +12,7 @@ def safe_error_code(error):
     if "rate limit" in message or "429" in message:
         return "PROVIDER_RATE_LIMIT_EXHAUSTED"
     provider_http = re.search(
-        r"(fallback ai provider|groq(?: api)?)(?: http error| server error):?\\s*(?:http\\s*)?(\\d{3})",
+        r"(fallback ai provider|groq(?: api)?)(?: http error| server error):?\s*(?:http\s*)?(\d{3})",
         message,
     )
     if provider_http:
