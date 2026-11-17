@@ -300,7 +300,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 31 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department execution gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, and Pentester specialist/reviewer safety gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 48 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department execution gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, and Pentester specialist/reviewer safety gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
@@ -330,3 +330,29 @@ external actions. GitHub Actions prints the live routing scorecard and fails the
 job if any expected department route is incorrect. `evaluate_task_record(record)`
 provides a structural 10-point quality and safety score for a saved orchestration record. A perfect
 score is not proof of factual correctness; human review remains mandatory.
+
+## Live AI department quality stress test
+
+The opt-in live suite in `agent_quality_stress_test.py` evaluates real Finance,
+Business, Tenders, Pentester and Technical department outputs. It checks
+specialist participation, manager/reviewer gates, task-specific requirements,
+honest uncertainty, arithmetic in the controlled Finance scenario, and safety
+flags. It deliberately disables Tavily research so the test uses only the
+controlled facts supplied in each scenario.
+
+Run locally only when you intentionally want to spend Groq API quota:
+
+```bash
+python agent_quality_stress_test.py --live
+```
+
+The command writes `agent_quality_stress_report.json`. It is not run on every
+pull request. In GitHub Actions, open **Actions → Technical Department Tests →
+Run workflow**, set **Run real AI department quality tests** to `true`, and
+start the run. The workflow uses the existing `GROQ_API_KEY` repository secret
+and uploads `live-agent-quality-stress-report` for 14 days.
+
+The live score is a heuristic quality gate, not proof that a factual claim is
+true. A passing score never replaces human review. The suite does not perform
+transactions, tender submissions, external contact, network scans, penetration
+tests, code edits, test execution, merges, or deployments.
