@@ -7,9 +7,6 @@ those remain explicit human-review responsibilities.
 
 
 CORE_DEPARTMENTS = {"finance", "business", "tenders", "technical", "pentester"}
-SUCCESS_STATUSES = {"COMPLETED", "PREPARATION_ONLY", "PASSIVE_REVIEW_ONLY"}
-
-
 def _nonempty(value):
     if isinstance(value, str):
         return bool(value.strip())
