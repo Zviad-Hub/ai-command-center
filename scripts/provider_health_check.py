@@ -11,6 +11,7 @@ import requests
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 TIMEOUT_SECONDS = 12
+HEALTH_CHECK_TOKEN_LIMIT = 64
 DAILY_QUOTA_MARKERS = (
     "daily quota",
     "per day",
@@ -26,11 +27,30 @@ def _classify_response(response):
     if 200 <= status < 300:
         try:
             payload = response.json()
-            choices = payload.get("choices", [])
-            content = choices[0].get("message", {}).get("content", "") if choices else ""
-        except (ValueError, TypeError, IndexError, AttributeError):
-            return "INVALID_RESPONSE"
-        return "PASS" if isinstance(content, str) and content.strip() else "INVALID_RESPONSE"
+        except (ValueError, TypeError):
+            return "INVALID_JSON"
+        if not isinstance(payload, dict):
+            return "INVALID_JSON_SHAPE"
+
+        choices = payload.get("choices")
+        if not isinstance(choices, list) or not choices:
+            return "NO_CHOICES"
+
+        first_choice = choices[0]
+        if not isinstance(first_choice, dict):
+            return "INVALID_CHOICE"
+        message = first_choice.get("message")
+        if not isinstance(message, dict):
+            return "INVALID_MESSAGE"
+
+        content = message.get("content")
+        if not isinstance(content, str):
+            return "NON_TEXT_CONTENT"
+        if not content.strip():
+            if first_choice.get("finish_reason") == "length":
+                return "TRUNCATED_RESPONSE"
+            return "EMPTY_CONTENT"
+        return "PASS"
 
     if status in (401, 403):
         return "AUTH_ERROR"
@@ -60,8 +80,14 @@ def check_provider(name, url, api_key, model, token_field, post_fn=None):
         "messages": [
             {"role": "user", "content": "Reply with exactly: OK"}
         ],
-        token_field: 8,
+        token_field: HEALTH_CHECK_TOKEN_LIMIT,
     }
+    # Match the production Groq request's low-reasoning configuration. A tiny
+    # 8-token budget can be consumed by reasoning before a visible answer exists.
+    if name == "groq":
+        payload["reasoning_effort"] = "low"
+        payload["include_reasoning"] = False
+
     try:
         response = post(
             url,
