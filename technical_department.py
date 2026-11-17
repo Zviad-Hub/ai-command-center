@@ -36,7 +36,7 @@ def _build_final_report(task, plan, specialist_results, context_data, status):
             str(item.get("report") or item.get("error") or "No written findings were returned.")
         ])
 
-    context_text = "\\n".join(
+    context_text = "\n".join(
         f"{key}: {value}" for key, value in context_data.items()
     ).lower()
     missing_markers = ("not provided", "not supplied", "missing", "unavailable")
@@ -67,7 +67,7 @@ def _build_final_report(task, plan, specialist_results, context_data, status):
         "RECOMMENDED NEXT STEP:",
         "Provide repository/source files and relevant logs, then approve a scoped review and test plan before implementation."
     ])
-    return "\\n".join(lines)
+    return "\n".join(lines)
 
 
 def run_technical_department(task, context=None):
