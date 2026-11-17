@@ -1,3 +1,33 @@
+def _research_context(task, department):
+    """Research is optional evidence gathering, never proof by itself."""
+
+    if not os.getenv("TAVILY_API_KEY"):
+        return {
+            "status": "NOT_CONFIGURED",
+            "sources": [],
+            "warning": "TAVILY_API_KEY is not configured; no web research was performed."
+        }
+
+    try:
+        result = run_research(task)
+
+        if not isinstance(result, dict):
+            return {
+                "status": "ERROR",
+                "sources": [],
+                "warning": "Research returned an invalid result."
+            }
+
+        return result
+
+    except Exception as error:
+        return {
+            "status": "ERROR",
+            "sources": [],
+            "warning": "Research failed; internal error details were withheld."
+        }
+
+
 import os
 
 from error_diagnostics import safe_error_code
