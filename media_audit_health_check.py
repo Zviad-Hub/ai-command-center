@@ -10,9 +10,11 @@ import uuid
 
 
 HEALTH_CHECK_MARKERS = (
+    # Keep this shortcut deliberately explicit. A generic phrase such as
+    # "provider health check" inside an ordinary Technical task must not
+    # bypass Director routing and force the Media/Audit diagnostic path.
     "system health check",
-    "health check",
-    "system diagnostic",
+    "complete system diagnostic",
     "diagnostic all departments",
 )
 
