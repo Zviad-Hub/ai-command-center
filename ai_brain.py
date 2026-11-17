@@ -168,7 +168,7 @@ def ask_ai(system_prompt, user_prompt):
             response = requests.post(
                 GROQ_API_URL,
                 headers=headers,
-                json=payload,
+                json=payload.copy(),
                 timeout=REQUEST_TIMEOUT
             )
 
