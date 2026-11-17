@@ -301,7 +301,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 115 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 124 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
@@ -358,3 +358,22 @@ The live score is a heuristic quality gate, not proof that a factual claim is
 true. A passing score never replaces human review. The suite does not perform
 transactions, tender submissions, external contact, network scans, penetration
 tests, code edits, test execution, merges, or deployments.
+
+Each department entry in the JSON report includes a `diagnostics` list when
+safe failure codes are available. These codes identify the failure category
+without exposing raw provider messages, prompts or credentials. Examples:
+
+| Diagnostic code | Meaning |
+|---|---|
+| `PROVIDER_RATE_LIMIT_EXHAUSTED` | The provider rate limit remained after retries. |
+| `PROVIDER_DAILY_QUOTA_EXHAUSTED` | The provider's daily quota was exhausted. |
+| `PROVIDER_TIMEOUT` | The provider request timed out. |
+| `PROVIDER_CONNECTION_ERROR` | A provider connection could not be completed. |
+| `PROVIDER_HTTP_ERROR` | The provider returned an unsuccessful HTTP response. |
+| `PROVIDER_EMPTY_RESPONSE` | The provider returned no usable response content. |
+| `INVALID_AGENT_RESPONSE` | An agent returned an invalid or unusable response. |
+| `AGENT_PROCESSING_ERROR` | An unexpected internal processing error occurred. |
+
+Use the `source` field to identify the affected manager or specialist. A
+diagnostic code narrows down the failure category; it does not expose the full
+provider response and does not by itself prove the underlying cause.
