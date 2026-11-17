@@ -119,5 +119,16 @@ class OrganizationQualityTests(unittest.TestCase):
                             for issue in audit["issues"]))
 
 
+    def test_general_audit_can_review_non_media_departments(self):
+        audit = audit_organization_task(
+            "Review the technical delivery.",
+            ["technical", "audit"],
+            [_core_result("technical"), _audit_result()],
+        )
+
+        self.assertEqual(audit["status"], "PASS", audit["issues"])
+        self.assertEqual(len(audit["department_checks"]), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
