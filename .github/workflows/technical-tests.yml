@@ -1,0 +1,70 @@
+name: Technical Department Tests
+
+on:
+  pull_request:
+    paths:
+      - "technical_manager.py"
+      - "stress_test_suite.py"
+      - "README.md"
+      - "technical_department.py"
+      - "technical_agents.py"
+      - "department_agents.py"
+      - "managers.py"
+      - "director.py"
+      - "task_manager.py"
+      - "main.py"
+      - "ai_brain.py"
+      - "research_agent.py"
+      - "config.py"
+      - "tests/**"
+      - ".github/workflows/technical-tests.yml"
+  workflow_dispatch:
+    inputs:
+      run_live_quality:
+        description: "Run real AI department quality tests (uses Groq API quota)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  technical-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Technical Department regression tests
+        run: |
+          python -m unittest discover -s tests -v
+      - name: Run Director routing stress scorecard
+        run: |
+          python -c "from stress_test_suite import run_routing_stress_tests; import json; report = run_routing_stress_tests(); print(json.dumps(report, ensure_ascii=False, indent=2)); raise SystemExit(0 if report['status'] == 'PASS' else 1)"
+
+      - name: Run opt-in live AI department quality tests
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_live_quality }}
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python agent_quality_stress_test.py --live
+
+      - name: Upload live AI quality report
+        if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.run_live_quality && hashFiles('agent_quality_stress_report.json') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-agent-quality-stress-report
+          path: agent_quality_stress_report.json
+          retention-days: 14

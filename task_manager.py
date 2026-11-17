@@ -1,4 +1,3 @@
-
 import json
 import os
 import uuid
@@ -55,40 +54,58 @@ def submit_task(ceo_task):
     # STEP 1: Director analyzes and routes the task.
     routing = route_task(ceo_task)
 
+    if not isinstance(routing, dict):
+        raise ValueError("Director returned an invalid routing plan.")
+
     departments = routing.get("departments", [])
 
     if not isinstance(departments, list):
         departments = []
 
-    departments = [
+    departments = list(dict.fromkeys(
         department
         for department in departments
         if department in VALID_DEPARTMENTS
-    ]
+    ))
 
     if not departments:
         departments = ["technical"]
 
-    # STEP 2: Execute department workflows.
+    missions = routing.get("missions", {})
+    if not isinstance(missions, dict):
+        missions = {}
+
+    # STEP 2: Each manager receives its own mission, not a generic copy
+    # of the CEO task. The original request remains available as context.
     results = []
 
     for department in departments:
+
+        mission = missions.get(department)
+        if not isinstance(mission, str) or not mission.strip():
+            mission = ceo_task
+
+        context = {
+            "original_task": ceo_task,
+            "department_mission": mission,
+            "previous_results": list(results)
+        }
 
         try:
             manager = get_manager(department)
 
             result = manager.receive_task(
-                ceo_task,
-                context={
-                    "previous_results": results
-                }
+                mission,
+                context=context
             )
 
             if not isinstance(result, dict):
                 result = {
                     "department": department,
                     "status": "ERROR",
-                    "message": "Department returned an invalid result."
+                    "message": "Department returned an invalid result.",
+                    "execution_performed": False,
+                    "requires_ceo_approval": True
                 }
 
         except Exception as error:
