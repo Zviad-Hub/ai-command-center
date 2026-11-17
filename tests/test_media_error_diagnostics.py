@@ -10,7 +10,7 @@ class SafeErrorDiagnosticsTests(unittest.TestCase):
         cases = [
             (RuntimeError("Groq daily quota has been exhausted."), "PROVIDER_DAILY_QUOTA_EXHAUSTED"),
             (RuntimeError("Groq rate limit exceeded after retries."), "PROVIDER_RATE_LIMIT_EXHAUSTED"),
-            (RuntimeError("Groq API HTTP error: 401; details withheld."), "PROVIDER_HTTP_ERROR"),
+            (RuntimeError("Groq API HTTP error: 401; details withheld."), "PRIMARY_PROVIDER_HTTP_401"),
             (RuntimeError("Request timed out."), "PROVIDER_TIMEOUT"),
             (RuntimeError("Connection error while calling provider."), "PROVIDER_CONNECTION_ERROR"),
             (RuntimeError("Creative Strategist returned empty output."), "PROVIDER_EMPTY_RESPONSE"),
