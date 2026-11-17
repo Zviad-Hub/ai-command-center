@@ -11,7 +11,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from department_quality import validate_specialist_reports
+from department_quality import validate_specialist_reports, validate_technical_specialists
 
 
 SCENARIOS = {
@@ -271,56 +271,12 @@ def _pentester_specialist_quality(specialist_reports):
 
 def _department_specialist_quality(department, specialist_reports=None,
                                     specialist_results=None, manager_plan=None):
-    """Validate advisory department roles using the shared runtime contract."""
-    if department != "technical":
+    """Validate advisory department roles using shared runtime contracts."""
+    if department == "technical":
+        validation = validate_technical_specialists(manager_plan, specialist_results)
+    else:
         validation = validate_specialist_reports(department, specialist_reports)
-        return validation["status"] == "PASS", validation["issues"]
-
-    technical_requirements = {
-        "system_architect": (("architecture", "system design", "components", "structure"), ("dependency", "trade-off", "risk", "scalability", "missing")),
-        "backend_developer": (("backend", "api", "endpoint", "server", "data model"), ("validation", "error handling", "transaction", "reliability", "testing")),
-        "frontend_developer": (("frontend", "ui", "interface", "component", "accessibility"), ("responsive", "interaction", "usability", "state", "testing")),
-        "devops_engineer": (("devops", "deployment", "infrastructure", "pipeline", "ci/cd"), ("rollback", "monitoring", "configuration", "security", "reliability")),
-        "qa_engineer": (("qa", "test", "testing", "acceptance criteria", "regression"), ("coverage", "assertion", "edge case", "quality", "validation")),
-        "code_reviewer": (("code review", "code quality", "maintainability", "defect", "logic"), ("evidence", "risk", "recommendation", "readability", "test")),
-        "security_engineer": (("security", "authentication", "authorization", "threat", "access control"), ("defensive", "mitigation", "vulnerability", "risk", "hardening")),
-        "database_engineer": (("database", "schema", "query", "migration", "sql"), ("integrity", "index", "performance", "transaction", "consistency")),
-    }
-    issues = []
-    plan = manager_plan if isinstance(manager_plan, dict) else {}
-    assignments = plan.get("selected_specialists", [])
-    if not isinstance(assignments, list) or len(assignments) < 2:
-        return False, ["technical: manager plan must select at least two specialists"]
-    selected = []
-    for item in assignments:
-        specialist_id = (
-            item.get("id") or item.get("specialist") or item.get("name") or ""
-            if isinstance(item, dict) else str(item or "")
-        )
-        specialist_id = str(specialist_id).strip()
-        if specialist_id not in technical_requirements:
-            issues.append(f"technical: unknown or invalid specialist assignment {specialist_id or '<empty>'}")
-        else:
-            selected.append(specialist_id)
-    if len(selected) != len(set(selected)):
-        issues.append("technical: duplicate specialist assignments are not allowed")
-    result_map = {}
-    for item in specialist_results if isinstance(specialist_results, list) else []:
-        if isinstance(item, dict):
-            result_map[str(item.get("specialist") or item.get("id") or "")] = item
-    for specialist_id in selected:
-        item = result_map.get(specialist_id)
-        if not isinstance(item, dict) or item.get("status") != "COMPLETED":
-            issues.append(f"{specialist_id}: selected specialist has no completed result")
-            continue
-        report = str(item.get("report") or "").casefold()
-        if not report.strip():
-            issues.append(f"{specialist_id}: completed result has no report")
-            continue
-        for index, alternatives in enumerate(technical_requirements[specialist_id]):
-            if not any(term in report for term in alternatives):
-                issues.append(f"{specialist_id}: report lacks role-specific evidence element {index + 1}")
-    return not issues, issues
+    return validation["status"] == "PASS", validation["issues"]
 
 
 def evaluate_live_result(department, result):
