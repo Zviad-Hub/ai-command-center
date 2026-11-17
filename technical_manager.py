@@ -200,17 +200,15 @@ def run_technical_manager(task):
     try:
         response = ask_ai(TECHNICAL_MANAGER_PROMPT, user_prompt)
     except Exception as error:
-        return {
-            "department": "technical",
-            "manager": "Technical Manager",
-            "status": "ERROR",
-            "message": "Technical planning provider call failed.",
-            "error": "TECHNICAL_PLANNING_FAILED",
-            "error_code": safe_error_code(error),
-            "selected_specialists": [],
-            "requires_ceo_approval": True,
-            "execution_authorized": False,
-        }
+        # Keep the department observable during provider outages. This creates
+        # an advisory-only deterministic plan; specialist calls still fail
+        # closed if the provider remains unavailable.
+        fallback = _safe_fallback_plan(
+            task,
+            "AI planning provider unavailable; using a conservative rule-based plan.",
+        )
+        fallback["planning_error_code"] = safe_error_code(error)
+        return fallback
 
     try:
         result = extract_json(response)
