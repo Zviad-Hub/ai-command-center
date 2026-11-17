@@ -162,5 +162,76 @@ class TaskManagerTests(unittest.TestCase):
         route_mock.assert_not_called()
 
 
+    def test_semantic_alignment_audit_is_disabled_by_default(self):
+        with patch.dict("os.environ", {"AI_ORGANIZATION_SEMANTIC_AUDIT": ""}), \
+             patch("task_manager.route_task", return_value={
+                 "departments": ["technical"], "missions": {"technical": "Review the app."}
+             }), \
+             patch("task_manager.get_manager") as manager_factory, \
+             patch("task_manager.load_tasks", return_value=[]), \
+             patch("task_manager.save_tasks"), \
+             patch("task_manager.run_semantic_alignment_audit") as semantic_mock:
+            manager = Mock()
+            manager.receive_task.return_value = {
+                "department": "technical", "status": "REVIEW_REQUIRED"
+            }
+            manager_factory.return_value = manager
+
+            record = submit_task("Review the app.")
+
+        semantic_mock.assert_not_called()
+        self.assertEqual(record["semantic_audit"]["status"], "NOT_RUN")
+        self.assertEqual(record["overall_status"], "REVIEW_REQUIRED")
+
+    def test_opt_in_semantic_revision_blocks_ready_for_human_review_status(self):
+        valid_finance_result = {
+            "department": "finance",
+            "status": "COMPLETED",
+            "report": "Finance report with calculations and assumptions.",
+            "requires_ceo_approval": True,
+            "execution_authorized": False,
+            "execution_performed": False,
+            "specialist_quality_validation": {"status": "PASS", "issues": []},
+            "quality_review_passed": True,
+        }
+        audit_pass = {
+            "status": "PASS",
+            "department_checks": [{"department": "finance", "status": "PASS", "issues": []}],
+            "issues": [],
+            "content_alignment_status": "HUMAN_REVIEW_REQUIRED",
+            "human_review_required": True,
+            "limitations": [],
+        }
+        semantic_revision = {
+            "status": "NEEDS_REVISION",
+            "task_coverage": "PARTIAL",
+            "summary": "One requested item is missing.",
+            "missing_requirements": ["Cash-flow sensitivity analysis is missing."],
+            "human_review_required": True,
+        }
+        with patch.dict("os.environ", {"AI_ORGANIZATION_SEMANTIC_AUDIT": "true"}), \
+             patch("task_manager.route_task", return_value={
+                 "departments": ["finance"], "missions": {"finance": "Prepare the financial review."}
+             }), \
+             patch("task_manager.get_manager") as manager_factory, \
+             patch("task_manager.load_tasks", return_value=[]), \
+             patch("task_manager.save_tasks"), \
+             patch("task_manager.audit_organization_task", return_value=audit_pass), \
+             patch("task_manager.run_semantic_alignment_audit", return_value=semantic_revision) as semantic_mock:
+            manager = Mock()
+            manager.receive_task.return_value = valid_finance_result
+            manager_factory.return_value = manager
+
+            record = submit_task("Prepare the financial review and cash-flow analysis.")
+
+        semantic_mock.assert_called_once()
+        self.assertEqual(record["semantic_audit"]["status"], "NEEDS_REVISION")
+        self.assertEqual(record["overall_status"], "REVIEW_REQUIRED")
+        self.assertEqual(
+            record["organization_audit"]["content_alignment_status"],
+            "AI_REVIEW_NEEDS_REVISION",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

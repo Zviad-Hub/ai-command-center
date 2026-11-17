@@ -10,6 +10,7 @@ from pathlib import Path
 from director import route_task
 from managers import get_manager
 from organization_quality import audit_organization_task
+from organization_semantic_auditor import run_semantic_alignment_audit
 
 
 def _default_tasks_file():
@@ -219,8 +220,40 @@ def submit_task(ceo_task):
         ceo_task, departments, results
     )
 
-    # STEP 4: Save task record. Department outputs remain unchanged; the
-    # organization audit is an additional, read-only orchestration verdict.
+    semantic_audit_enabled = os.getenv(
+        "AI_ORGANIZATION_SEMANTIC_AUDIT", ""
+    ).strip().casefold() in {"1", "true", "yes", "enabled"}
+    if semantic_audit_enabled:
+        semantic_audit = run_semantic_alignment_audit(
+            ceo_task, departments, results
+        )
+    else:
+        semantic_audit = {
+            "status": "NOT_RUN",
+            "reason": "OPT_IN_DISABLED",
+            "summary": "Optional AI semantic audit is disabled; human task-alignment review remains required.",
+            "human_review_required": True,
+        }
+
+    semantic_status = semantic_audit.get("status")
+    if semantic_status == "PASS":
+        organization_audit["content_alignment_status"] = "AI_REVIEW_PASS_HUMAN_REVIEW_REQUIRED"
+    elif semantic_status == "NEEDS_REVISION":
+        organization_audit["content_alignment_status"] = "AI_REVIEW_NEEDS_REVISION"
+    elif semantic_status == "UNAVAILABLE":
+        organization_audit["content_alignment_status"] = "AI_REVIEW_UNAVAILABLE"
+    else:
+        organization_audit["content_alignment_status"] = "HUMAN_REVIEW_REQUIRED"
+
+    semantic_gate_passed = semantic_status in {"PASS", "NOT_RUN"}
+    overall_status = (
+        "READY_FOR_HUMAN_REVIEW"
+        if organization_audit["status"] == "PASS" and semantic_gate_passed
+        else "REVIEW_REQUIRED"
+    )
+
+    # STEP 4: Save task record. Department outputs remain unchanged; both
+    # organization audits are read-only and never authorize consequential actions.
     record = {
         "id": str(uuid.uuid4())[:8],
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -229,11 +262,8 @@ def submit_task(ceo_task):
         "routing": routing,
         "results": results,
         "organization_audit": organization_audit,
-        "overall_status": (
-            "READY_FOR_HUMAN_REVIEW"
-            if organization_audit["status"] == "PASS"
-            else "REVIEW_REQUIRED"
-        ),
+        "semantic_audit": semantic_audit,
+        "overall_status": overall_status,
         "human_review_required": True,
     }
 
