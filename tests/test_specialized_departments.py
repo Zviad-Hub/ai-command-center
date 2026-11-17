@@ -192,14 +192,14 @@ class SpecializedDepartmentTests(unittest.TestCase):
         from department_agents import _review_is_substantive
 
         invalid_reviews = [
-            "REVIEW STATUS: PASS\\nISSUES:\\nREQUIRED CORRECTIONS:\\nFINAL QUALITY SUMMARY: "
+            "REVIEW STATUS: PASS\nISSUES:\nREQUIRED CORRECTIONS:\nFINAL QUALITY SUMMARY: "
             "Evidence and limitations are represented correctly.",
-            "REVIEW STATUS: PASS\\nThe reviewer mentioned issues, required corrections, "
+            "REVIEW STATUS: PASS\nThe reviewer mentioned issues, required corrections, "
             "and final quality summary in passing, but supplied no structured findings.",
-            "REVIEW STATUS: PASS\\nISSUES: None.\\nREQUIRED CORRECTIONS: None.\\n"
+            "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None.\n"
             "FINAL QUALITY SUMMARY: Looks good.",
-            "REVIEW STATUS: NEEDS_REVISION\\nISSUES: None.\\n"
-            "REQUIRED CORRECTIONS: None.\\n"
+            "REVIEW STATUS: NEEDS_REVISION\nISSUES: None.\n"
+            "REQUIRED CORRECTIONS: None.\n"
             "FINAL QUALITY SUMMARY: Evidence and limitations are represented correctly.",
         ]
 
