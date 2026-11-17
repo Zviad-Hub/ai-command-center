@@ -248,6 +248,28 @@ class TaskManagerTests(unittest.TestCase):
                 "quality_review_passed": True,
                 "requires_ceo_approval": True,
                 "execution_performed": False,
+            }, {
+                "department": "media",
+                "status": "REVIEW_REQUIRED",
+                "specialists": ["Research Agent"],
+                "validation": {
+                    "word_count_passed": True,
+                    "visual_scene_count_passed": False,
+                    "timestamps_passed": True,
+                },
+                "warnings": ["PRIVATE MEDIA WARNING"],
+                "publication_approved": False,
+            }, {
+                "department": "audit",
+                "status": "REVIEW_REQUIRED",
+                "auditors": [{"auditor": "PRIVATE AUDITOR NAME"}],
+                "summary": {
+                    "total_checks": 12,
+                    "passed_checks": 10,
+                    "failed_checks": 2,
+                },
+                "final_decision": "CEO_APPROVAL_REQUIRED",
+                "publication_approved": False,
             }],
             "organization_audit": {
                 "status": "REVIEW_REQUIRED",
@@ -275,6 +297,12 @@ class TaskManagerTests(unittest.TestCase):
             "PASS",
         )
         self.assertEqual(summary["organization_audit"]["department_checks"][0]["issue_count"], 1)
+        media_row = summary["department_results"][1]
+        self.assertEqual(media_row["script_validation"]["visual_scene_count_passed"], False)
+        self.assertEqual(media_row["warning_count"], 1)
+        audit_row = summary["department_results"][2]
+        self.assertEqual(audit_row["audit_failed_checks"], 2)
+        self.assertEqual(audit_row["final_decision"], "CEO_APPROVAL_REQUIRED")
         self.assertTrue(summary["human_review_required"])
         for private_text in (
             "PRIVATE CEO TASK",
