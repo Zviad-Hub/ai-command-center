@@ -250,6 +250,77 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self.assertEqual(result["status"], "COMPLETED")
         self.assertTrue(result["quality_review_passed"])
 
+    @patch("department_agents._research_context")
+    @patch("department_agents.ask_ai")
+    def test_business_and_tenders_preserve_specialist_evidence_for_review(
+        self, ai_mock, research_mock
+    ):
+        scenarios = (
+            (
+                "business",
+                "Assess whether the supplied customer-retention plan is viable.",
+                [
+                    "MARKET ANALYST: Customer demand has not been measured.",
+                    "STRATEGY PLANNER: Two options have different implementation costs.",
+                    "OPERATIONS ANALYST: Retention KPI needs a defined denominator.",
+                ],
+                (
+                    "EXECUTIVE SUMMARY\\nBUSINESS CONTEXT\\nANALYSIS\\n"
+                    "OPTIONS AND TRADE-OFFS\\nRISKS\\nRECOMMENDATIONS\\n"
+                    "KPIS\\nMISSING INFORMATION\\n"
+                    "Business recommendation remains conditional."
+                ),
+            ),
+            (
+                "tenders",
+                "Assess the supplied tender pack for eligibility and compliance gaps.",
+                [
+                    "ELIGIBILITY ANALYST: The official eligibility clause is unclear.",
+                    "COMPLIANCE ANALYST: One required attachment is not provided.",
+                    "PRICING ANALYST: Delivery costs cannot be confirmed from supplied data.",
+                ],
+                (
+                    "TENDER OVERVIEW\\nELIGIBILITY\\nMANDATORY DOCUMENTS\\n"
+                    "DEADLINES\\nEVALUATION CRITERIA\\nCOMPLIANCE MATRIX\\n"
+                    "RISKS AND GAPS\\nQUESTIONS\\nDRAFT RESPONSE PLAN\\n"
+                    "MISSING MATERIAL\\n"
+                    "No bid readiness conclusion is possible yet."
+                ),
+            ),
+        )
+        research_mock.return_value = {
+            "status": "NOT_CONFIGURED",
+            "sources": [],
+            "warning": "No research key."
+        }
+
+        for department, mission, specialist_outputs, manager_draft in scenarios:
+            with self.subTest(department=department):
+                ai_mock.reset_mock()
+                ai_mock.side_effect = specialist_outputs + [manager_draft, PASS_REVIEW]
+
+                result = run_department_workflow(
+                    department,
+                    mission,
+                    context={"original_task": f"CEO request for {department}."}
+                )
+
+                manager_prompt = ai_mock.call_args_list[3].args[1]
+                reviewer_prompt = ai_mock.call_args_list[4].args[1]
+
+                for evidence in specialist_outputs:
+                    with self.subTest(department=department, evidence=evidence):
+                        self.assertIn(evidence, manager_prompt)
+                        self.assertIn(evidence, reviewer_prompt)
+
+                self.assertIn(manager_draft, reviewer_prompt)
+                self.assertIn(mission, manager_prompt)
+                self.assertIn(mission, reviewer_prompt)
+                self.assertEqual(result["status"], "COMPLETED")
+                self.assertTrue(result["quality_review_passed"])
+                self.assertEqual(len(result["specialist_reports"]), 3)
+                self.assertFalse(result["execution_performed"])
+
     def test_substantive_reviewer_requires_all_sections(self):
         from department_agents import _review_is_substantive
 
