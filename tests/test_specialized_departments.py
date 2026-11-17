@@ -21,9 +21,9 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self, ai_mock, research_mock
     ):
         ai_mock.side_effect = [
-            "Arithmetic review: inputs are incomplete.",
-            "Risk review: tax treatment requires local professional review.",
-            "Budget scenarios: revenue assumptions are unverified.",
+            "Arithmetic review: calculation formulas, revenue and cost inputs are incomplete; assumptions and units need clarification.",
+            "Risk review: liquidity risk and downside sensitivity require mitigation; tax treatment is uncertain and requires local professional review.",
+            "Budget forecast scenarios and cash flow projections use assumptions; missing inputs and cost sensitivity remain.",
             "EXECUTIVE SUMMARY\nINPUTS\nCALCULATIONS\nASSUMPTIONS\nRISKS\nRECOMMENDATIONS\nMISSING INFORMATION\nA sample budget analysis.",
             PASS_REVIEW
         ]
@@ -40,6 +40,7 @@ class SpecializedDepartmentTests(unittest.TestCase):
         )
 
         self.assertEqual(result["status"], "COMPLETED")
+        self.assertEqual(result["specialist_quality_validation"]["status"], "PASS")
         self.assertEqual(len(result["specialist_reports"]), 3)
         self.assertTrue(result["quality_review_passed"])
         self.assertTrue(result["advisory_only"])
@@ -56,9 +57,9 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self, ai_mock, research_mock
     ):
         ai_mock.side_effect = [
-            "Eligibility: official notice not supplied.",
-            "Documents: cannot confirm without attachments.",
-            "Pricing: no quantities or pricing schedule supplied.",
+            "Eligibility criteria from the official tender: notice not provided; cannot confirm without evidence.",
+            "Compliance document checklist: attachments are missing and validity is unclear; evidence not provided.",
+            "Pricing and quantity assumptions are missing; financial risk and uncertainty cannot be assessed.",
             "TENDER OVERVIEW\nELIGIBILITY\nMANDATORY DOCUMENTS\nDEADLINES\nEVALUATION CRITERIA\nCOMPLIANCE MATRIX\nRISKS AND GAPS\nQUESTIONS\nDRAFT RESPONSE PLAN\nMISSING MATERIAL\nDocuments to verify.",
             PASS_REVIEW
         ]
@@ -110,9 +111,9 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self, ai_mock, research_mock
     ):
         ai_mock.side_effect = [
-            "Market review complete.",
-            "Strategy review complete.",
-            "KPI review complete.",
+            "Market and customer demand review: validation evidence and assumptions remain incomplete.",
+            "Business strategy and positioning options: trade-offs, dependencies and risks need review.",
+            "Operations KPI measures and formulas need data; missing workflow inputs are identified.",
             "Draft business report.",
             "REVIEW STATUS: NEEDS_REVISION\nISSUES: Unsupported market claim."
         ]
@@ -153,9 +154,9 @@ class SpecializedDepartmentTests(unittest.TestCase):
     @patch("department_agents.ask_ai")
     def test_reviewer_one_line_pass_is_not_accepted(self, ai_mock, research_mock):
         ai_mock.side_effect = [
-            "Financial specialist findings.",
-            "Risk specialist findings.",
-            "Budget specialist findings.",
+            "Financial arithmetic and calculation formula review: revenue inputs and assumptions are incomplete.",
+            "Risk and liquidity review: downside sensitivity and mitigation are required.",
+            "Budget forecast scenarios: revenue assumptions are unverified and missing inputs remain.",
             "EXECUTIVE SUMMARY\nINPUTS\nCALCULATIONS\nASSUMPTIONS\nRISKS\nRECOMMENDATIONS\nMISSING INFORMATION\nComplete finance report.",
             "REVIEW STATUS: PASS",
         ]
@@ -173,9 +174,9 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self, ai_mock, research_mock
     ):
         ai_mock.side_effect = [
-            "Eligibility findings.",
-            "Compliance findings.",
-            "Pricing risk findings.",
+            "Eligibility criteria from the official tender: notice not provided; cannot confirm without evidence.",
+            "Compliance document checklist: requirements are missing and unclear; evidence not provided.",
+            "Pricing and quantity assumptions: financial risk and uncertainty remain.",
             "TENDER OVERVIEW\nELIGIBILITY\nMANDATORY DOCUMENTS\nA partial report.",
             PASS_REVIEW,
         ]
@@ -215,9 +216,9 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self, ai_mock, research_mock
     ):
         specialist_outputs = [
-            "SPECIALIST_ALPHA: Revenue inputs are incomplete.",
-            "SPECIALIST_BETA: Liquidity risk requires sensitivity analysis.",
-            "SPECIALIST_GAMMA: Forecast assumptions are unverified.",
+            "SPECIALIST_ALPHA: Revenue calculation inputs are incomplete; formulas, units and assumptions need verification.",
+            "SPECIALIST_BETA: Liquidity risk requires downside sensitivity analysis and mitigation controls.",
+            "SPECIALIST_GAMMA: Budget forecast assumptions are unverified; missing cash flow inputs remain.",
         ]
         manager_draft = (
             "EXECUTIVE SUMMARY\nINPUTS\nCALCULATIONS\nASSUMPTIONS\n"
@@ -260,9 +261,9 @@ class SpecializedDepartmentTests(unittest.TestCase):
                 "business",
                 "Assess whether the supplied customer-retention plan is viable.",
                 [
-                    "MARKET ANALYST: Customer demand has not been measured.",
-                    "STRATEGY PLANNER: Two options have different implementation costs.",
-                    "OPERATIONS ANALYST: Retention KPI needs a defined denominator.",
+                    "MARKET ANALYST: Market customer demand has not been measured; validation evidence and assumptions are missing.",
+                    "STRATEGY PLANNER: Business strategy and positioning options have trade-offs, dependencies and risks.",
+                    "OPERATIONS ANALYST: Operations retention KPI needs a defined formula, measurement data and denominator.",
                 ],
                 (
                     "EXECUTIVE SUMMARY\\nBUSINESS CONTEXT\\nANALYSIS\\n"
@@ -275,9 +276,9 @@ class SpecializedDepartmentTests(unittest.TestCase):
                 "tenders",
                 "Assess the supplied tender pack for eligibility and compliance gaps.",
                 [
-                    "ELIGIBILITY ANALYST: The official eligibility clause is unclear.",
-                    "COMPLIANCE ANALYST: One required attachment is not provided.",
-                    "PRICING ANALYST: Delivery costs cannot be confirmed from supplied data.",
+                    "ELIGIBILITY ANALYST: Official tender eligibility criteria are unclear; evidence cannot confirm the requirement.",
+                    "COMPLIANCE ANALYST: Compliance document checklist shows one requirement is missing and not provided.",
+                    "PRICING ANALYST: Delivery pricing costs cannot be confirmed; financial risk and uncertainty remain due to missing data.",
                 ],
                 (
                     "TENDER OVERVIEW\\nELIGIBILITY\\nMANDATORY DOCUMENTS\\n"
@@ -344,9 +345,9 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self, ai_mock, research_mock
     ):
         ai_mock.side_effect = [
-            "Market evidence review.",
-            "Strategy review.",
-            "Operations review.",
+            "Market customer demand and competitor evidence review; validation assumptions are missing.",
+            "Business strategy positioning options and trade-offs; dependencies and risks identified.",
+            "Operations KPI formulas and measurement data; missing process inputs identified.",
             "EXECUTIVE SUMMARY\nBUSINESS CONTEXT\nANALYSIS\nOPTIONS AND TRADE-OFFS\nRISKS\nRECOMMENDATIONS\nKPIS\nMISSING INFORMATION\nBusiness analysis.",
             PASS_REVIEW
         ]
@@ -404,6 +405,31 @@ class SpecializedDepartmentTests(unittest.TestCase):
             for item in result["specialist_not_run"]
         ))
         self.assertEqual(result["report"], "")
+
+
+    @patch("department_agents._research_context")
+    @patch("department_agents.ask_ai")
+    def test_independent_specialist_validator_blocks_generic_reports_before_synthesis(
+        self, ai_mock, research_mock
+    ):
+        ai_mock.side_effect = [
+            "Done.",
+            "Looks good.",
+            "All fine.",
+        ]
+        research_mock.return_value = {"status": "NOT_CONFIGURED", "sources": []}
+
+        result = run_department_workflow(
+            "business",
+            "Prepare a business strategy and operational review.",
+        )
+
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["report"], "")
+        self.assertEqual(result["specialist_quality_validation"]["status"], "REVIEW_REQUIRED")
+        self.assertTrue(result["specialist_quality_validation"]["issues"])
+        self.assertEqual(ai_mock.call_count, 3)
+        self.assertFalse(result["quality_review_passed"] if "quality_review_passed" in result else False)
 
 
 

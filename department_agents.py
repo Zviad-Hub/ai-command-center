@@ -33,6 +33,7 @@ import os
 from error_diagnostics import safe_error_code
 from ai_brain import ask_ai
 from research_agent import run_research
+from department_quality import validate_specialist_reports
 
 
 DEPARTMENT_PROMPTS = {
@@ -437,6 +438,18 @@ def run_department_workflow(department, task, context=None):
             "status": "REVIEW_REQUIRED",
             "message": "One or more specialists failed; no manager report was approved.",
             "report": ""
+        }
+
+    specialist_quality_validation = validate_specialist_reports(
+        department, specialist_reports
+    )
+    base_result["specialist_quality_validation"] = specialist_quality_validation
+    if specialist_quality_validation["status"] != "PASS":
+        return {
+            **base_result,
+            "status": "REVIEW_REQUIRED",
+            "message": "Independent specialist quality validation failed; manager synthesis and reviewer approval were blocked.",
+            "report": "",
         }
 
     specialist_text = "\n\n".join(

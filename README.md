@@ -46,6 +46,8 @@ A department being selected does not mean every requested real-world action is a
 
 The Director automatically adds Audit to Media tasks for a separate quality review. Routing is currently based on keywords, so describe the subject and desired department clearly. If a task is ambiguous, inspect the routing result rather than assuming the intended department was selected.
 
+Finance, Business and Tenders now have an independent deterministic specialist-quality gate before manager synthesis. It checks that every required specialist returned a non-empty report with minimum role-relevant evidence markers. Missing or weak specialist output stops the workflow with `REVIEW_REQUIRED`; the manager and AI reviewer are not asked to approve it. Technical and Pentester retain their separate specialist/reviewer controls. These checks validate role coverage and report structure, not factual truth, and they do not replace human review.
+
 ## Requirements
 
 - Python **3.11** (recommended; GitHub Actions uses 3.11)
@@ -319,7 +321,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 160 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on every Python source change and every workflow change in pull requests. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 161 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on every Python source change and every workflow change in pull requests. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 

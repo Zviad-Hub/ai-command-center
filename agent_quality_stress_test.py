@@ -11,6 +11,8 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
+from department_quality import validate_specialist_reports
+
 
 SCENARIOS = {
     "finance": {
@@ -269,51 +271,11 @@ def _pentester_specialist_quality(specialist_reports):
 
 def _department_specialist_quality(department, specialist_reports=None,
                                     specialist_results=None, manager_plan=None):
-    """Validate that each department's named specialists contribute role-relevant evidence."""
-    role_requirements = {
-        "finance": {
-            "financial_analyst": (
-                ("calculation", "formula", "arithmetic", "revenue", "cost", "margin"),
-                ("inputs", "assumption", "units", "missing", "uncertainty"),
-            ),
-            "risk_controller": (
-                ("risk", "liquidity", "downside", "sensitivity", "exposure", "compliance"),
-                ("mitigation", "uncertainty", "missing", "assumption", "control"),
-            ),
-            "budget_planner": (
-                ("budget", "forecast", "scenario", "cash flow", "projection"),
-                ("assumption", "missing", "inputs", "sensitivity", "cost"),
-            ),
-        },
-        "business": {
-            "market_analyst": (
-                ("market", "customer", "demand", "competitor", "audience"),
-                ("validation", "evidence", "unknown", "assumption", "research"),
-            ),
-            "strategy_planner": (
-                ("strategy", "positioning", "value proposition", "options", "trade-off"),
-                ("assumption", "dependency", "risk", "recommendation", "execution"),
-            ),
-            "operations_kpi_analyst": (
-                ("kpi", "operations", "process", "capacity", "staffing"),
-                ("formula", "measure", "data", "missing", "workflow"),
-            ),
-        },
-        "tenders": {
-            "eligibility_analyst": (
-                ("eligibility", "criteria", "official tender", "requirements"),
-                ("not provided", "cannot confirm", "evidence", "verification", "unknown"),
-            ),
-            "compliance_document_analyst": (
-                ("compliance", "document", "checklist", "requirement", "registration"),
-                ("missing", "unclear", "not provided", "met", "validity", "evidence"),
-            ),
-            "pricing_risk_analyst": (
-                ("pricing", "price", "cost", "quantity", "financial"),
-                ("risk", "assumption", "missing", "uncertainty", "sensitivity"),
-            ),
-        },
-    }
+    """Validate advisory department roles using the shared runtime contract."""
+    if department != "technical":
+        validation = validate_specialist_reports(department, specialist_reports)
+        return validation["status"] == "PASS", validation["issues"]
+
     technical_requirements = {
         "system_architect": (("architecture", "system design", "components", "structure"), ("dependency", "trade-off", "risk", "scalability", "missing")),
         "backend_developer": (("backend", "api", "endpoint", "server", "data model"), ("validation", "error handling", "transaction", "reliability", "testing")),
@@ -324,61 +286,42 @@ def _department_specialist_quality(department, specialist_reports=None,
         "security_engineer": (("security", "authentication", "authorization", "threat", "access control"), ("defensive", "mitigation", "vulnerability", "risk", "hardening")),
         "database_engineer": (("database", "schema", "query", "migration", "sql"), ("integrity", "index", "performance", "transaction", "consistency")),
     }
-
     issues = []
-    if department == "technical":
-        plan = manager_plan if isinstance(manager_plan, dict) else {}
-        assignments = plan.get("selected_specialists", [])
-        if not isinstance(assignments, list) or len(assignments) < 2:
-            return False, ["technical: manager plan must select at least two specialists"]
-        selected = []
-        for item in assignments:
-            specialist_id = (
-                item.get("id") or item.get("specialist") or item.get("name") or ""
-                if isinstance(item, dict) else str(item or "")
-            )
-            specialist_id = str(specialist_id).strip()
-            if specialist_id not in technical_requirements:
-                issues.append(f"technical: unknown or invalid specialist assignment {specialist_id or '<empty>'}")
-            else:
-                selected.append(specialist_id)
-        if len(selected) != len(set(selected)):
-            issues.append("technical: duplicate specialist assignments are not allowed")
-        result_map = {}
-        for item in specialist_results if isinstance(specialist_results, list) else []:
-            if isinstance(item, dict):
-                result_map[str(item.get("specialist") or item.get("id") or "")] = item
-        for specialist_id in selected:
-            item = result_map.get(specialist_id)
-            if not isinstance(item, dict) or item.get("status") != "COMPLETED":
-                issues.append(f"{specialist_id}: selected specialist has no completed result")
-                continue
-            report = str(item.get("report") or "").casefold()
-            if not report.strip():
-                issues.append(f"{specialist_id}: completed result has no report")
-                continue
-            for index, alternatives in enumerate(technical_requirements[specialist_id]):
-                if not any(term in report for term in alternatives):
-                    issues.append(f"{specialist_id}: report lacks role-specific evidence element {index + 1}")
-        return not issues, issues
-
-    required = role_requirements.get(department)
-    if required is None:
-        return False, [f"{department}: no specialist quality contract is defined"]
-    reports = specialist_reports if isinstance(specialist_reports, dict) else {}
-    for specialist_id, groups in required.items():
-        value = reports.get(specialist_id)
-        if not isinstance(value, str) or not value.strip():
-            issues.append(f"{specialist_id}: required specialist report is missing or empty")
+    plan = manager_plan if isinstance(manager_plan, dict) else {}
+    assignments = plan.get("selected_specialists", [])
+    if not isinstance(assignments, list) or len(assignments) < 2:
+        return False, ["technical: manager plan must select at least two specialists"]
+    selected = []
+    for item in assignments:
+        specialist_id = (
+            item.get("id") or item.get("specialist") or item.get("name") or ""
+            if isinstance(item, dict) else str(item or "")
+        )
+        specialist_id = str(specialist_id).strip()
+        if specialist_id not in technical_requirements:
+            issues.append(f"technical: unknown or invalid specialist assignment {specialist_id or '<empty>'}")
+        else:
+            selected.append(specialist_id)
+    if len(selected) != len(set(selected)):
+        issues.append("technical: duplicate specialist assignments are not allowed")
+    result_map = {}
+    for item in specialist_results if isinstance(specialist_results, list) else []:
+        if isinstance(item, dict):
+            result_map[str(item.get("specialist") or item.get("id") or "")] = item
+    for specialist_id in selected:
+        item = result_map.get(specialist_id)
+        if not isinstance(item, dict) or item.get("status") != "COMPLETED":
+            issues.append(f"{specialist_id}: selected specialist has no completed result")
             continue
-        lowered = value.casefold()
-        for index, alternatives in enumerate(groups):
-            if not any(term in lowered for term in alternatives):
+        report = str(item.get("report") or "").casefold()
+        if not report.strip():
+            issues.append(f"{specialist_id}: completed result has no report")
+            continue
+        for index, alternatives in enumerate(technical_requirements[specialist_id]):
+            if not any(term in report for term in alternatives):
                 issues.append(f"{specialist_id}: report lacks role-specific evidence element {index + 1}")
-    unexpected = sorted(set(reports) - set(required))
-    if unexpected:
-        issues.append("unexpected specialist IDs: " + ", ".join(unexpected))
     return not issues, issues
+
 
 def evaluate_live_result(department, result):
     """Return a transparent 10-point heuristic score, not a truth guarantee."""
