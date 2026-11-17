@@ -27,10 +27,18 @@ MAX_WORDS = 140
 # TEXT UTILITIES
 # ==================================================
 
+def is_georgian_request(task):
+    """Detect Georgian text or an explicit Georgian-language instruction."""
+    task_text = str(task or "").casefold()
+    return bool(
+        re.search(r"[\u10A0-\u10FF]", task_text)
+        or re.search(r"\\bgeorgian\\b|ქართულ", task_text)
+    )
+
+
 def requested_language_instruction(task):
     """Keep generated creative content in the CEO request's language."""
-    task_text = str(task or "")
-    if re.search(r"[\u10A0-\u10FF]", task_text):
+    if is_georgian_request(task):
         language = "Georgian"
     else:
         language = "the same language as the CEO's original request"
@@ -49,7 +57,7 @@ def requested_language_instruction(task):
 
 def narration_matches_requested_language(task, narration):
     """Return False when a Georgian request receives non-Georgian narration."""
-    if re.search(r"[\u10A0-\u10FF]", str(task or "")):
+    if is_georgian_request(task):
         return bool(re.search(r"[\u10A0-\u10FF]", str(narration or "")))
     return True
 
@@ -440,22 +448,30 @@ Maximum 220 words.
     ]
 
     if missing:
+        if is_georgian_request(task):
+            hook_text = "გამოიკვლიე ისტორიული საიდუმლო მტკიცებულებებზე დაყრდნობით და არა ვარაუდებით."
+            questions_text = "რომელი დეტალებია დადასტურებული მოწოდებული ისტორიული მტკიცებულებებით და რომელი რჩება გაურკვეველი?"
+            supported_text = "გამოიყენე მხოლოდ ის დეტალები, რომლებსაც მოწოდებული კვლევა პირდაპირ ადასტურებს."
+            uncertain_text = "საკმარისი მტკიცებულების გარეშე არსებული მტკიცებები საჭიროებს დამატებით გადამოწმებას."
+        else:
+            hook_text = "Investigate the central historical mystery using evidence rather than assumptions."
+            questions_text = "Which details are supported by the supplied historical evidence, and which remain uncertain?"
+            supported_text = "Use only details directly supported by supplied research."
+            uncertain_text = "Claims without sufficient supplied evidence require further verification."
+
         result = (
             "EXACT TOPIC:\n"
             + str(task)
             + "\n\nVIDEO CONCEPT:\n"
             + result
             + "\n\nHOOK:\n"
-            + "Investigate the central historical mystery using "
-              "evidence rather than assumptions."
+            + hook_text
             + "\n\nKEY QUESTIONS TO INVESTIGATE:\n"
-            + "Which details are supported by the supplied historical "
-              "evidence, and which remain uncertain?"
+            + questions_text
             + "\n\nSUPPORTED HISTORICAL DETAILS:\n"
-            + "Use only details directly supported by supplied research."
+            + supported_text
             + "\n\nUNCERTAIN DETAILS:\n"
-            + "Claims without sufficient supplied evidence require "
-              "further verification."
+            + uncertain_text
         )
 
         print(
