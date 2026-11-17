@@ -16,7 +16,7 @@ def safe_error_code(error):
             elif f"{provider} fallback provider rate limit" in message:
                 details.append(f"{prefix}_RATE_LIMIT")
             else:
-                match = re.search(rf"{provider} fallback provider http error: (\\d{{3}})", message)
+                match = re.search(rf"{provider} fallback provider http error: (\d{{3}})", message)
                 if match:
                     details.append(f"{prefix}_HTTP_{match.group(1)}")
                 elif f"{provider} fallback provider timed out" in message:
