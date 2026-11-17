@@ -259,7 +259,7 @@ def _pentester_specialist_quality(specialist_reports):
                     f"{specialist_id}: missing required evidence-discipline element {index + 1}"
                 )
         if specialist_id == "vulnerability_analyst":
-            claims_cve = re.search(r"\\bCVE-\\d{4}-\\d{4,}\\b", value, re.IGNORECASE)
+            claims_cve = re.search(r"\bCVE-\d{4}-\d{4,}\b", value, re.IGNORECASE)
             confirms = _has_any(lowered, ["confirmed vulnerability", "confirmed cve", "verified vulnerability"])
             if claims_cve and confirms:
                 issues.append("vulnerability_analyst: unsupported confirmed CVE/vulnerability claim")
