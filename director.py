@@ -183,9 +183,9 @@ def detect_departments(task):
     # Explicit exclusions must override keyword matches. This prevents a
     # diagnostic request saying "do not run Media" from launching Media.
     media_excluded = bool(re.search(
-        r"(?:\\bmedia\\b.{0,40}\\b(?:do not run|don't run|exclude|skip|not run)\\b"
-        r"|\\b(?:do not run|don't run|exclude|skip|not run)\\b.{0,40}\\bmedia\\b"
-        r"|\\bmedia\\s+არ\\s+(?:გაუშვა|გაუშვათ|ჩართო|გაუშვას))",
+        r"(?:\bmedia\b.{0,40}\b(?:do not run|don't run|exclude|skip|not run)\b"
+        r"|\b(?:do not run|don't run|exclude|skip|not run)\b.{0,40}\bmedia\b"
+        r"|\bmedia\s+არ\s+(?:გაუშვა|გაუშვათ|ჩართო|გაუშვას))",
         text,
     ))
 
