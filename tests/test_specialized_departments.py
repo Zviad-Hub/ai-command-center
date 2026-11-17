@@ -188,6 +188,27 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self.assertIn("deadlines", result["missing_report_sections"])
         self.assertIn("compliance matrix", result["missing_report_sections"])
 
+    def test_reviewer_rejects_headings_without_real_section_content(self):
+        from department_agents import _review_is_substantive
+
+        invalid_reviews = [
+            "REVIEW STATUS: PASS\nISSUES:\nREQUIRED CORRECTIONS:\nFINAL QUALITY SUMMARY: "
+            "Evidence and limitations are represented correctly.",
+            "REVIEW STATUS: PASS\nThe reviewer mentioned issues, required corrections, "
+            "and final quality summary in passing, but supplied no structured findings.",
+            "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None.\n"
+            "FINAL QUALITY SUMMARY: Looks good.",
+            "REVIEW STATUS: NEEDS_REVISION\nISSUES: None.\n"
+            "REQUIRED CORRECTIONS: None.\n"
+            "FINAL QUALITY SUMMARY: Evidence and limitations are represented correctly.",
+        ]
+
+        for review in invalid_reviews:
+            with self.subTest(review=review):
+                self.assertFalse(_review_is_substantive(review))
+
+        self.assertTrue(_review_is_substantive(PASS_REVIEW))
+
     def test_substantive_reviewer_requires_all_sections(self):
         from department_agents import _review_is_substantive
 
