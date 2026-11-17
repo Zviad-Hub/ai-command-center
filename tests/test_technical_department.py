@@ -108,8 +108,8 @@ class TechnicalDepartmentTests(unittest.TestCase):
             },
         ]
         manager_draft = (
-            "EXECUTIVE SUMMARY\\nThe API review is limited to supplied material.\\n"
-            "TECHNICAL RECOMMENDATIONS\\nDocument retry behavior."
+            "EXECUTIVE SUMMARY\nThe API review is limited to supplied material.\n"
+            "TECHNICAL RECOMMENDATIONS\nDocument retry behavior."
         )
         manager_mock.return_value = manager_plan
         specialist_mock.side_effect = specialist_results
@@ -148,25 +148,25 @@ class TechnicalDepartmentTests(unittest.TestCase):
 
         invalid_reviews = [
             (
-                "REVIEW STATUS: PASS\\nISSUES:\\nREQUIRED CORRECTIONS:\\n"
+                "REVIEW STATUS: PASS\nISSUES:\nREQUIRED CORRECTIONS:\n"
                 "FINAL QUALITY SUMMARY: Evidence and execution limits are represented correctly."
             ),
             (
-                "REVIEW STATUS: PASS\\nThe reviewer mentioned issues, required corrections, "
+                "REVIEW STATUS: PASS\nThe reviewer mentioned issues, required corrections, "
                 "and final quality summary without structured findings."
             ),
             (
-                "REVIEW STATUS: PASS\\nISSUES: None.\\nREQUIRED CORRECTIONS: None.\\n"
+                "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None.\n"
                 "FINAL QUALITY SUMMARY: Looks good."
             ),
             (
-                "REVIEW STATUS: PASS\\nISSUES: None.\\nISSUES: Duplicate heading.\\n"
-                "REQUIRED CORRECTIONS: None.\\n"
+                "REVIEW STATUS: PASS\nISSUES: None.\nISSUES: Duplicate heading.\n"
+                "REQUIRED CORRECTIONS: None.\n"
                 "FINAL QUALITY SUMMARY: Evidence and execution limits are represented correctly."
             ),
             (
-                "REVIEW STATUS: NEEDS_REVISION\\nISSUES: Unsupported claim.\\n"
-                "REQUIRED CORRECTIONS: Correct it.\\n"
+                "REVIEW STATUS: NEEDS_REVISION\nISSUES: Unsupported claim.\n"
+                "REQUIRED CORRECTIONS: Correct it.\n"
                 "FINAL QUALITY SUMMARY: Evidence and execution limits are represented correctly."
             ),
         ]
