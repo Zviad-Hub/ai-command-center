@@ -285,6 +285,17 @@ FILE: config/settings.yaml
 
 Cited references such as `src/auth.py:2-3` are checked against the supplied file and numbered lines. If artifacts are supplied in another format, references are treated as unverifiable and the report is held for review. With no artifacts and no confirmed claims, the validator reports `UNVERIFIED` rather than inventing evidence. CVE identifiers are checked only for a matching mention in the supplied material; this is not external CVE-database verification or proof that a vulnerability exists.
 
+## AI provider resilience
+
+Groq remains the primary AI provider. An optional OpenAI-compatible fallback can be configured in GitHub repository Actions secrets:
+
+- `AI_FALLBACK_API_URL`: full chat-completions endpoint URL.
+- `AI_FALLBACK_API_KEY`: fallback provider API key.
+- `AI_FALLBACK_MODEL`: model identifier accepted by that endpoint.
+- Optional Actions variable `AI_FALLBACK_TOKEN_FIELD`: `max_tokens` (default) or `max_completion_tokens`.
+
+The fallback is used only when the primary Groq key is absent or Groq explicitly reports daily quota exhaustion. Other authentication, request, and provider errors do not silently switch providers. If the fallback is not fully configured, the system fails closed and reports the provider limitation. Never commit provider keys or place them in workflow inputs or task prompts.
+
 ## Task history
 
 Each submitted task is stored outside the repository in the operating system's private application-data directory. You can override the location with `AI_COMMAND_CENTER_TASKS_FILE`. On Windows the default is under `%LOCALAPPDATA%\\AI Command Center\\tasks.json`; on macOS it is under `~/Library/Application Support/AI Command Center/tasks.json`; on Linux it is under `$XDG_STATE_HOME/ai-command-center/tasks.json` or `~/.local/state/ai-command-center/tasks.json`. A legacy root-level `tasks.json` is migrated on first run if it is still present. **Before pulling this update in an older checkout, copy the file to the new private location first**, because Git will remove the tracked root-level file. Windows PowerShell: `New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\\AI Command Center" | Out-Null; Copy-Item .\\tasks.json "$env:LOCALAPPDATA\\AI Command Center\\tasks.json"`. Linux: `mkdir -p ~/.local/state/ai-command-center && cp tasks.json ~/.local/state/ai-command-center/tasks.json`. macOS: `mkdir -p "$HOME/Library/Application Support/AI Command Center" && cp tasks.json "$HOME/Library/Application Support/AI Command Center/tasks.json"`. If you use `AI_COMMAND_CENTER_TASKS_FILE` or `XDG_STATE_HOME`, copy it to that configured path instead. In GitHub Actions the file is temporary, and a full report artifact is created only for private repositories. The record includes:
