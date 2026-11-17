@@ -47,9 +47,12 @@ class DepartmentManager:
         # AUDIT DEPARTMENT
         if self.department == "audit":
             try:
-                from audit_agents import run_audit
+                from audit_agents import run_audit, run_general_audit
 
                 previous_results = context.get("previous_results", [])
+                if not isinstance(previous_results, list):
+                    previous_results = []
+
                 media_result = next(
                     (
                         result for result in previous_results
@@ -59,25 +62,38 @@ class DepartmentManager:
                     None
                 )
 
-                if not media_result:
-                    return {
-                        "department": "audit",
-                        "status": "REVIEW_REQUIRED",
-                        "message": (
-                            "აუდიტმა მედიის შედეგი ვერ მიიღო. "
-                            "დამოუკიდებელი შემოწმება ვერ დასრულდა."
-                        ),
-                        "publication_approved": False
-                    }
+                if media_result:
+                    # Preserve the specialized Media compliance/evidence audit.
+                    media_audit = run_audit(task, media_result)
+                    other_results = [
+                        result for result in previous_results
+                        if isinstance(result, dict)
+                        and result.get("department") not in {"media", "audit"}
+                    ]
+                    if other_results:
+                        handoff_audit = run_general_audit(task, other_results)
+                        media_audit["auditors"].extend(handoff_audit.get("auditors", []))
+                        media_audit["summary"]["total_checks"] += handoff_audit["summary"]["total_checks"]
+                        media_audit["summary"]["passed_checks"] += handoff_audit["summary"]["passed_checks"]
+                        media_audit["summary"]["failed_checks"] += handoff_audit["summary"]["failed_checks"]
+                        media_audit["failed_checks"].extend(handoff_audit.get("failed_checks", []))
+                        if handoff_audit.get("status") != "PASSED_WITH_LIMITATIONS":
+                            media_audit["status"] = "REVIEW_REQUIRED"
+                            media_audit["message"] = "აუდიტმა მედიის ან სხვა დეპარტამენტის შემოწმებაში შეუსაბამობა აღმოაჩინა."
+                    return media_audit
 
-                return run_audit(task, media_result)
+                return run_general_audit(task, previous_results)
 
-            except Exception as error:
+            except Exception:
                 return {
                     "department": "audit",
                     "status": "ERROR",
                     "message": "Department workflow failed safely; internal error details were withheld.",
-                    "publication_approved": False
+                    "publication_approved": False,
+                    "final_decision": "CEO_APPROVAL_REQUIRED",
+                    "requires_ceo_approval": True,
+                    "execution_authorized": False,
+                    "execution_performed": False
                 }
 
         # TECHNICAL DEPARTMENT
