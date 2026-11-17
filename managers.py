@@ -10,7 +10,7 @@ class DepartmentManager:
         print("\n" + "=" * 45)
         print(f"{self.department.upper()} MANAGER")
         print("=" * 45)
-        print("RECEIVED MISSION:", task)
+        print("MISSION RECEIVED (details withheld).")
 
         # PENTESTER DEPARTMENT — DEFENSIVE, PASSIVE-ONLY WORKFLOW; NO NETWORK OPERATIONS
         if self.department == "pentester":
