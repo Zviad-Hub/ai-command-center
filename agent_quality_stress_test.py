@@ -198,6 +198,9 @@ def _contains_daily_quota_exhaustion(value):
     """Detect a provider daily-quota failure without masking quality failures."""
     flattened = _flatten(value).lower()
     indicators = (
+        # Prefer the stable, sanitized diagnostic code emitted by our managers.
+        "provider_daily_quota_exhausted",
+        # Keep message-based fallbacks for older result shapes.
         "daily quota has been exhausted",
         "daily quota exhausted",
         "daily limit has been reached",
