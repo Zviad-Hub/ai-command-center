@@ -14,6 +14,15 @@ class StressTestSuiteTests(unittest.TestCase):
             self.assertTrue(item["task"].strip())
             self.assertTrue(item["expected"])
 
+    def test_real_director_passes_customer_routing_scenarios(self):
+        result = run_routing_stress_tests()
+        self.assertEqual(
+            result["status"],
+            "PASS",
+            msg=str([item for item in result["results"] if not item["passed"]])
+        )
+        self.assertEqual(result["score_out_of_10"], 10)
+
     @patch("stress_test_suite.route_task")
     def test_all_routing_scenarios_pass(self, route_mock):
         route_mock.side_effect = [
