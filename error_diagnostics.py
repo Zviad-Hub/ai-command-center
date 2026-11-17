@@ -8,7 +8,27 @@ def safe_error_code(error):
     message = str(error or "").casefold()
 
     if "all configured fallback providers failed" in message:
-        return "PROVIDER_FALLBACK_CHAIN_EXHAUSTED"
+        # Preserve provider names and safe failure classes only.
+        details = []
+        for provider, prefix in (("gemini", "GEMINI"), ("openrouter", "OPENROUTER")):
+            if f"{provider} fallback provider daily quota" in message:
+                details.append(f"{prefix}_DAILY_QUOTA")
+            elif f"{provider} fallback provider rate limit" in message:
+                details.append(f"{prefix}_RATE_LIMIT")
+            else:
+                match = re.search(rf"{provider} fallback provider http error: (\d{{3}})", message)
+                if match:
+                    details.append(f"{prefix}_HTTP_{match.group(1)}")
+                elif f"{provider} fallback provider timed out" in message:
+                    details.append(f"{prefix}_TIMEOUT")
+                elif f"{provider} fallback provider connection failed" in message:
+                    details.append(f"{prefix}_CONNECTION_ERROR")
+                elif f"{provider} fallback provider returned an invalid response" in message:
+                    details.append(f"{prefix}_INVALID_RESPONSE")
+                elif f"{provider} fallback provider returned an empty response" in message:
+                    details.append(f"{prefix}_EMPTY_RESPONSE")
+        suffix = "_".join(details)
+        return f"PROVIDER_FALLBACK_CHAIN_EXHAUSTED_{suffix}" if suffix else "PROVIDER_FALLBACK_CHAIN_EXHAUSTED"
     if "daily quota" in message or "daily limit" in message or "tokens per day" in message:
         return "PROVIDER_DAILY_QUOTA_EXHAUSTED"
     if "rate limit" in message or "429" in message:
