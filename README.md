@@ -40,9 +40,9 @@ A department being selected does not mean every requested real-world action is a
 | **Audit** | Reviews the preceding Media result when one is available. | The current manager expects a Media result; a standalone audit request may return `REVIEW_REQUIRED`. |
 | **Technical** | Creates a technical plan and assigns selected specialist agents for analysis and reports. | The specialist workflow is advisory: it does not currently edit project files, execute tests or deploy code. |
 | **Pentester** | Receives cybersecurity requests and applies a safety gate. | Active testing is currently blocked by the manager. Do not treat task submission as authorization or as a completed security test. |
-| **Finance** | Department is registered with the Director. | Currently returns a placeholder `RECEIVED` response; it does not perform a full financial workflow or transactions. |
-| **Tenders** | Department is registered with the Director. | Currently returns a placeholder `RECEIVED` response; it does not submit bids or tenders. |
-| **Business** | Department is registered with the Director. | Currently returns a placeholder `RECEIVED` response; its full specialist workflow is not implemented yet. |
+| **Finance** | Produces an AI-assisted advisory report with calculations, assumptions, risks and missing inputs; can attach optional Tavily research candidates. | No transactions, payments, investments or accounting-system changes. Professional review may be needed for regulated advice. |
+| **Tenders** | Prepares tender-analysis reports, eligibility/document checklists, compliance gaps and draft response plans. | Does not submit bids or contact contracting authorities. Actual tender documents are required for a specific compliance assessment. |
+| **Business** | Produces strategy reports, options, trade-offs, risks and measurable KPI recommendations, with optional research candidates. | Does not commit funds, sign agreements, contact third parties or execute business actions. |
 
 The Director automatically adds Audit to Media tasks for a separate quality review. Routing is currently based on keywords, so describe the subject and desired department clearly. If a task is ambiguous, inspect the routing result rather than assuming the intended department was selected.
 
@@ -236,7 +236,7 @@ Show the calculation method, risks and practical recommendations.
 Do not make payments, move funds or enter into agreements.
 ```
 
-**Note:** Finance and Business are currently registered departments but their full specialist workflows are not implemented yet.
+**Note:** Finance and Business now produce advisory AI reports; optional Tavily research is treated as candidate evidence, not independently verified fact.
 
 ### Tender preparation
 
@@ -247,7 +247,7 @@ compliance gaps, risks and a draft response outline.
 Do not submit the tender or contact the contracting authority.
 ```
 
-**Note:** The Tenders department currently returns a placeholder response; do not rely on it for a completed tender package.
+**Note:** Tenders now prepares an advisory analysis and draft checklist, but it cannot submit a bid. A specific tender still requires its complete official notice and attachments.
 
 ### Cybersecurity assessment
 
@@ -301,7 +301,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 16 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department execution gates, and CEO console report rendering. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 22 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department execution gates, CEO console report rendering, and Finance/Business/Tenders advisory workflows. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
