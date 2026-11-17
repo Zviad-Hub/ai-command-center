@@ -36,6 +36,11 @@ def display_manager_result(item):
     if message:
         print(message)
 
+    report = item.get("report")
+    if isinstance(report, str) and report.strip():
+        print("\\nDEPARTMENT REPORT:\\n")
+        print(report.strip())
+
     summary = item.get("summary")
     if isinstance(summary, dict):
         selected = summary.get("selected_specialists")
