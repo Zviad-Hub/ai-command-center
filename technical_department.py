@@ -281,7 +281,7 @@ def run_technical_department(task, context=None):
                 "specialist": specialist_id,
                 "specialist_name": specialist_name,
                 "status": "ERROR",
-                "error": str(error),
+                "error": "SPECIALIST_FAILED",
                 "execution_performed": False,
             })
 
@@ -396,5 +396,5 @@ Independently review the complete proposed report against the supplied evidence.
         return _review_required_result(
             base_result,
             "Technical report could not be prepared and independently approved.",
-            error=str(error),
+            error="TECHNICAL_WORKFLOW_FAILED",
         )
