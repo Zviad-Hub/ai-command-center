@@ -301,7 +301,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 14 automated tests across Director routing, Task Manager orchestration, Technical Manager planning and Technical Department execution gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 16 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department execution gates, and CEO console report rendering. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
