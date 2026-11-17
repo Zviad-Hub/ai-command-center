@@ -1,6 +1,6 @@
 import unittest
 
-from agent_quality_stress_test import evaluate_live_result, _pentester_specialist_quality
+from agent_quality_stress_test import evaluate_live_result, _pentester_specialist_quality, _department_specialist_quality
 
 
 def _good_pentester_specialists():
@@ -27,6 +27,26 @@ def _good_pentester_specialists():
     }
 
 
+def _good_department_specialists(department):
+    return {
+        "finance": {
+            "financial_analyst": "Calculation formula for revenue, costs and margin from supplied inputs; assumptions and missing units are identified.",
+            "risk_controller": "Risk and liquidity review with downside sensitivity, uncertainty and mitigation controls.",
+            "budget_planner": "Budget forecast scenarios and cash flow projections; assumptions, missing inputs and cost sensitivity.",
+        },
+        "business": {
+            "market_analyst": "Market, customer demand and competitor evidence; validation questions and unknown assumptions.",
+            "strategy_planner": "Business strategy, positioning and value proposition options; trade-offs, dependencies and risks.",
+            "operations_kpi_analyst": "Operations process, staffing and capacity KPIs; formula, measurement data and missing inputs.",
+        },
+        "tenders": {
+            "eligibility_analyst": "Eligibility criteria and official tender requirements; notice not provided, cannot confirm without evidence.",
+            "compliance_document_analyst": "Compliance document checklist and registration requirements; missing, unclear and not provided evidence.",
+            "pricing_risk_analyst": "Pricing, cost and quantity assumptions; financial risk, uncertainty and missing inputs.",
+        },
+    }[department]
+
+
 class AgentQualityStressTestTests(unittest.TestCase):
 
     def test_daily_quota_failure_is_blocked_not_scored_as_quality_failure(self):
@@ -49,7 +69,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_manager_daily_quota_failure_is_also_blocked(self):
         result = evaluate_live_result("business", {
             "status": "REVIEW_REQUIRED",
-            "specialist_reports": {"a": "one", "b": "two", "c": "three"},
+            "specialist_reports": _good_department_specialists("finance"),
             "error": "Groq daily quota has been exhausted.",
         })
         self.assertEqual(result["status"], "BLOCKED")
@@ -118,7 +138,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_finance_requires_correct_calculations_and_review(self):
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "x", "b": "y", "c": "z"},
+            "specialist_reports": _good_department_specialists("finance"),
             "quality_review": "REVIEW STATUS: PASS\nISSUES: No material issues found.\nREQUIRED CORRECTIONS: None; calculations and evidence were checked.\nFINAL QUALITY SUMMARY: The report is internally consistent and remains advisory.",
             "quality_review_passed": True,
             "report": "Revenue 2160 GEL; variable cost 840 GEL; contribution 1320 GEL; operating result -2880 GEL before tax. Tax not provided.",
@@ -347,7 +367,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         """
         result = evaluate_live_result("business", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "market", "b": "strategy", "c": "operations"},
+            "specialist_reports": _good_department_specialists("business"),
             "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; assumptions are disclosed.\nFINAL QUALITY SUMMARY: The report contains four formulas and three validation experiments.",
             "quality_review_passed": True,
             "report": report,
@@ -382,7 +402,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         """
         result = evaluate_live_result("tenders", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "eligibility", "b": "documents", "c": "pricing"},
+            "specialist_reports": _good_department_specialists("tenders"),
             "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware and avoids unsupported tender claims.",
             "quality_review_passed": True,
             "report": report,
@@ -414,12 +434,16 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "status": "COMPLETED",
             "manager_plan": {
                 "status": "PLAN_CREATED",
-                "selected_specialists": ["qa", "reviewer"],
+                "selected_specialists": [
+                    {"id": "qa_engineer", "mission": "Prepare QA acceptance criteria and regression tests."},
+                    {"id": "code_reviewer", "mission": "Review code quality and maintainability evidence."},
+                ],
                 "execution_plan": ["Review supplied source"],
                 "testing_strategy": ["Run tests after approval"],
             },
             "specialist_results": [
-                {"status": "COMPLETED"}, {"status": "COMPLETED"}
+                {"specialist": "qa_engineer", "status": "COMPLETED", "report": "QA testing acceptance criteria and regression coverage with edge case validation."},
+                {"specialist": "code_reviewer", "status": "COMPLETED", "report": "Code review found maintainability and logic risks; evidence-based recommendations and tests."}
             ],
             "report": "TECHNICAL DEPARTMENT — FINAL REPORT\nSTATUS: COMPLETED\nMANAGER SYNTHESIS:\nNo source code was supplied.\nEVIDENCE LIMITATIONS:\nEXECUTION AND APPROVAL:",
             "quality_review": "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None; all evidence limits are clear.\nFINAL QUALITY SUMMARY: The technical report is accurate and advisory.",
@@ -436,12 +460,16 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "status": "COMPLETED",
             "manager_plan": {
                 "status": "PLAN_CREATED",
-                "selected_specialists": ["qa", "reviewer"],
+                "selected_specialists": [
+                    {"id": "qa_engineer", "mission": "Prepare QA acceptance criteria and regression tests."},
+                    {"id": "code_reviewer", "mission": "Review code quality and maintainability evidence."},
+                ],
                 "execution_plan": ["Review supplied source"],
                 "testing_strategy": ["Run tests after approval"],
             },
             "specialist_results": [
-                {"status": "COMPLETED"}, {"status": "COMPLETED"}
+                {"specialist": "qa_engineer", "status": "COMPLETED", "report": "QA testing acceptance criteria and regression coverage with edge case validation."},
+                {"specialist": "code_reviewer", "status": "COMPLETED", "report": "Code review found maintainability and logic risks; evidence-based recommendations and tests."}
             ],
             "execution_performed": False,
             "code_modified": False,
@@ -456,12 +484,16 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "status": "COMPLETED",
             "manager_plan": {
                 "status": "PLAN_CREATED",
-                "selected_specialists": ["qa", "reviewer"],
+                "selected_specialists": [
+                    {"id": "qa_engineer", "mission": "Prepare QA acceptance criteria and regression tests."},
+                    {"id": "code_reviewer", "mission": "Review code quality and maintainability evidence."},
+                ],
                 "execution_plan": ["Review supplied source"],
                 "testing_strategy": ["Run tests after approval"],
             },
             "specialist_results": [
-                {"status": "COMPLETED"}, {"status": "COMPLETED"}
+                {"specialist": "qa_engineer", "status": "COMPLETED", "report": "QA testing acceptance criteria and regression coverage with edge case validation."},
+                {"specialist": "code_reviewer", "status": "COMPLETED", "report": "Code review found maintainability and logic risks; evidence-based recommendations and tests."}
             ],
             "execution_performed": False,
             "code_modified": False,
@@ -475,7 +507,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
             "specialist_reports": {
-                "analyst": "Revenue 2160; variable cost 840; contribution 1320; operating result -2880."
+                "financial_analyst": "Calculation formula revenue 2160; variable cost 840; contribution 1320; operating result -2880. Inputs, assumptions and missing tax are stated.",
+                "risk_controller": "Risk and liquidity assessment with downside sensitivity and mitigation.",
+                "budget_planner": "Budget forecast and cash flow scenario assumptions."
             },
             "quality_review": "REVIEW STATUS: PASS\nISSUES: No material issues found.\nREQUIRED CORRECTIONS: None; calculations and evidence were checked.\nFINAL QUALITY SUMMARY: The report is internally consistent and remains advisory.",
             "quality_review_passed": True,
@@ -593,6 +627,63 @@ class AgentQualityStressTestTests(unittest.TestCase):
                 ]
                 self.assertIn("safety_and_human_approval", failed)
                 self.assertLess(evaluated["score_out_of_10"], 10)
+
+
+    def test_department_specialist_quality_accepts_all_named_roles(self):
+        for department in ("finance", "business", "tenders"):
+            with self.subTest(department=department):
+                passed, issues = _department_specialist_quality(
+                    department, specialist_reports=_good_department_specialists(department)
+                )
+                self.assertTrue(passed, issues)
+
+    def test_finance_role_gate_rejects_missing_risk_controller(self):
+        reports = _good_department_specialists("finance")
+        del reports["risk_controller"]
+        passed, issues = _department_specialist_quality("finance", specialist_reports=reports)
+        self.assertFalse(passed)
+        self.assertTrue(any("risk_controller" in issue for issue in issues))
+
+    def test_business_role_gate_rejects_generic_market_report(self):
+        reports = _good_department_specialists("business")
+        reports["market_analyst"] = "Great idea; the business will succeed."
+        passed, issues = _department_specialist_quality("business", specialist_reports=reports)
+        self.assertFalse(passed)
+        self.assertTrue(any("market_analyst" in issue for issue in issues))
+
+    def test_tenders_role_gate_rejects_unsupported_compliance_report(self):
+        reports = _good_department_specialists("tenders")
+        reports["compliance_document_analyst"] = "All documents are approved and compliant."
+        passed, issues = _department_specialist_quality("tenders", specialist_reports=reports)
+        self.assertFalse(passed)
+        self.assertTrue(any("compliance_document_analyst" in issue for issue in issues))
+
+    def test_technical_role_gate_rejects_unknown_specialist_and_missing_report(self):
+        plan = {"selected_specialists": [
+            {"id": "qa_engineer", "mission": "Test"},
+            {"id": "imaginary_expert", "mission": "Do everything"},
+        ]}
+        results = [{"specialist": "qa_engineer", "status": "COMPLETED", "report": "QA testing acceptance criteria and regression coverage with edge case validation."}]
+        passed, issues = _department_specialist_quality(
+            "technical", specialist_results=results, manager_plan=plan
+        )
+        self.assertFalse(passed)
+        self.assertTrue(any("unknown or invalid specialist" in issue for issue in issues))
+
+    def test_technical_role_gate_rejects_empty_completed_specialist_report(self):
+        plan = {"selected_specialists": [
+            {"id": "qa_engineer", "mission": "Test"},
+            {"id": "code_reviewer", "mission": "Review"},
+        ]}
+        results = [
+            {"specialist": "qa_engineer", "status": "COMPLETED", "report": ""},
+            {"specialist": "code_reviewer", "status": "COMPLETED", "report": "Code review maintainability and evidence based risk recommendations."},
+        ]
+        passed, issues = _department_specialist_quality(
+            "technical", specialist_results=results, manager_plan=plan
+        )
+        self.assertFalse(passed)
+        self.assertTrue(any("qa_engineer" in issue and "no report" in issue for issue in issues))
 
 
 if __name__ == "__main__":
