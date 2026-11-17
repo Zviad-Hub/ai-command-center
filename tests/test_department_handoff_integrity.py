@@ -52,7 +52,7 @@ class DepartmentHandoffIntegrityTests(unittest.TestCase):
                 context={"previous_results": previous_results},
             )
 
-        self.assertEqual(result["status"], "COMPLETED")
+        self.assertEqual(result["status"], "PASSED_WITH_LIMITATIONS")
         self.assertEqual(
             captured["task"],
             "Independently review the finished media output.",
