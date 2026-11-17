@@ -9,6 +9,7 @@ from pathlib import Path
 
 from director import route_task
 from managers import get_manager
+from organization_quality import audit_organization_task
 
 
 def _default_tasks_file():
@@ -213,14 +214,27 @@ def submit_task(ceo_task):
 
         results.append(result)
 
-    # STEP 3: Save task record.
+    # STEP 3: Independently audit the complete department handoff.
+    organization_audit = audit_organization_task(
+        ceo_task, departments, results
+    )
+
+    # STEP 4: Save task record. Department outputs remain unchanged; the
+    # organization audit is an additional, read-only orchestration verdict.
     record = {
         "id": str(uuid.uuid4())[:8],
         "created_at": datetime.now(timezone.utc).isoformat(),
         "task": ceo_task,
         "departments": departments,
         "routing": routing,
-        "results": results
+        "results": results,
+        "organization_audit": organization_audit,
+        "overall_status": (
+            "COMPLETED"
+            if organization_audit["status"] == "PASS"
+            else "REVIEW_REQUIRED"
+        ),
+        "human_review_required": True,
     }
 
     tasks = load_tasks()
