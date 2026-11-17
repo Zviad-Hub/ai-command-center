@@ -301,7 +301,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 124 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 126 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
@@ -331,6 +331,16 @@ external actions. GitHub Actions prints the live routing scorecard and fails the
 job if any expected department route is incorrect. `evaluate_task_record(record)`
 provides a structural 10-point quality and safety score for a saved orchestration record. A perfect
 score is not proof of factual correctness; human review remains mandatory.
+
+## Offline department quality regression tests
+
+Run the deterministic evaluator tests without calling Groq, Tavily, or any external service:
+
+```bash
+python -m unittest tests.test_agent_quality_stress_test -v
+```
+
+These tests use controlled fixtures to verify each department's scoring rules, reviewer gates, evidence handling, safety flags, and provider-quota classification. They do **not** execute department agents and do not consume API quota. Use this offline suite for routine quality-regression checks; reserve the opt-in live test below for deliberate end-to-end evaluations when provider quota is available.
 
 ## Live AI department quality stress test
 
