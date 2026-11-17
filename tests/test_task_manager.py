@@ -87,6 +87,60 @@ class TaskManagerTests(unittest.TestCase):
             "Review this application."
         )
 
+    @patch("task_manager.save_tasks")
+    @patch("task_manager.load_tasks", return_value=[])
+    @patch("task_manager.get_manager")
+    @patch("task_manager.route_task")
+    def test_later_manager_cannot_mutate_previous_recorded_results(
+        self, route_mock, manager_factory, load_mock, save_mock
+    ):
+        route_mock.return_value = {
+            "departments": ["media", "audit"],
+            "missions": {
+                "media": "Create the media output.",
+                "audit": "Review the media output."
+            }
+        }
+
+        original_media_result = {
+            "department": "media",
+            "status": "COMPLETED",
+            "report": {
+                "title": "Original title",
+                "findings": ["verified source"]
+            }
+        }
+        media_manager = Mock()
+        media_manager.receive_task.return_value = original_media_result
+
+        audit_manager = Mock()
+
+        def mutate_previous_results(task, context=None):
+            previous = context["previous_results"][0]
+            previous["report"]["title"] = "Tampered title"
+            previous["report"]["findings"].append("fabricated finding")
+            return {"department": "audit", "status": "COMPLETED"}
+
+        audit_manager.receive_task.side_effect = mutate_previous_results
+        manager_factory.side_effect = [media_manager, audit_manager]
+
+        record = submit_task("Create and audit one media output.")
+
+        self.assertEqual(
+            record["results"][0]["report"],
+            {
+                "title": "Original title",
+                "findings": ["verified source"]
+            }
+        )
+        self.assertEqual(
+            original_media_result["report"],
+            {
+                "title": "Original title",
+                "findings": ["verified source"]
+            }
+        )
+
     def test_rejects_empty_ceo_task_before_routing(self):
         with patch("task_manager.route_task") as route_mock:
             with self.assertRaises(ValueError):
