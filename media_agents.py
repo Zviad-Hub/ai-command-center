@@ -37,11 +37,11 @@ def requested_language_instruction(task):
 
     return (
         "LANGUAGE REQUIREMENT (MANDATORY):\n"
-        f"- Write all user-facing creative content in {language}.\\n"
+        f"- Write all user-facing creative content in {language}.\n"
         "- The narration, hook, title, visual descriptions, concept, and editorial "
-        "explanations must use that language.\\n"
+        "explanations must use that language.\n"
         "- Keep the required structural headings and machine-readable status labels "
-        "in English exactly as specified, so automated validation remains reliable.\\n"
+        "in English exactly as specified, so automated validation remains reliable.\n"
         "- Do not translate the narration into English unless the CEO explicitly "
         "requests English."
     )
