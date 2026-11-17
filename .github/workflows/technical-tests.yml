@@ -3,24 +3,11 @@ name: Technical Department Tests
 on:
   pull_request:
     paths:
-      - "technical_manager.py"
-      - "stress_test_suite.py"
+      - "**.py"
+      - ".github/workflows/**"
+      - ".github/dependabot.yml"
       - "README.md"
       - "requirements.txt"
-      - ".github/dependabot.yml"
-      - "technical_department.py"
-      - "technical_agents.py"
-      - "department_agents.py"
-      - "managers.py"
-      - "director.py"
-      - "task_manager.py"
-      - "main.py"
-      - "ai_brain.py"
-      - "research_agent.py"
-      - "config.py"
-      - "tests/**"
-      - ".github/workflows/technical-tests.yml"
-      - ".github/workflows/ai_command_center.yml"
   workflow_dispatch:
     inputs:
       run_live_quality:

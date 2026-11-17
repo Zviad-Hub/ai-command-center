@@ -2,7 +2,7 @@
 
 **AI Command Center** is a multi-department AI organization controlled by a human CEO. You give the system a task; the AI Director selects the relevant department managers; managers coordinate their specialist workflows and return a recorded result.
 
-> **Important:** This repository is under active development. Some departments are working pipelines, while others are currently placeholders. Read the capability and safety notes below before relying on an output.
+> **Important:** This repository is under active development. Departments have different capabilities and strict operational limits; some workflows are advisory or passive-only. Read the capability and safety notes below before relying on an output.
 
 ## Contents
 
@@ -301,7 +301,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 126 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 129 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on every Python source change and every workflow change in pull requests. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
