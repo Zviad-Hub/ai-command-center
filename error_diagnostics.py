@@ -1,5 +1,7 @@
 """Safe, non-sensitive failure classification for agent diagnostics."""
 
+import re
+
 
 def safe_error_code(error):
     """Classify failures without exposing provider messages, prompts, or secrets."""
@@ -9,6 +11,13 @@ def safe_error_code(error):
         return "PROVIDER_DAILY_QUOTA_EXHAUSTED"
     if "rate limit" in message or "429" in message:
         return "PROVIDER_RATE_LIMIT_EXHAUSTED"
+    provider_http = re.search(
+        r"(fallback ai provider|groq(?: api)?)(?: http error| server error):?\\s*(?:http\\s*)?(\\d{3})",
+        message,
+    )
+    if provider_http:
+        provider = "FALLBACK" if provider_http.group(1).startswith("fallback") else "PRIMARY"
+        return f"{provider}_PROVIDER_HTTP_{provider_http.group(2)}"
     if "http error" in message or "http status" in message or "server error" in message:
         return "PROVIDER_HTTP_ERROR"
     if "timed out" in message or "timeout" in message:
