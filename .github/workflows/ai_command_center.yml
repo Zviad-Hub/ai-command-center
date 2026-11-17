@@ -68,7 +68,7 @@ jobs:
               # It deliberately excludes task text, reports, prompts, URLs and provider bodies.
               summary = build_public_task_summary(record)
               diagnostics_path.write_text(
-                  json.dumps(summary, ensure_ascii=False, indent=2) + "\\n",
+                  json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
                   encoding="utf-8",
               )
               print(json.dumps(summary, ensure_ascii=False))
@@ -80,7 +80,7 @@ jobs:
                   "human_review_required": True,
               }
               diagnostics_path.write_text(
-                  json.dumps(safe_failure, ensure_ascii=False, indent=2) + "\\n",
+                  json.dumps(safe_failure, ensure_ascii=False, indent=2) + "\n",
                   encoding="utf-8",
               )
               print(json.dumps(safe_failure, ensure_ascii=False))
