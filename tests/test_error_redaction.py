@@ -121,6 +121,10 @@ class ManagerErrorRedactionTests(unittest.TestCase):
         self.assertEqual(result["status"], "REVIEW_REQUIRED")
         self.assertNotIn(SECRET_DETAIL, repr(result))
         self.assertEqual(result["specialist_results"][0]["error"], "SPECIALIST_FAILED")
+        self.assertEqual(
+            result["specialist_results"][0]["error_code"],
+            "PROVIDER_REQUEST_FAILED",
+        )
 
     def test_technical_manager_exception_is_redacted(self):
         plan = {
@@ -168,6 +172,7 @@ class ManagerErrorRedactionTests(unittest.TestCase):
         self.assertEqual(result["status"], "REVIEW_REQUIRED")
         self.assertNotIn(SECRET_DETAIL, repr(result))
         self.assertEqual(result["error"], "PENTESTER_WORKFLOW_FAILED")
+        self.assertEqual(result["error_code"], "PROVIDER_REQUEST_FAILED")
 
     def test_director_routing_exception_is_redacted_from_result_and_console(self):
         output = io.StringIO()
