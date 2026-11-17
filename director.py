@@ -184,19 +184,19 @@ def detect_departments(task):
     # Evaluate each sentence/clause independently so a restriction does not
     # accidentally suppress a department mentioned elsewhere in the task.
     exclusion_patterns = {
-        "media": r"\\bmedia\\b|\\bმედია\\b",
-        "audit": r"\\baudit(?:or)?\\b|\\bაუდიტ(?:ი|ის|ის)?\\b",
-        "pentester": r"\\b(?:pentester|pentest)\\b|პენტესტ(?:ერი)?",
-        "finance": r"\\bfinance\\b|\\bfinancial\\b|\\bფინანს(?:ი|ები|ური|ურ)\\b",
-        "business": r"\\bbusiness\\b|\\bბიზნეს(?:ი|ის|ური)?\\b",
-        "tenders": r"\\btenders?\\b|\\bprocurement\\b|\\bტენდერ(?:ი|ის)?\\b|\\bშესყიდვ(?:ა|ის)\\b",
-        "technical": r"\\btechnical\\b|\\bტექნიკურ(?:ი|ის|ად)?\\b",
+        "media": r"\bmedia\b|\bმედია\b",
+        "audit": r"\baudit(?:or)?\b|\bაუდიტ(?:ი|ის|ის)?\b",
+        "pentester": r"\b(?:pentester|pentest)\b|პენტესტ(?:ერი)?",
+        "finance": r"\bfinance\b|\bfinancial\b|\bფინანს(?:ი|ები|ური|ურ)\b",
+        "business": r"\bbusiness\b|\bბიზნეს(?:ი|ის|ური)?\b",
+        "tenders": r"\btenders?\b|\bprocurement\b|\bტენდერ(?:ი|ის)?\b|\bშესყიდვ(?:ა|ის)\b",
+        "technical": r"\btechnical\b|\bტექნიკურ(?:ი|ის|ად)?\b",
     }
     excluded_departments = set()
-    for clause in re.split(r"[\\n.!?;]+", text):
+    for clause in re.split(r"[\n.!?;]+", text):
         has_exclusion = bool(re.search(
-            r"(?:არ\\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|გააქტიურო(?:თ)?)"
-            r"|do\\s+not\\s+run|don't\\s+run|exclude|skip|not\\s+run)",
+            r"(?:არ\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|გააქტიურო(?:თ)?)"
+            r"|do\s+not\s+run|don't\s+run|exclude|skip|not\s+run)",
             clause,
         ))
         if not has_exclusion:
