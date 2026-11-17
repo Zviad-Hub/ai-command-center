@@ -90,7 +90,7 @@ class TaskManagerTests(unittest.TestCase):
         }
         manager_factory.return_value = manager
 
-        submit_task("Review this application.")
+        record = submit_task("Review this application.")
 
         self.assertEqual(
             manager.receive_task.call_args.args[0],
