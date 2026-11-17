@@ -261,6 +261,24 @@ Do not scan, probe, connect to, exploit or modify any system.
 
 **Note:** Pentester runs four defensive specialist analyses, creates a manager report, and sends it to an independent security reviewer. The report is released only after an explicit review PASS. This workflow is passive-only and cannot perform an active penetration test, even if scope or an authorization reference is supplied. Human scope review and separate CEO approval remain mandatory for any future active-testing capability.
 
+#### Supplying evidence to Pentester
+
+For deterministic file and line validation, include source excerpts in the CEO task context using this numbered manifest format. Repeat the `FILE:` header for each supplied file:
+
+```text
+FILE: src/auth.py
+1: def login(user):
+2:     if user.is_authenticated:
+3:         return dashboard()
+4:     return login_page()
+
+FILE: config/settings.yaml
+1: DEBUG: false
+2: SESSION_COOKIE_SECURE: true
+```
+
+Cited references such as `src/auth.py:2-3` are checked against the supplied file and numbered lines. If artifacts are supplied in another format, references are treated as unverifiable and the report is held for review. With no artifacts and no confirmed claims, the validator reports `UNVERIFIED` rather than inventing evidence. CVE identifiers are checked only for a matching mention in the supplied material; this is not external CVE-database verification or proof that a vulnerability exists.
+
 ## Task history
 
 Each submitted task is stored outside the repository in the operating system's private application-data directory. You can override the location with `AI_COMMAND_CENTER_TASKS_FILE`. On Windows the default is under `%LOCALAPPDATA%\\AI Command Center\\tasks.json`; on macOS it is under `~/Library/Application Support/AI Command Center/tasks.json`; on Linux it is under `$XDG_STATE_HOME/ai-command-center/tasks.json` or `~/.local/state/ai-command-center/tasks.json`. A legacy root-level `tasks.json` is migrated on first run if it is still present. **Before pulling this update in an older checkout, copy the file to the new private location first**, because Git will remove the tracked root-level file. Windows PowerShell: `New-Item -ItemType Directory -Force "$env:LOCALAPPDATA\\AI Command Center" | Out-Null; Copy-Item .\\tasks.json "$env:LOCALAPPDATA\\AI Command Center\\tasks.json"`. Linux: `mkdir -p ~/.local/state/ai-command-center && cp tasks.json ~/.local/state/ai-command-center/tasks.json`. macOS: `mkdir -p "$HOME/Library/Application Support/AI Command Center" && cp tasks.json "$HOME/Library/Application Support/AI Command Center/tasks.json"`. If you use `AI_COMMAND_CENTER_TASKS_FILE` or `XDG_STATE_HOME`, copy it to that configured path instead. In GitHub Actions the file is temporary, and a full report artifact is created only for private repositories. The record includes:
