@@ -44,6 +44,7 @@ jobs:
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           CEO_TASK: ${{ inputs.task }}
           AI_COMMAND_CENTER_TASKS_FILE: ${{ runner.temp }}/ai-command-center/tasks.json
+          AI_DIAGNOSTICS_FILE: ${{ runner.temp }}/ai-command-center-diagnostics/diagnostics.json
         run: |
           python - <<'PY'
           import contextlib
@@ -51,27 +52,50 @@ jobs:
           import json
           import os
           import sys
+          from pathlib import Path
 
           from task_manager import build_public_task_summary, submit_task
+
+          diagnostics_path = Path(os.environ["AI_DIAGNOSTICS_FILE"])
+          diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
 
           try:
               # Agent prompts and reports must not leak into public Actions logs.
               with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                   record = submit_task(os.environ["CEO_TASK"])
 
-              # Publish only non-sensitive gate statuses; never print tasks or reports.
-              print(json.dumps(
-                  build_public_task_summary(record),
-                  ensure_ascii=False
-              ))
+              # This is the same allow-listed, redacted summary printed to the log.
+              # It deliberately excludes task text, reports, prompts, URLs and provider bodies.
+              summary = build_public_task_summary(record)
+              diagnostics_path.write_text(
+                  json.dumps(summary, ensure_ascii=False, indent=2) + "\\n",
+                  encoding="utf-8",
+              )
+              print(json.dumps(summary, ensure_ascii=False))
           except Exception as error:
-              # Keep user prompts, provider responses and exception details out of logs.
-              print(json.dumps({
-                  "status": "FAILED",
-                  "error_type": type(error).__name__
-              }))
+              # Keep user prompts, provider responses, credentials and exception details out.
+              safe_failure = {
+                  "run_status": "FAILED",
+                  "error_type": type(error).__name__,
+                  "human_review_required": True,
+              }
+              diagnostics_path.write_text(
+                  json.dumps(safe_failure, ensure_ascii=False, indent=2) + "\\n",
+                  encoding="utf-8",
+              )
+              print(json.dumps(safe_failure, ensure_ascii=False))
               sys.exit(1)
           PY
+
+      # This artifact contains only the allow-listed public summary, never tasks.json.
+      - name: Upload redacted run diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ai-command-center-diagnostics
+          path: ${{ runner.temp }}/ai-command-center-diagnostics/diagnostics.json
+          if-no-files-found: warn
+          retention-days: 14
 
       # Full reports are uploaded only for private repositories.
       - name: Upload private task report
