@@ -1,3 +1,4 @@
+import os
 import sys
 import types
 import unittest
@@ -71,7 +72,7 @@ class ManagerErrorRedactionTests(unittest.TestCase):
         self.assertEqual(result["error"], "DEPARTMENT_WORKFLOW_FAILED")
 
     def test_research_exception_is_redacted_from_warning(self):
-        with patch.object(
+        with patch.dict(os.environ, {"TAVILY_API_KEY": "test-key"}), patch.object(
             department_agents, "run_research", side_effect=RuntimeError(SECRET_DETAIL)
         ):
             result = department_agents._research_context("test task", "finance")
