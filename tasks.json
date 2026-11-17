@@ -1,5 +1,381 @@
 [
     {
+        "id": "8fc3be01",
+        "created_at": "2026-11-17T07:37:39.477678+00:00",
+        "task": "CEO STRESS TEST — MEDIA + AUDIT AGENT INTEGRATION  Create exactly ONE English YouTube Shorts video about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. Roanoke Lost Colony must remain the ONLY topic. Never change, replace, or broaden the topic. 2. Create exactly ONE video concept. No alternative concepts. 3. Video duration must be exactly 60 seconds. 4. Narration must contain 125–140 words. 5. Include exactly SIX visual scenes. 6. Each visual scene must have exactly one timestamp range:    0:00-0:10    0:10-0:20    0:20-0:30    0:30-0:40    0:40-0:50    0:50-1:00 7. Do not invent historical facts, dates, numbers, quotes, people, or explanations. 8. Every historical claim must be supported by research evidence. 9. Clearly distinguish verified facts from unresolved historical theories. 10. Use credible sources. Do not treat search snippets or URL existence as proof of verification. 11. If evidence is insufficient, explicitly mark the claim NEEDS SOURCE. Never fabricate verification. 12. The final script must contain:     - VIDEO TITLE     - SCRIPT     - VISUAL DIRECTIONS     - FACTS TO VERIFY 13. The Media Agent must complete research, writing, editing, and final fact-checking. 14. The Audit Agent must independently inspect the final Media output. 15. Audit must check topic preservation, narration word count, all six exact timestamps, required sections, source verification, fact-check statuses, and publication safety. 16. Audit must never approve publication automatically. 17. Technical Agent must inspect the pipeline integration and report any structural issues. Do not modify files. 18. If any requirement fails, report the exact failure and explain what must be corrected.  FINAL CEO REPORT:  Return a clear report containing: - Media Agent status - Research source count - Verified source count - Narration word count - Visual scene count - Timestamp validation - Fact-check results - Audit total checks, passed checks, and failed checks - Technical Agent findings - Final publication decision  Publication approval must remain FALSE.  Do not silently relax any requirement to obtain a passing result.",
+        "analysis": "დავალება გაანალიზებულია. დეპარტამენტები შეირჩა დავალების შინაარსის მიხედვით.",
+        "departments": [
+            "media",
+            "audit",
+            "technical"
+        ],
+        "requires_ceo_approval": true,
+        "results": [
+            {
+                "department": "media",
+                "status": "ERROR",
+                "failed_stage": "Creative Strategist",
+                "message": "Creative Strategist failed: Creative Strategist omitted required sections: EXACT TOPIC:, VIDEO CONCEPT:, HOOK:, KEY QUESTIONS TO INVESTIGATE:",
+                "original_ceo_topic": "CEO STRESS TEST — MEDIA + AUDIT AGENT INTEGRATION  Create exactly ONE English YouTube Shorts video about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. Roanoke Lost Colony must remain the ONLY topic. Never change, replace, or broaden the topic. 2. Create exactly ONE video concept. No alternative concepts. 3. Video duration must be exactly 60 seconds. 4. Narration must contain 125–140 words. 5. Include exactly SIX visual scenes. 6. Each visual scene must have exactly one timestamp range:    0:00-0:10    0:10-0:20    0:20-0:30    0:30-0:40    0:40-0:50    0:50-1:00 7. Do not invent historical facts, dates, numbers, quotes, people, or explanations. 8. Every historical claim must be supported by research evidence. 9. Clearly distinguish verified facts from unresolved historical theories. 10. Use credible sources. Do not treat search snippets or URL existence as proof of verification. 11. If evidence is insufficient, explicitly mark the claim NEEDS SOURCE. Never fabricate verification. 12. The final script must contain:     - VIDEO TITLE     - SCRIPT     - VISUAL DIRECTIONS     - FACTS TO VERIFY 13. The Media Agent must complete research, writing, editing, and final fact-checking. 14. The Audit Agent must independently inspect the final Media output. 15. Audit must check topic preservation, narration word count, all six exact timestamps, required sections, source verification, fact-check statuses, and publication safety. 16. Audit must never approve publication automatically. 17. Technical Agent must inspect the pipeline integration and report any structural issues. Do not modify files. 18. If any requirement fails, report the exact failure and explain what must be corrected.  FINAL CEO REPORT:  Return a clear report containing: - Media Agent status - Research source count - Verified source count - Narration word count - Visual scene count - Timestamp validation - Fact-check results - Audit total checks, passed checks, and failed checks - Technical Agent findings - Final publication decision  Publication approval must remain FALSE.  Do not silently relax any requirement to obtain a passing result.",
+                "concept": "",
+                "script": "",
+                "edited_script": "",
+                "initial_fact_check": "",
+                "fact_check": "",
+                "research": {
+                    "status": "COMPLETED",
+                    "original_ceo_topic": "CEO STRESS TEST — MEDIA + AUDIT AGENT INTEGRATION  Create exactly ONE English YouTube Shorts video about the Roanoke Lost Colony.  STRICT CEO REQUIREMENTS:  1. Roanoke Lost Colony must remain the ONLY topic. Never change, replace, or broaden the topic. 2. Create exactly ONE video concept. No alternative concepts. 3. Video duration must be exactly 60 seconds. 4. Narration must contain 125–140 words. 5. Include exactly SIX visual scenes. 6. Each visual scene must have exactly one timestamp range:    0:00-0:10    0:10-0:20    0:20-0:30    0:30-0:40    0:40-0:50    0:50-1:00 7. Do not invent historical facts, dates, numbers, quotes, people, or explanations. 8. Every historical claim must be supported by research evidence. 9. Clearly distinguish verified facts from unresolved historical theories. 10. Use credible sources. Do not treat search snippets or URL existence as proof of verification. 11. If evidence is insufficient, explicitly mark the claim NEEDS SOURCE. Never fabricate verification. 12. The final script must contain:     - VIDEO TITLE     - SCRIPT     - VISUAL DIRECTIONS     - FACTS TO VERIFY 13. The Media Agent must complete research, writing, editing, and final fact-checking. 14. The Audit Agent must independently inspect the final Media output. 15. Audit must check topic preservation, narration word count, all six exact timestamps, required sections, source verification, fact-check statuses, and publication safety. 16. Audit must never approve publication automatically. 17. Technical Agent must inspect the pipeline integration and report any structural issues. Do not modify files. 18. If any requirement fails, report the exact failure and explain what must be corrected.  FINAL CEO REPORT:  Return a clear report containing: - Media Agent status - Research source count - Verified source count - Narration word count - Visual scene count - Timestamp validation - Fact-check results - Audit total checks, passed checks, and failed checks - Technical Agent findings - Final publication decision  Publication approval must remain FALSE.  Do not silently relax any requirement to obtain a passing result.",
+                    "extracted_topic": "the Roanoke Lost Colony",
+                    "query": "the Roanoke Lost Colony reliable sources authoritative records official documentation primary evidence",
+                    "source_count": 15,
+                    "full_page_count": 13,
+                    "snippet_count": 2,
+                    "sources": [
+                        {
+                            "title": "The Lost Colony of Roanoke",
+                            "url": "https://scholarworks.harding.edu/cgi/viewcontent.cgi?article=1249&context=tenor",
+                            "domain": "scholarworks.harding.edu",
+                            "content": "# TTenor of Our Times enor of Our Times\n\nVolume 12 Article 18\n\n# The Lost Colony of Roanok The Lost Colony of Roanoke e\n\nAllison Wisdom Harding University, awisdom@harding.edu\n\nFollow this and additional works at: [https://scholarworks.harding.edu/tenor](https://scholarworks.harding.edu/tenor) Part of the History Commons\n\n## Recommended Citation Recommended Citation\n\nWisdom, Allison ( 2023) \"The Lost Colony of Roanoke,\" Tenor of Our Times: Vol. 12, Article 18. Available at: [https://scholarworks.harding.edu/tenor/vol12/iss1/18](https://scholarworks.harding.edu/tenor/vol12/iss1/18)\n\nThis Article is brought to you for free and open access by the College of Arts & Humanities at Scholar Works at Harding. It has been accepted for inclusion in Tenor of Our Times by an authorized editor of Scholar Works at Harding. For more information, please contact scholarworks@harding.edu.\n\n## The Lost Colony of Roanoke\n\n## By Allison Wisdom\n\n# The Legend of Roanoke\n\nRoanoke-a colony originally disregarded as a failed attempt to establish a British presence in the New World-has since become one of the most popular modern-day legends. It has been over 400 years since the colony was discovered, abandoned, and yet the fate of Roanoke is still being discussed. Most of the folklore surrounding Roanoke is focused on the mysterious disappearance of its settlers, leaving out more of the seemingly mundane aspects, such as the origin of the colony as well as life within it. However, both of those factors ",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6948206,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "A Primary Source History of the Lost Colony of Roanoke - Brian Belval - Google Books",
+                            "url": "https://books.google.com/books/about/A_Primary_Source_History_of_the_Lost_Col.html?id=0eRCy1ZASooC",
+                            "domain": "books.google.com",
+                            "content": "[Sign in](https://www.google.com/accounts/Login?service=print&continue=https://books.google.com.br/books%3Fid%3D0eRCy1ZASooC%26redir_esc%3Dy%26hl%3Den&hl=en&ec=GAZACg)\n\n[![Screen reader users: click this link for accessible mode. Accessible mode has the same essential features but works better with your reader.](//www.google.com/images/cleardot.gif)](https://books.google.com.br/books/about/A_Primary_Source_History_of_the_Lost_Col.html?id=0eRCy1ZASooC&redir_esc=y&hl=en&output=html_text \"Screen reader users: click this link for accessible mode. Accessible mode has the same essential features but works better with your reader.\")\n\n1. [My library](https://www.google.com/accounts/Login?service=print&continue=https://books.google.com.br/books%3Fop%3Dlibrary&hl=en)\n2. [Help](http://books.google.com.ua/support/topic/4359341?hl=en-BR)\n3. [Advanced Book Search](https://books.google.com.br/advanced_book_search)\n\n[Get print book](https://books.google.com.br/books?id=0eRCy1ZASooC&sitesec=buy&source=gbs_atb)\n\nNo eBook available\n\n* [The Rosen Publishing Group, Inc](https://www.rosenpublishing.com/9781404204355)\n* [Amazon.com](http://www.amazon.com/gp/search?index=books&linkCode=qs&keywords=9781404204355)\n* [Amazon.com.br](https://www.amazon.com.br/gp/search?index=books&linkCode=qs&keywords=9781404204355)\n* [Find in a library](https://books.google.com.br/url?id=0eRCy1ZASooC&q=http://worldcat.org/oclc/57549696&clientid=librarylink&usg=AOvVaw1sq9F2JzYOQShajrhXCBx1&source=gbs_buy_r)\n* [All selle",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6800292,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy",
+                            "url": "https://dna-explained.com/2018/06/28/the-lost-colony-of-roanoke-did-they-survive-national-geographic-archaeology-historical-records-and-dna?replytocom=223674",
+                            "domain": "dna-explained.com",
+                            "content": "# [DNAeXplained – Genetic Genealogy](https://dna-explained.com/)\n\n## Discovering Your Ancestors – One Gene at a Time\n\n![DNAeXplained – Genetic Genealogy](https://dna-explained.com/wp-content/uploads/2012/07/cropped-dnaexplain1.jpg)\n\n### Main menu\n\n### Post navigation\n\n# The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA\n\nThe Lost Colony of Roanoke – what an enduring mystery – for 431 years it has remained unsolved and fascinated Americans and the British, alike.\n\nAn entire tourist industry has sprung up around the mystery of the Lost Colony along the Outer Banks in North Carolina. An [open-air theater](https://www.thelostcolony.org/) tells the story every summer on Roanoke Island near where [Fort Raleigh](https://www.nps.gov/fora/index.htm) was established. Tourists drift south to Hatteras Island across a [long bridge](https://www.outerbanks.com/herbert-c-bonner-bridge.html) that today connects Roanoke Island to Hatteras Island, the location where the colonists themselves indicated they were moving when they left the Fort Raleigh on Roanoke Island.\n\nThen.\n\nNothing.\n\nHints, rescue missions, old entries in yellowed records that refer to the colonists, or might…but nothing factual or definitive about what happened to those colonists.\n\nI joined the search for those elusive colonists in 2007 by co-founding The Lost Colony Research Group (LCRG) and establishing the Lost Colony DNA projects. Our small group of volunteers woul",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6686639,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy",
+                            "url": "https://dna-explained.com/2018/06/28/the-lost-colony-of-roanoke-did-they-survive-national-geographic-archaeology-historical-records-and-dna?replytocom=137023",
+                            "domain": "dna-explained.com",
+                            "content": "# [DNAeXplained – Genetic Genealogy](https://dna-explained.com/)\n\n## Discovering Your Ancestors – One Gene at a Time\n\n![DNAeXplained – Genetic Genealogy](https://dna-explained.com/wp-content/uploads/2012/07/cropped-dnaexplain1.jpg)\n\n### Main menu\n\n### Post navigation\n\n# The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA\n\nThe Lost Colony of Roanoke – what an enduring mystery – for 431 years it has remained unsolved and fascinated Americans and the British, alike.\n\nAn entire tourist industry has sprung up around the mystery of the Lost Colony along the Outer Banks in North Carolina. An [open-air theater](https://www.thelostcolony.org/) tells the story every summer on Roanoke Island near where [Fort Raleigh](https://www.nps.gov/fora/index.htm) was established. Tourists drift south to Hatteras Island across a [long bridge](https://www.outerbanks.com/herbert-c-bonner-bridge.html) that today connects Roanoke Island to Hatteras Island, the location where the colonists themselves indicated they were moving when they left the Fort Raleigh on Roanoke Island.\n\nThen.\n\nNothing.\n\nHints, rescue missions, old entries in yellowed records that refer to the colonists, or might…but nothing factual or definitive about what happened to those colonists.\n\nI joined the search for those elusive colonists in 2007 by co-founding The Lost Colony Research Group (LCRG) and establishing the Lost Colony DNA projects. Our small group of volunteers woul",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6686639,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy",
+                            "url": "https://dna-explained.com/2018/06/28/the-lost-colony-of-roanoke-did-they-survive-national-geographic-archaeology-historical-records-and-dna?replytocom=137073",
+                            "domain": "dna-explained.com",
+                            "content": "# [DNAeXplained – Genetic Genealogy](https://dna-explained.com/)\n\n## Discovering Your Ancestors – One Gene at a Time\n\n![DNAeXplained – Genetic Genealogy](https://dna-explained.com/wp-content/uploads/2012/07/cropped-dnaexplain1.jpg)\n\n### Main menu\n\n### Post navigation\n\n# The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA\n\nThe Lost Colony of Roanoke – what an enduring mystery – for 431 years it has remained unsolved and fascinated Americans and the British, alike.\n\nAn entire tourist industry has sprung up around the mystery of the Lost Colony along the Outer Banks in North Carolina. An [open-air theater](https://www.thelostcolony.org/) tells the story every summer on Roanoke Island near where [Fort Raleigh](https://www.nps.gov/fora/index.htm) was established. Tourists drift south to Hatteras Island across a [long bridge](https://www.outerbanks.com/herbert-c-bonner-bridge.html) that today connects Roanoke Island to Hatteras Island, the location where the colonists themselves indicated they were moving when they left the Fort Raleigh on Roanoke Island.\n\nThen.\n\nNothing.\n\nHints, rescue missions, old entries in yellowed records that refer to the colonists, or might…but nothing factual or definitive about what happened to those colonists.\n\nI joined the search for those elusive colonists in 2007 by co-founding The Lost Colony Research Group (LCRG) and establishing the Lost Colony DNA projects. Our small group of volunteers woul",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6686639,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy",
+                            "url": "https://dna-explained.com/2018/06/28/the-lost-colony-of-roanoke-did-they-survive-national-geographic-archaeology-historical-records-and-dna?replytocom=137048",
+                            "domain": "dna-explained.com",
+                            "content": "[Skip to primary content](#content)\n\n# [DNAeXplained – Genetic Genealogy](https://dna-explained.com/)\n\n## Discovering Your Ancestors – One Gene at a Time\n\n# The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA\n\nPosted on   by  [Roberta Estes](https://dna-explained.com/author/robertajestes/ \"View all posts by Roberta Estes\")\n\nThe Lost Colony of Roanoke – what an enduring mystery – for 431 years it has remained unsolved and fascinated Americans and the British, alike.\n\nAn entire tourist industry has sprung up around the mystery of the Lost Colony along the Outer Banks in North Carolina. An [open-air theater](https://www.thelostcolony.org/) tells the story every summer on Roanoke Island near where [Fort Raleigh](https://www.nps.gov/fora/index.htm) was established. Tourists drift south to Hatteras Island across a [long bridge](https://www.outerbanks.com/herbert-c-bonner-bridge.html) that today connects Roanoke Island to Hatteras Island, the location where the colonists themselves indicated they were moving when they left the Fort Raleigh on Roanoke Island.\n\nHints, rescue missions, old entries in yellowed records that refer to the colonists, or might…but nothing factual or definitive about what happened to those colonists.\n\nI joined the search for those elusive colonists in 2007 by co-founding The Lost Colony Research Group (LCRG) and establishing the Lost Colony DNA projects. Our small group of volunteers would contract with",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6686639,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy",
+                            "url": "https://dna-explained.com/2018/06/28/the-lost-colony-of-roanoke-did-they-survive-national-geographic-archaeology-historical-records-and-dna?replytocom=164407",
+                            "domain": "dna-explained.com",
+                            "content": "# [DNAeXplained – Genetic Genealogy](https://dna-explained.com/)\n\n## Discovering Your Ancestors – One Gene at a Time\n\n![DNAeXplained – Genetic Genealogy](https://dna-explained.com/wp-content/uploads/2012/07/cropped-dnaexplain1.jpg)\n\n### Main menu\n\n### Post navigation\n\n# The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA\n\nThe Lost Colony of Roanoke – what an enduring mystery – for 431 years it has remained unsolved and fascinated Americans and the British, alike.\n\nAn entire tourist industry has sprung up around the mystery of the Lost Colony along the Outer Banks in North Carolina. An [open-air theater](https://www.thelostcolony.org/) tells the story every summer on Roanoke Island near where [Fort Raleigh](https://www.nps.gov/fora/index.htm) was established. Tourists drift south to Hatteras Island across a [long bridge](https://www.outerbanks.com/herbert-c-bonner-bridge.html) that today connects Roanoke Island to Hatteras Island, the location where the colonists themselves indicated they were moving when they left the Fort Raleigh on Roanoke Island.\n\nThen.\n\nNothing.\n\nHints, rescue missions, old entries in yellowed records that refer to the colonists, or might…but nothing factual or definitive about what happened to those colonists.\n\nI joined the search for those elusive colonists in 2007 by co-founding The Lost Colony Research Group (LCRG) and establishing the Lost Colony DNA projects. Our small group of volunteers woul",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6686639,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy",
+                            "url": "https://dna-explained.com/2018/06/28/the-lost-colony-of-roanoke-did-they-survive-national-geographic-archaeology-historical-records-and-dna",
+                            "domain": "dna-explained.com",
+                            "content": "[Skip to primary content](#content)\n\n# [DNAeXplained – Genetic Genealogy](https://dna-explained.com/)\n\n## Discovering Your Ancestors – One Gene at a Time\n\n [![DNAeXplained – Genetic Genealogy](https://dna-explained.com/wp-content/uploads/2012/07/cropped-dnaexplain1.jpg)](https://dna-explained.com/) \n\n# The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA\n\nPosted on   by  [Roberta Estes](https://dna-explained.com/author/robertajestes/ \"View all posts by Roberta Estes\")\n\nThe Lost Colony of Roanoke – what an enduring mystery – for 431 years it has remained unsolved and fascinated Americans and the British, alike.\n\nAn entire tourist industry has sprung up around the mystery of the Lost Colony along the Outer Banks in North Carolina. An [open-air theater](https://www.thelostcolony.org/) tells the story every summer on Roanoke Island near where [Fort Raleigh](https://www.nps.gov/fora/index.htm) was established. Tourists drift south to Hatteras Island across a [long bridge](https://www.outerbanks.com/herbert-c-bonner-bridge.html) that today connects Roanoke Island to Hatteras Island, the location where the colonists themselves indicated they were moving when they left the Fort Raleigh on Roanoke Island.\n\nHints, rescue missions, old entries in yellowed records that refer to the colonists, or might…but nothing factual or definitive about what happened to those colonists.\n\nI joined the search for those elusive colonists in 2007 by",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6686639,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Roanoke Colonists' Appeal to John White; an excerpt from \"The voyage of Edward Stafford and John White\" by John White (1589) - Encyclopedia Virginia",
+                            "url": "https://encyclopediavirginia.org/primary-documents/roanoke-colonists-appeal-to-john-white-an-excerpt-from-the-voyage-of-edward-stafford-and-john-white-by-john-white-1589",
+                            "domain": "encyclopediavirginia.org",
+                            "content": "[Encyclopedia Virginia, Virginia Humanities](https://encyclopediavirginia.org/)\n\n![Facebook](https://encyclopediavirginia.org/wp-content/themes/ev/img/square-facebook.svg)\n![Instagram](https://encyclopediavirginia.org/wp-content/themes/ev/img/square-instagram.svg)\n\n# Roanoke Colonists’ Appeal to John White; an excerpt from “The voyage of Edward Stafford and John White” by John White (1589)\n\n![Roanoke Colonists' Appeal to John White; an excerpt from \"The voyage of Edward Stafford and John White\" by John White (1589)](https://encyclopediavirginia.org/wp-content/uploads/2020/11/6560_0ec825f33633c07-215x215.jpeg)\n\n[John White](https://encyclopediavirginia.org/entries/white-john-d-1593/), governor of the so-called Lost Colony at [Roanoke Island](https://encyclopediavirginia.org/entries/roanoke-colonies-the/), claimed that the settlers demanded he return to England to update their backer, [Sir Walter Raleigh](https://encyclopediavirginia.org/entries/raleigh-sir-walter-ca-1552-1618/), on the colony’s progress. At first he refused; then he required that the settler put the request in writing, which they did on August 25, 1587. According to the historian David Beers Quinn, “This testimonial is the first formal document to survive which originated in an English settlement on the mainland of North America.” White’s narrative, based on his journal, was published in [Richard Hakluyt (the younger)](https://encyclopediavirginia.org/entries/hakluyt-richard-1552-1616/)‘s *Principall Navigatio",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.63770795,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy",
+                            "url": "https://dna-explained.com/2018/06/28/the-lost-colony-of-roanoke-did-they-survive-national-geographic-archaeology-historical-records-and-dna?replytocom=137255",
+                            "domain": "dna-explained.com",
+                            "content": "Title: The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy\n# The Lost Colony of Roanoke: Did They Survive? The Lost Colony of Roanoke – what an enduring mystery – for 431 years it has remained unsolved and fascinated Americans and the British, alike. An entire tourist industry has sprung up around the mystery of the Lost Colony along the Outer Banks in North Carolina. An open-air theater tells the story every summer on Roanoke Island near where Fort Raleigh was established. Tourists drift south to Hatteras Island across a long bridge that today connects Roanoke Island to Hatteras Island, the location where the colonists themselves indicated they were moving when they left the Fort Raleigh on Roanoke Island. Hints, rescue missions, old entries in yellowed records that refer to the colonists, or might…but nothing factual or definitive about what happened to those colonists. I joined the search for those elusive colonists in 2007 by co-founding The Lost Colony Research Group (LCRG) and establishing the Lost Colony DNA projects. In 2017, Andrew Lawler, a journalist who was writing an article for National Geographic about the Lost Colony contacted me for an interview. Over the next several weeks, we would talk as well as exchange e-mails, discussing the story of the colony, the archaeological digs, and the DNA efforts to solve the mystery of whether any of the colonists survived. The Lost C",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.6353356,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy",
+                            "url": "https://dna-explained.com/2018/06/28/the-lost-colony-of-roanoke-did-they-survive-national-geographic-archaeology-historical-records-and-dna?replytocom=137110",
+                            "domain": "dna-explained.com",
+                            "content": "Title: The Lost Colony of Roanoke: Did They Survive? – National Geographic, Archaeology, Historical Records and DNA | DNAeXplained – Genetic Genealogy\n# The Lost Colony of Roanoke: Did They Survive? The Lost Colony of Roanoke – what an enduring mystery – for 431 years it has remained unsolved and fascinated Americans and the British, alike. An entire tourist industry has sprung up around the mystery of the Lost Colony along the Outer Banks in North Carolina. An open-air theater tells the story every summer on Roanoke Island near where Fort Raleigh was established. Tourists drift south to Hatteras Island across a long bridge that today connects Roanoke Island to Hatteras Island, the location where the colonists themselves indicated they were moving when they left the Fort Raleigh on Roanoke Island. Hints, rescue missions, old entries in yellowed records that refer to the colonists, or might…but nothing factual or definitive about what happened to those colonists. I joined the search for those elusive colonists in 2007 by co-founding The Lost Colony Research Group (LCRG) and establishing the Lost Colony DNA projects. In 2017, Andrew Lawler, a journalist who was writing an article for National Geographic about the Lost Colony contacted me for an interview. Over the next several weeks, we would talk as well as exchange e-mails, discussing the story of the colony, the archaeological digs, and the DNA efforts to solve the mystery of whether any of the colonists survived. The Lost C",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.6353356,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "How First Colony Foundation Found the Lost Colony of Roanoke",
+                            "url": "https://www.firstcolonyfoundation.org/news/lost-colony-is-found",
+                            "domain": "firstcolonyfoundation.org",
+                            "content": "[Skip to content](#content \"Skip to content\")\n\n\n[![First Colony Foundation](https://www.firstcolonyfoundation.org/wp-content/uploads/first-colony-foundation-logo-1x.png)](https://www.firstcolonyfoundation.org/)\n\n# The Lost Colony is Found! How We Did It.\n\n[Home](https://www.firstcolonyfoundation.org/) » [News](https://www.firstcolonyfoundation.org/news/) » The Lost Colony is Found! How We Did It.\n\n![Enhanced fort image showing location fifty miles west of Roanoke Island.](https://www.firstcolonyfoundation.org/wp-content/uploads/lost-colony-is-found.png)\n\nEnhanced fort image showing the location, fifty miles west of Roanoke Island.\n\nThis is *not* another hoax or false claim. The discovery was based on years of dedication and preparation by a research team of professional archaeologists and historians, the First Colony Foundation.\n\n## First Colony Foundation’s Search for Raleigh’s Lost Settlers\n\nHaving led excavations for Colonial Williamsburg in the past, they have an international reputation for their fieldwork on the earliest English colonial sites in Virginia, Ireland, and the Caribbean.\n\nWe of First Colony have focused on Sir Walter Raleigh’s colonial settlement on Roanoke Island, inland from North Carolina’s easterly, dangerous Cape Hatteras, called the Graveyard of the Atlantic for its rough seas and its far-reaching shoals.\n\n## Excavating Roanoke Island and Fort Raleigh\n\nThe site of that settlement is well-known to history, and one small piece of it is the earthwork For",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.6304574,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Evidence Grows, the Lost Colony Split Up | PBS North Carolina",
+                            "url": "https://www.pbsnc.org/blogs/science/lost-colony-split",
+                            "domain": "pbsnc.org",
+                            "content": "# Evidence Grows, the Lost Colony Split Up\n\nby  Frank Graff •  Published on  • Last modified on\n\n![group excavating in woods with poured concrete](https://image.pbs.org/bento3-prod/pbsnc-redesign-phase-1/Blueridge%20Mountains%20Sunrise/1-from%20pbs%20nc/302a26e262_302a26e262_Lost_Colony_Split_NPS_banner.jpg)\n\nPhoto courtesy of NPS\n\n[Science & Nature](//www.pbsnc.org/blogs/science/)\n\n# **Where the Lost Colony Went**\n\nIt’s a line you hear in almost every movie or television show where there’s a chase scene, “Let’s split up, you go that way and I’ll go this way!”\n\nSome version of that action movie line may have been said on the North Carolina coast more than 400 years ago.\n\nThe results of two archaeological studies announced this year provide growing evidence that’s what the British settlers who arrived on North Carolina’s shores in 1587 did. The colony’s disappearance became America’s oldest unsolved mystery.\n\n## **First a quick trip back in time**\n\nYou know the story: 115 English settlers arrived on Roanoke Island to start a new life. They were not the first English explorers, but this group included women and children. Their goal was the creation of a permanent English settlement in the new world.\n\nThe expedition’s leader, Governor John White returned to England to get more supplies. His returned was delayed by a war between England and Spain, but when he made it back three years later, he found the colony deserted and the word “CROATOAN” carved into a wooden post.\n\nThere has",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.60853595,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Additional Online Resources - Jamestown and Roanoke Colonies: A Resource Guide - Research Guides at Library of Congress",
+                            "url": "https://guides.loc.gov/jamestown-roanoke-colonies/additional-online-resources",
+                            "domain": "guides.loc.gov",
+                            "content": "[Skip to Main Content](#s-lg-guide-main)\n\n[Library of Congress ![](https://cdn.loc.gov/libguide/images/logo-loc-padded.svg)](https://www.loc.gov/)   [Research Guides ![](https://cdn.loc.gov/libguide/images/logo-research-guides.svg)](/)\n\n1. [Library of Congress](https://www.loc.gov/)\n2. [Research Guides](https://guides.loc.gov/)\n3. [Main Reading Room](https://guides.loc.gov/main-reading-room)\n4. [Jamestown and Roanoke Colonies: A Resource Guide](https://guides.loc.gov/jamestown-roanoke-colonies)\n5. Additional Online Resources\n\n# Jamestown and Roanoke Colonies: A Resource Guide\n\n* [Introduction](https://guides.loc.gov/jamestown-roanoke-colonies/introduction)\n* [Primary Sources](https://guides.loc.gov/jamestown-roanoke-colonies/primary-sources)\n* [Secondary Sources: Selected Books](https://guides.loc.gov/jamestown-roanoke-colonies/secondary-books)\n* [Secondary Sources: Periodicals](https://guides.loc.gov/jamestown-roanoke-colonies/secondary-periodicals)\n* [Imaginative Works: A Selection](https://guides.loc.gov/jamestown-roanoke-colonies/imaginative-works)\n* [Especially for K-12 Students & Teachers](https://guides.loc.gov/jamestown-roanoke-colonies/students-teachers)\n* [Additional Online Resources](https://guides.loc.gov/jamestown-roanoke-colonies/additional-online-resources)\n\n# Additional Online Resources\n\n## Library of Congress\n\n* [Exhibition: American Treasures of the Library of Congress: Memory Gallery A This link opens in a new window](https://www.loc.gov/exhibits/treasures/",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.58942103,
+                            "preferred_domain_candidate": true,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "The Lost Colony of Roanoke: A Historical Mystery",
+                            "url": "https://ancientpedia.com/the-lost-colony-of-roanoke-a-historical-mystery-that-endures",
+                            "domain": "ancientpedia.com",
+                            "content": "![](https://ancientpedia.com/wp-content/plugins/legal-pages/assets/common/img/loader.gif)\n\n* [News](https://ancientpedia.com/category/news/)\n* [History](https://ancientpedia.com/category/history/)\n* [Space](https://ancientpedia.com/category/space/)\n* [Civilizations](https://ancientpedia.com/category/civilizations/)\n  + [Aztecs](https://ancientpedia.com/category/civilizations/aztecs/)\n  + [Egyptians](https://ancientpedia.com/category/civilizations/egyptians/)\n  + [Greeks](https://ancientpedia.com/category/civilizations/greeks/)\n  + [Mayans](https://ancientpedia.com/category/civilizations/mayans/)\n  + [Romans](https://ancientpedia.com/category/civilizations/romans/)\n  + [Vikings](https://ancientpedia.com/category/civilizations/vikings/)\n* [Unexplained](https://ancientpedia.com/category/unexplained/)\n* [Contact](https://ancientpedia.com/contact/)\n* [About Us](https://ancientpedia.com/about-us/)\n\n[AncientPedia](https://ancientpedia.com/)  DISCOVER THE ART OF PUBLISHING\n\n* [News](https://ancientpedia.com/category/news/)\n* [History](https://ancientpedia.com/category/history/)\n* [Space](https://ancientpedia.com/category/space/)\n* [Civilizations](https://ancientpedia.com/category/civilizations/)\n  + [Aztecs](https://ancientpedia.com/category/civilizations/aztecs/)\n  + [Egyptians](https://ancientpedia.com/category/civilizations/egyptians/)\n  + [Greeks](https://ancientpedia.com/category/civilizations/greeks/)\n  + [Mayans](https://ancientpedia.com/category/civilizations/mayans/)\n  + [Ro",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.58516043,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        }
+                    ],
+                    "warning": "Research results are evidence candidates. A preferred domain does not prove a claim. URLs have not been independently verified. Fact-check every claim against supplied content."
+                },
+                "narration_word_count": 0,
+                "validation": {},
+                "publication_approved": false,
+                "specialists": [
+                    "Research Agent"
+                ],
+                "warnings": [
+                    "Pipeline stopped during: Creative Strategist.",
+                    "Previously completed work has been preserved.",
+                    "CEO review is required.",
+                    "Publication is not approved."
+                ]
+            },
+            {
+                "department": "audit",
+                "status": "REVIEW_REQUIRED",
+                "auditors": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "checks": [
+                            {
+                                "check": "Topic preservation",
+                                "passed": true,
+                                "details": "The original Roanoke Lost Colony topic must be preserved."
+                            },
+                            {
+                                "check": "Narration word count",
+                                "passed": false,
+                                "details": "Detected 0 words; required 125-140."
+                            },
+                            {
+                                "check": "Six visual scenes",
+                                "passed": false,
+                                "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                            },
+                            {
+                                "check": "Required content sections",
+                                "passed": false,
+                                "details": "Missing: video title, script, visual directions"
+                            },
+                            {
+                                "check": "Narration completeness",
+                                "passed": false,
+                                "details": "Final narration must be present."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "checks": [
+                            {
+                                "check": "Source verification",
+                                "passed": false,
+                                "details": "Sources: 15; valid URLs: 15; statuses: ['NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED']; URL structure does not prove source verification."
+                            },
+                            {
+                                "check": "Fact-check coverage",
+                                "passed": false,
+                                "details": "At least one explicitly VERIFIED claim is required."
+                            },
+                            {
+                                "check": "Unsupported claims",
+                                "passed": true,
+                                "details": "No claims marked NEEDS SOURCE were found."
+                            },
+                            {
+                                "check": "Contradiction detection",
+                                "passed": true,
+                                "details": "No claims marked CONTRADICTED were found."
+                            },
+                            {
+                                "check": "URL structure",
+                                "passed": true,
+                                "details": "No malformed URLs detected."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "checks": [
+                            {
+                                "check": "Department identity",
+                                "passed": true,
+                                "details": "Received department: media"
+                            },
+                            {
+                                "check": "Media review status",
+                                "passed": false,
+                                "details": "Received status: ERROR"
+                            },
+                            {
+                                "check": "Publication safety",
+                                "passed": true,
+                                "details": "Media must never approve its own publication."
+                            },
+                            {
+                                "check": "Result structure",
+                                "passed": true,
+                                "details": "Media result must be a dictionary."
+                            },
+                            {
+                                "check": "Research data structure",
+                                "passed": true,
+                                "details": "Research results must be present."
+                            },
+                            {
+                                "check": "Specialist output",
+                                "passed": true,
+                                "details": "Received 1 specialists."
+                            }
+                        ],
+                        "passed": false
+                    }
+                ],
+                "summary": {
+                    "total_checks": 16,
+                    "passed_checks": 9,
+                    "failed_checks": 7
+                },
+                "failed_checks": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration word count",
+                        "passed": false,
+                        "details": "Detected 0 words; required 125-140."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Six visual scenes",
+                        "passed": false,
+                        "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Required content sections",
+                        "passed": false,
+                        "details": "Missing: video title, script, visual directions"
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration completeness",
+                        "passed": false,
+                        "details": "Final narration must be present."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Source verification",
+                        "passed": false,
+                        "details": "Sources: 15; valid URLs: 15; statuses: ['NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED']; URL structure does not prove source verification."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Fact-check coverage",
+                        "passed": false,
+                        "details": "At least one explicitly VERIFIED claim is required."
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "check": "Media review status",
+                        "passed": false,
+                        "details": "Received status: ERROR"
+                    }
+                ],
+                "publication_approved": false,
+                "final_decision": "CEO_APPROVAL_REQUIRED",
+                "message": "აუდიტმა აღმოაჩინა პრობლემები. მასალა საჭიროებს შესწორებას ან დამატებით მტკიცებულებებს."
+            },
+            {
+                "department": "technical",
+                "status": "RECEIVED",
+                "message": "დავალება მიღებულია. სპეციალიზებული აგენტები შემდეგ ეტაპზე დაემატება."
+            }
+        ]
+    },
+    {
         "id": "42674870",
         "created_at": "2026-11-17T07:22:14.455094+00:00",
         "task": "CEO STRESS TEST #2 — QUALITY CONTROL & EVIDENCE CHALLENGE  Create exactly ONE English YouTube Shorts video about the Roanoke Lost Colony.  THE CEO IS THE FINAL AUTHORITY.  STRICT REQUIREMENTS:  1. TOPIC LOCK - Roanoke Lost Colony must remain the ONLY topic. - Never replace, broaden, or change the topic. - Create exactly ONE video concept and ONE final script.  2. NARRATION - English only. - Narration must contain 125–140 words. - Target approximately 132 words. - Count narration separately from headings and visual directions. - Do not invent historical facts to reach the word count.  3. VISUAL TIMELINE - Exactly SIX scenes. - Use these exact timestamps, once each, in this order:   0:00-0:10   0:10-0:20   0:20-0:30   0:30-0:40   0:40-0:50   0:50-1:00 - Each scene must have a clear visual description. - Visuals must match the narration.  4. HISTORICAL EVIDENCE - Research the Roanoke Lost Colony using supplied research sources. - Distinguish primary sources from secondary sources. - Distinguish full-page extracts from search snippets. - Do not treat search-result titles or URLs as evidence. - Do not invent quotations, dates, names, numbers, or events. - Do not claim independent URL verification unless actually performed. - Every important historical claim must have supporting evidence. - Mark unsupported claims NEEDS SOURCE. - Mark claims CONTRADICTED only when evidence directly contradicts them.  5. INDEPENDENT QUALITY CONTROL - Scriptwriter must produce the initial script. - Quality Editor must check word count and all six scenes. - Fact-Checker must independently examine every important claim. - Evidence Editor must remove unsupported or contradicted claims. - Final Fact-Checker must check the corrected script again. - Agents must not simply approve one another's work. - If a requirement fails, attempt correction before returning the result.  6. FINAL OUTPUT Return: - Exact topic - One video concept - Final title - Complete narration - Six visual directions - Narration word count - Visual scene count - Timestamp validation - Research source count - Full-page extract count - Search snippet count - Verified claims count - NEEDS SOURCE claims count - CONTRADICTED claims count - Remaining warnings - Publication approval status  7. PUBLICATION SAFETY - Never publish automatically. - publication_approved must remain FALSE. - Final status must honestly reflect all failed checks. - CEO approval is mandatory.  Do not fabricate successful validation. Do not hide failed checks. Do not claim completion when mandatory requirements remain unmet.",
