@@ -71,6 +71,38 @@ class AskAITests(unittest.TestCase):
 
     @patch.dict(os.environ, {
         "GROQ_API_KEY": "primary-key",
+        "GEMINI_API_KEY": "gemini-test-key",
+        "AI_FALLBACK_API_URL": "https://legacy.example/v1/chat/completions",
+        "AI_FALLBACK_API_KEY": "legacy-key",
+        "AI_FALLBACK_MODEL": "legacy-model",
+    })
+    @patch("ai_brain.requests.post")
+    def test_gemini_free_fallback_takes_precedence_over_legacy_provider(self, post):
+        quota = Mock()
+        quota.status_code = 429
+        quota.ok = False
+        quota.text = '{"error":"daily quota exhausted"}'
+        post.side_effect = [quota, _response("Gemini fallback result")]
+
+        result = ai_brain.ask_ai("system prompt", "user prompt")
+
+        self.assertEqual(result, "Gemini fallback result")
+        self.assertEqual(post.call_count, 2)
+        fallback_call = post.call_args_list[1]
+        self.assertEqual(
+            fallback_call.args[0],
+            "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        )
+        self.assertEqual(
+            fallback_call.kwargs["headers"]["Authorization"],
+            "Bearer gemini-test-key",
+        )
+        self.assertEqual(fallback_call.kwargs["json"]["model"], "gemini-3.8-flash")
+        self.assertIn("max_tokens", fallback_call.kwargs["json"])
+        self.assertNotIn("reasoning_effort", fallback_call.kwargs["json"])
+
+    @patch.dict(os.environ, {
+        "GROQ_API_KEY": "primary-key",
         "AI_FALLBACK_API_URL": "https://fallback.example/v1/chat/completions",
         "AI_FALLBACK_API_KEY": "fallback-key",
         "AI_FALLBACK_MODEL": "fallback-model",

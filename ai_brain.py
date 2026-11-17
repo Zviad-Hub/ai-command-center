@@ -89,7 +89,16 @@ def is_daily_limit_error(response_text):
 
 
 def _fallback_provider_config():
-    """Return a fully configured OpenAI-compatible fallback, or None."""
+    """Prefer the free-tier Gemini fallback; retain legacy generic fallback support."""
+    gemini_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if gemini_key:
+        return (
+            "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            gemini_key,
+            os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip(),
+            "max_tokens",
+        )
+
     url = os.getenv("AI_FALLBACK_API_URL", "").strip()
     key = os.getenv("AI_FALLBACK_API_KEY", "").strip()
     model = os.getenv("AI_FALLBACK_MODEL", "").strip()
