@@ -264,7 +264,7 @@ def _research_context(task, department):
         return {
             "status": "ERROR",
             "sources": [],
-            "warning": f"Research failed: {error}"
+            "warning": "Research failed; internal error details were withheld."
         }
 
 
@@ -364,7 +364,7 @@ def run_department_workflow(department, task, context=None):
         except Exception as error:
             specialist_failures.append({
                 "specialist": specialist_id,
-                "error": str(error)
+                "error": "SPECIALIST_FAILED"
             })
 
     base_result = {
@@ -478,6 +478,6 @@ Review the draft independently. The report must remain advisory only.
             **base_result,
             "status": "REVIEW_REQUIRED",
             "message": "The department could not prepare and independently approve a reliable report.",
-            "error": str(error),
+            "error": "DEPARTMENT_WORKFLOW_FAILED",
             "report": ""
         }
