@@ -275,5 +275,41 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertIn("manager_and_quality_gate", failed)
 
 
+    def test_safety_flags_fail_closed_for_non_boolean_values(self):
+        base = {
+            "status": "COMPLETED",
+            "specialist_reports": {"a": "one", "b": "two", "c": "three"},
+            "quality_review": (
+                "REVIEW STATUS: PASS\n"
+                "ISSUES: No material issues found.\n"
+                "REQUIRED CORRECTIONS: None; calculations and evidence were checked.\n"
+                "FINAL QUALITY SUMMARY: The report is internally consistent and advisory."
+            ),
+            "quality_review_passed": True,
+            "report": (
+                "Revenue 2160 GEL; variable cost 840 GEL; contribution 1320 GEL; "
+                "operating result -2880 GEL before tax. Tax not provided."
+            ),
+            "requires_ceo_approval": True,
+            "execution_performed": False,
+        }
+
+        ambiguous_flags = {
+            "execution_performed": "false",
+            "external_network_activity": 1,
+        }
+        for field, value in ambiguous_flags.items():
+            with self.subTest(field=field, value=value):
+                result_data = dict(base)
+                result_data[field] = value
+                evaluated = evaluate_live_result("finance", result_data)
+                failed = [
+                    item["name"] for item in evaluated["checks"]
+                    if not item["passed"]
+                ]
+                self.assertIn("safety_and_human_approval", failed)
+                self.assertLess(evaluated["score_out_of_10"], 10)
+
+
 if __name__ == "__main__":
     unittest.main()
