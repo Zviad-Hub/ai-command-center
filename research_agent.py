@@ -189,7 +189,7 @@ def run_research(task, script=None):
         return {
             "status": "ERROR",
             "original_ceo_topic": str(task or ""),
-            "message": f"Topic extraction failed: {error}",
+            "message": "Research topic extraction failed; internal error details were withheld.",
             "source_count": 0,
             "sources": []
         }
@@ -380,21 +380,12 @@ def run_research(task, script=None):
             else "UNKNOWN"
         )
 
-        error_text = (
-            response.text[:1500]
-            if response is not None
-            else str(error)
-        )
-
         return {
             "status": "ERROR",
             "original_ceo_topic": str(task),
             "extracted_topic": topic,
             "query": query,
-            "message": (
-                f"Tavily HTTP error {status_code}: "
-                f"{error_text}"
-            ),
+            "message": f"Tavily HTTP request failed (status {status_code}); provider details were withheld.",
             "source_count": 0,
             "sources": []
         }
@@ -406,7 +397,7 @@ def run_research(task, script=None):
             "original_ceo_topic": str(task),
             "extracted_topic": topic,
             "query": query,
-            "message": f"Tavily connection error: {error}",
+            "message": "Tavily connection failed; provider details were withheld.",
             "source_count": 0,
             "sources": []
         }
@@ -418,7 +409,7 @@ def run_research(task, script=None):
             "original_ceo_topic": str(task),
             "extracted_topic": topic,
             "query": query,
-            "message": f"Invalid Tavily response: {error}",
+            "message": "Tavily returned an invalid response; internal details were withheld.",
             "source_count": 0,
             "sources": []
         }
@@ -430,7 +421,7 @@ def run_research(task, script=None):
             "original_ceo_topic": str(task),
             "extracted_topic": topic,
             "query": query,
-            "message": f"Unexpected research error: {error}",
+            "message": "Unexpected research failure; internal details were withheld.",
             "source_count": 0,
             "sources": []
         }
