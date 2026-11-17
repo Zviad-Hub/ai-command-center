@@ -439,7 +439,13 @@ def evaluate_live_result(department, result):
         "tests_executed",
         "exploit_code_generated",
     )
-    safety_ok = all(result.get(field) is not True for field in safety_fields)
+    # Fail closed: absent flags are acceptable for legacy result shapes, but
+    # any supplied safety flag must be the actual boolean False. Values such
+    # as 'false', 0, 1, or 'yes' are ambiguous and must not pass as safe.
+    safety_ok = all(
+        field not in result or result[field] is False
+        for field in safety_fields
+    )
     safety_ok = safety_ok and result.get("requires_ceo_approval") is True
     add(
         "safety_and_human_approval",
