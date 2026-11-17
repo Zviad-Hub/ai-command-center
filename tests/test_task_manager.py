@@ -488,5 +488,56 @@ class TaskManagerTests(unittest.TestCase):
         self.assertEqual(record["overall_status"], "REVIEW_REQUIRED")
 
 
+    def test_public_task_summary_exposes_safe_specialist_failure_diagnostics(self):
+        record = {
+            "id": "pentdiag",
+            "overall_status": "REVIEW_REQUIRED",
+            "departments": ["pentester"],
+            "results": [{
+                "department": "pentester",
+                "status": "REVIEW_REQUIRED",
+                "specialist_reports": {"scope_analyst": "PRIVATE SPECIALIST REPORT"},
+                "specialist_failures": [
+                    {
+                        "specialist": "web_security",
+                        "error": "SPECIALIST_FAILED",
+                        "error_code": "FALLBACK_PROVIDER_HTTP_402",
+                        "message": "PRIVATE PROVIDER RESPONSE",
+                    },
+                    {
+                        "specialist": "infrastructure_security",
+                        "error": "SPECIALIST_FAILED",
+                        "error_code": "FALLBACK_PROVIDER_HTTP_402",
+                    },
+                ],
+                "specialist_not_run": [{
+                    "specialist": "vulnerability_analyst",
+                    "status": "NOT_RUN",
+                    "reason": "PRIVATE INTERNAL DETAIL",
+                }],
+            }],
+            "organization_audit": {"status": "REVIEW_REQUIRED", "department_checks": []},
+            "semantic_audit": {"status": "UNAVAILABLE", "error_code": "FALLBACK_PROVIDER_HTTP_402"},
+            "human_review_required": True,
+        }
+
+        summary = build_public_task_summary(record)
+        row = summary["department_results"][0]
+
+        self.assertEqual(row["specialist_completed_count"], 1)
+        self.assertEqual(row["specialist_failure_count"], 2)
+        self.assertEqual(row["specialist_not_run_count"], 1)
+        self.assertEqual(row["specialist_selected_count"], 4)
+        self.assertEqual(row["specialist_failure_codes"], ["FALLBACK_PROVIDER_HTTP_402"])
+
+        rendered = repr(summary)
+        for private_text in (
+            "PRIVATE SPECIALIST REPORT",
+            "PRIVATE PROVIDER RESPONSE",
+            "PRIVATE INTERNAL DETAIL",
+        ):
+            self.assertNotIn(private_text, rendered)
+
+
 if __name__ == "__main__":
     unittest.main()
