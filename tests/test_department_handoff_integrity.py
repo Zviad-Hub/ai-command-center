@@ -26,8 +26,12 @@ class DepartmentHandoffIntegrityTests(unittest.TestCase):
             captured["media_result"] = received_media_result
             return {
                 "department": "audit",
-                "status": "COMPLETED",
+                "status": "PASSED_WITH_LIMITATIONS",
+                "auditors": [],
+                "summary": {"total_checks": 1, "passed_checks": 1, "failed_checks": 0},
+                "failed_checks": [],
                 "publication_approved": False,
+                "final_decision": "CEO_APPROVAL_REQUIRED",
             }
 
         audit_module = types.ModuleType("audit_agents")
