@@ -7,27 +7,29 @@ class DepartmentManager:
 
         context = context if isinstance(context, dict) else {}
 
-        print("\n" + "=" * 45)
+        print("\\n" + "=" * 45)
         print(f"{self.department.upper()} MANAGER")
         print("=" * 45)
         print("RECEIVED MISSION:", task)
 
-        # PENTESTER SECURITY GATE
-        # Active testing remains disabled until a separate,
-        # verifiable authorization workflow is implemented.
+        # PENTESTER DEPARTMENT — DEFENSIVE, PASSIVE-ONLY WORKFLOW
         if self.department == "pentester":
-            return {
-                "department": "pentester",
-                "status": "BLOCKED",
-                "message": (
-                    "შეღწევადობის აქტიური ტესტირება დაბლოკილია. "
-                    "საჭიროა წერილობითი ავტორიზაცია, ზუსტი scope "
-                    "და CEO-ს ცალკე ნებართვა."
-                ),
-                "execution_authorized": False,
-                "execution_performed": False,
-                "requires_ceo_approval": True
-            }
+            try:
+                from pentester_agents import run_pentester_department
+                return run_pentester_department(task, context=context)
+            except Exception as error:
+                return {
+                    "department": "pentester",
+                    "status": "REVIEW_REQUIRED",
+                    "message": "Pentester workflow failed safely.",
+                    "error": str(error),
+                    "report": "",
+                    "requires_ceo_approval": True,
+                    "execution_authorized": False,
+                    "execution_performed": False,
+                    "active_testing_available": False,
+                    "external_network_activity": False
+                }
 
         # MEDIA DEPARTMENT
         if self.department == "media":
