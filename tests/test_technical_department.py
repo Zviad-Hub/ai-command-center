@@ -64,6 +64,58 @@ class TechnicalDepartmentTests(unittest.TestCase):
         self.assertFalse(result["execution_authorized"])
         self.assertEqual(result["final_decision"], "CEO_APPROVAL_REQUIRED")
 
+
+    @patch("technical_department.run_specialist")
+    @patch("technical_department.run_technical_manager")
+    def test_final_report_summarizes_work_and_states_execution_limits(
+        self, manager_mock, specialist_mock
+    ):
+        manager_mock.return_value = {
+            "status": "PLAN_CREATED",
+            "task_understanding": "Review the supplied application architecture.",
+            "selected_specialists": [
+                {
+                    "specialist": "qa_engineer",
+                    "mission": "Propose a test strategy.",
+                    "deliverables": ["Prioritized test plan"]
+                },
+                {
+                    "specialist": "code_reviewer",
+                    "mission": "Identify code review risks.",
+                    "deliverables": ["Risk summary"]
+                }
+            ],
+            "execution_plan": ["Inspect supplied architecture and identify risks."],
+            "testing_strategy": ["Run unit tests after explicit approval."]
+        }
+        specialist_mock.side_effect = [
+            {
+                "specialist": "qa_engineer",
+                "status": "COMPLETED",
+                "report": "Recommend unit, integration, and edge-case tests.",
+            },
+            {
+                "specialist": "code_reviewer",
+                "status": "COMPLETED",
+                "report": "No source code was supplied; concrete defects cannot be verified.",
+            }
+        ]
+
+        result = run_technical_department(
+            "Review application quality.",
+            context={"source_code": "NOT PROVIDED", "test_logs": "NOT PROVIDED"}
+        )
+
+        report = result["report"]
+        self.assertIn("TECHNICAL DEPARTMENT — FINAL REPORT", report)
+        self.assertIn("Recommend unit, integration, and edge-case tests.", report)
+        self.assertIn("No source files were directly loaded or inspected", report)
+        self.assertIn("Tests were not executed", report)
+        self.assertIn("Missing or unavailable inputs: source_code, test_logs", report)
+        self.assertTrue(result["requires_ceo_approval"])
+        self.assertFalse(result["execution_performed"])
+        self.assertFalse(result["tests_executed"])
+
     def test_empty_task_is_rejected(self):
         with patch("technical_department.run_technical_manager") as manager_mock:
             result = run_technical_department("   ")
