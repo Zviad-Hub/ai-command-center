@@ -150,7 +150,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_finance_rejects_wrong_arithmetic(self):
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "x", "b": "y", "c": "z"},
+            "specialist_reports": _good_department_specialists("finance"),
             "quality_review": "REVIEW STATUS: PASS",
             "quality_review_passed": True,
             "report": "Revenue 2000; variable cost 800; contribution 1200; operating result -3000. Tax not provided.",
@@ -161,7 +161,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_reviewer_rubber_stamp_is_not_accepted(self):
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "x", "b": "y", "c": "z"},
+            "specialist_reports": _good_department_specialists("finance"),
             "quality_review": "Looks good. REVIEW STATUS: PASS",
             "quality_review_passed": True,
             "report": "2160 840 1320 -2880 before tax; tax not provided.",
@@ -333,7 +333,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_department_status_must_be_completed_for_review_gate(self):
         result = evaluate_live_result("finance", {
             "status": "REVIEW_REQUIRED",
-            "specialist_reports": {"a": "x", "b": "y", "c": "z"},
+            "specialist_reports": _good_department_specialists("finance"),
             "quality_review": "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None.\nFINAL QUALITY SUMMARY: The review is complete and evidence-aware.",
             "quality_review_passed": True,
             "report": "Revenue 2160; variable cost 840; contribution 1320; operating result -2880 before tax. Tax not provided.",
@@ -345,7 +345,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_ceo_approval_flag_must_be_explicitly_true(self):
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "x", "b": "y", "c": "z"},
+            "specialist_reports": _good_department_specialists("finance"),
             "quality_review": "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None.\nFINAL QUALITY SUMMARY: The review is complete and evidence-aware.",
             "quality_review_passed": True,
             "report": "Revenue 2160; variable cost 840; contribution 1320; operating result -2880 before tax. Tax not provided.",
@@ -383,7 +383,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         """
         result = evaluate_live_result("business", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "market", "b": "strategy", "c": "operations"},
+            "specialist_reports": _good_department_specialists("business"),
             "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; assumptions are disclosed.\nFINAL QUALITY SUMMARY: Review complete.",
             "quality_review_passed": True,
             "report": report,
@@ -421,7 +421,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         """
         result = evaluate_live_result("tenders", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "eligibility", "b": "documents", "c": "pricing"},
+            "specialist_reports": _good_department_specialists("tenders"),
             "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware and avoids unsupported tender claims.",
             "quality_review_passed": True,
             "report": report,
@@ -546,7 +546,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
             with self.subTest(review=review):
                 result = evaluate_live_result("finance", {
                     "status": "COMPLETED",
-                    "specialist_reports": {"a": "one", "b": "two", "c": "three"},
+                    "specialist_reports": _good_department_specialists("finance"),
                     "quality_review": review,
                     "quality_review_passed": True,
                     "report": (
@@ -567,7 +567,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         )
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "one", "b": "two", "c": "three"},
+            "specialist_reports": _good_department_specialists("finance"),
             "quality_review": review,
             "quality_review_passed": True,
             "report": (
@@ -583,7 +583,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_reviewer_pass_requires_substantive_sections(self):
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "x", "b": "y", "c": "z"},
+            "specialist_reports": _good_department_specialists("finance"),
             "quality_review": "REVIEW STATUS: PASS",
             "quality_review_passed": True,
             "report": "2160 840 1320 -2880 before tax; tax not provided.",
@@ -596,7 +596,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_safety_flags_fail_closed_for_non_boolean_values(self):
         base = {
             "status": "COMPLETED",
-            "specialist_reports": {"a": "one", "b": "two", "c": "three"},
+            "specialist_reports": _good_department_specialists("finance"),
             "quality_review": (
                 "REVIEW STATUS: PASS\n"
                 "ISSUES: No material issues found.\n"
