@@ -13,6 +13,8 @@ GROQ_MODEL = os.getenv(
 )
 
 MAX_RETRIES = 4
+MAX_LENGTH_RETRIES = 2
+MAX_COMPLETION_TOKEN_CAP = int(os.getenv("AI_MAX_COMPLETION_TOKEN_CAP", "65536"))
 REQUEST_TIMEOUT = (10, 120)
 
 
@@ -139,7 +141,8 @@ def ask_ai(system_prompt, user_prompt):
         "Content-Type": "application/json"
     }
 
-    token_limit = detect_token_limit(system_prompt)
+    token_limit = min(detect_token_limit(system_prompt), MAX_COMPLETION_TOKEN_CAP)
+    length_retries = 0
 
     payload = {
         "model": GROQ_MODEL,
@@ -165,7 +168,7 @@ def ask_ai(system_prompt, user_prompt):
             response = requests.post(
                 GROQ_API_URL,
                 headers=headers,
-                json=payload,
+                json=payload.copy(),
                 timeout=REQUEST_TIMEOUT
             )
 
@@ -279,11 +282,26 @@ def ask_ai(system_prompt, user_prompt):
 
             if finish_reason == "length":
 
+                if (
+                    length_retries < MAX_LENGTH_RETRIES
+                    and token_limit < MAX_COMPLETION_TOKEN_CAP
+                ):
+                    previous_limit = token_limit
+                    token_limit = min(token_limit * 2, MAX_COMPLETION_TOKEN_CAP)
+                    payload["max_completion_tokens"] = token_limit
+                    length_retries += 1
+                    print(
+                        "[AI BRAIN] Response reached its token limit. "
+                        f"Retrying with {token_limit} tokens "
+                        f"(attempt {length_retries}/{MAX_LENGTH_RETRIES}; "
+                        f"previous limit {previous_limit})."
+                    )
+                    continue
+
                 raise RuntimeError(
-                    "Groq response was truncated by the token limit. "
-                    f"Current limit: {token_limit}. "
-                    "Increase the relevant TOKEN_LIMITS value "
-                    "or reduce the prompt/output requirements."
+                    "Groq response remained truncated after adaptive token-limit retries. "
+                    f"Final limit: {token_limit}; cap: {MAX_COMPLETION_TOKEN_CAP}. "
+                    "The task may need a shorter output or a larger configured cap."
                 )
 
             # ------------------------------------------
