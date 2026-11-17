@@ -7,6 +7,8 @@ def safe_error_code(error):
     """Classify failures without exposing provider messages, prompts, or secrets."""
     message = str(error or "").casefold()
 
+    if "all configured fallback providers failed" in message:
+        return "PROVIDER_FALLBACK_CHAIN_EXHAUSTED"
     if "daily quota" in message or "daily limit" in message or "tokens per day" in message:
         return "PROVIDER_DAILY_QUOTA_EXHAUSTED"
     if "rate limit" in message or "429" in message:
