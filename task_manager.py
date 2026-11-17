@@ -308,6 +308,40 @@ def build_public_task_summary(record):
             "status": str(item.get("status") or "UNKNOWN"),
         }
 
+        # Expose safe, structured failure diagnostics without publishing raw
+        # provider errors, prompts, source URLs, or generated content.
+        failed_stage = item.get("failed_stage")
+        if isinstance(failed_stage, str) and failed_stage.strip():
+            row["failed_stage"] = failed_stage.strip()[:80]
+
+        research = item.get("research")
+        if isinstance(research, dict):
+            research_status = research.get("status")
+            if isinstance(research_status, str):
+                row["research_status"] = research_status.upper()[:40]
+            for source_field in ("source_count", "full_page_count", "snippet_count"):
+                source_value = research.get(source_field)
+                if isinstance(source_value, int) and not isinstance(source_value, bool):
+                    row[f"research_{source_field}"] = max(0, source_value)
+
+        failed_checks = item.get("failed_checks")
+        if isinstance(failed_checks, list):
+            safe_names = []
+            safe_auditors = []
+            for check in failed_checks:
+                if not isinstance(check, dict):
+                    continue
+                check_name = check.get("check")
+                auditor_name = check.get("auditor")
+                if isinstance(check_name, str) and check_name.strip():
+                    safe_names.append(check_name.strip()[:100])
+                if isinstance(auditor_name, str) and auditor_name.strip():
+                    safe_auditors.append(auditor_name.strip()[:80])
+            if safe_names:
+                row["failed_check_names"] = safe_names[:30]
+            if safe_auditors:
+                row["failed_auditor_names"] = list(dict.fromkeys(safe_auditors))[:10]
+
         specialist_reports = item.get("specialist_reports")
         specialist_results = item.get("specialist_results")
         specialists = item.get("specialists")
