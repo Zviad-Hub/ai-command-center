@@ -23,6 +23,16 @@ SECRET_DETAIL = "SENSITIVE_PROVIDER_EXCEPTION_TOKEN"
 
 
 class ManagerErrorRedactionTests(unittest.TestCase):
+    def test_manager_console_does_not_log_raw_user_mission(self):
+        output = io.StringIO()
+        private_mission = "CONFIDENTIAL_CUSTOMER_PLAN_91f3"
+        with contextlib.redirect_stdout(output):
+            result = DepartmentManager("finance").receive_task(private_mission)
+
+        self.assertNotIn(private_mission, output.getvalue())
+        self.assertIn("MISSION RECEIVED (details withheld).", output.getvalue())
+        self.assertEqual(result["department"], "finance")
+
     def test_manager_exceptions_are_not_returned_for_any_department(self):
         cases = {
             "pentester": ("pentester_agents", "run_pentester_department"),
