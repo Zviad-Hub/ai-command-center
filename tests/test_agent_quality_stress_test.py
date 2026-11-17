@@ -265,20 +265,20 @@ class AgentQualityStressTestTests(unittest.TestCase):
     def test_live_scorecard_rejects_prose_only_and_duplicate_review_sections(self):
         invalid_reviews = [
             (
-                "REVIEW STATUS: PASS\\nThe reviewer mentioned issues, required corrections, "
+                "REVIEW STATUS: PASS\nThe reviewer mentioned issues, required corrections, "
                 "and final quality summary but did not provide separate sections."
             ),
             (
-                "REVIEW STATUS: PASS\\nISSUES:\\nREQUIRED CORRECTIONS:\\n"
+                "REVIEW STATUS: PASS\nISSUES:\nREQUIRED CORRECTIONS:\n"
                 "FINAL QUALITY SUMMARY: The report is complete and evidence-aware."
             ),
             (
-                "REVIEW STATUS: PASS\\nISSUES: None.\\nISSUES: Duplicate.\\n"
-                "REQUIRED CORRECTIONS: None.\\n"
+                "REVIEW STATUS: PASS\nISSUES: None.\nISSUES: Duplicate.\n"
+                "REQUIRED CORRECTIONS: None.\n"
                 "FINAL QUALITY SUMMARY: The report is complete and evidence-aware."
             ),
             (
-                "REVIEW STATUS: PASS\\nISSUES: None.\\nREQUIRED CORRECTIONS: None.\\n"
+                "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None.\n"
                 "FINAL QUALITY SUMMARY: Looks good."
             ),
         ]
@@ -301,9 +301,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
 
     def test_live_scorecard_accepts_only_explicit_structured_review(self):
         review = (
-            "REVIEW STATUS: PASS\\n"
-            "ISSUES: No unsupported claims were identified in the supplied evidence.\\n"
-            "REQUIRED CORRECTIONS: None; calculations and uncertainty are represented.\\n"
+            "REVIEW STATUS: PASS\n"
+            "ISSUES: No unsupported claims were identified in the supplied evidence.\n"
+            "REQUIRED CORRECTIONS: None; calculations and uncertainty are represented.\n"
             "FINAL QUALITY SUMMARY: The report is internally consistent, evidence-aware and advisory."
         )
         result = evaluate_live_result("finance", {
