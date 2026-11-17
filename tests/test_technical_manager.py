@@ -78,13 +78,15 @@ class TechnicalManagerTests(unittest.TestCase):
         self.assertFalse(result["execution_authorized"])
 
     @patch("technical_manager.ask_ai")
-    def test_provider_failure_does_not_masquerade_as_fallback_success(self, ask_ai_mock):
+    def test_provider_failure_returns_advisory_plan_with_safe_error_code(self, ask_ai_mock):
         ask_ai_mock.side_effect = RuntimeError("provider unavailable")
 
         result = run_technical_manager("Review the project.")
 
-        self.assertEqual(result["status"], "ERROR")
-        self.assertEqual(result["error"], "TECHNICAL_PLANNING_FAILED")
+        self.assertEqual(result["status"], "PLAN_CREATED")
+        self.assertEqual(result["planning_method"], "SAFE_RULE_BASED_FALLBACK")
+        self.assertEqual(result["planning_error_code"], "PROVIDER_REQUEST_FAILED")
+        self.assertGreater(len(result["selected_specialists"]), 0)
         self.assertFalse(result["execution_authorized"])
         self.assertTrue(result["requires_ceo_approval"])
 
