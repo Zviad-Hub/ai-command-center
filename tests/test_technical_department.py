@@ -79,6 +79,107 @@ class TechnicalDepartmentTests(unittest.TestCase):
     @patch("technical_department.ask_ai")
     @patch("technical_department.run_specialist")
     @patch("technical_department.run_technical_manager")
+    def test_manager_and_reviewer_receive_all_technical_evidence(
+        self, manager_mock, specialist_mock, ask_ai_mock
+    ):
+        mission = "Review the supplied order-processing API for reliability."
+        manager_plan = {
+            "status": "PLAN_CREATED",
+            "task_understanding": "Check API reliability using supplied evidence.",
+            "selected_specialists": [
+                {"specialist": "backend_developer", "mission": "Inspect API error handling."},
+                {"specialist": "qa_engineer", "mission": "Identify regression test gaps."},
+            ],
+            "execution_plan": ["Inspect the supplied API evidence."],
+            "testing_strategy": ["Propose tests; do not execute them."],
+        }
+        specialist_results = [
+            {
+                "specialist": "backend_developer",
+                "specialist_name": "Backend Developer",
+                "status": "COMPLETED",
+                "report": "BACKEND EVIDENCE: Retry behavior is not documented.",
+            },
+            {
+                "specialist": "qa_engineer",
+                "specialist_name": "QA Engineer",
+                "status": "COMPLETED",
+                "report": "QA EVIDENCE: No failure-mode test cases were supplied.",
+            },
+        ]
+        manager_draft = (
+            "EXECUTIVE SUMMARY\\nThe API review is limited to supplied material.\\n"
+            "TECHNICAL RECOMMENDATIONS\\nDocument retry behavior."
+        )
+        manager_mock.return_value = manager_plan
+        specialist_mock.side_effect = specialist_results
+        ask_ai_mock.side_effect = [manager_draft, PASS_REVIEW]
+
+        result = run_technical_department(
+            mission,
+            context={"source_code": "API SOURCE NOT PROVIDED", "ticket": "INC-204"}
+        )
+
+        manager_prompt = ask_ai_mock.call_args_list[0].args[1]
+        reviewer_prompt = ask_ai_mock.call_args_list[1].args[1]
+
+        for evidence in (
+            "BACKEND EVIDENCE: Retry behavior is not documented.",
+            "QA EVIDENCE: No failure-mode test cases were supplied.",
+            "PLAN_CREATED",
+            "INC-204",
+        ):
+            with self.subTest(evidence=evidence):
+                self.assertIn(evidence, manager_prompt)
+                self.assertIn(evidence, reviewer_prompt)
+
+        self.assertIn(mission, manager_prompt)
+        self.assertIn(mission, reviewer_prompt)
+        self.assertIn(manager_draft, reviewer_prompt)
+        self.assertIn("No tests were executed", reviewer_prompt)
+        self.assertEqual(result["status"], "COMPLETED")
+        self.assertTrue(result["quality_review_passed"])
+        self.assertFalse(result["code_modified"])
+        self.assertFalse(result["tests_executed"])
+        self.assertFalse(result["execution_authorized"])
+
+    def test_reviewer_requires_distinct_populated_sections(self):
+        from technical_department import _review_is_substantive
+
+        invalid_reviews = [
+            (
+                "REVIEW STATUS: PASS\\nISSUES:\\nREQUIRED CORRECTIONS:\\n"
+                "FINAL QUALITY SUMMARY: Evidence and execution limits are represented correctly."
+            ),
+            (
+                "REVIEW STATUS: PASS\\nThe reviewer mentioned issues, required corrections, "
+                "and final quality summary without structured findings."
+            ),
+            (
+                "REVIEW STATUS: PASS\\nISSUES: None.\\nREQUIRED CORRECTIONS: None.\\n"
+                "FINAL QUALITY SUMMARY: Looks good."
+            ),
+            (
+                "REVIEW STATUS: PASS\\nISSUES: None.\\nISSUES: Duplicate heading.\\n"
+                "REQUIRED CORRECTIONS: None.\\n"
+                "FINAL QUALITY SUMMARY: Evidence and execution limits are represented correctly."
+            ),
+            (
+                "REVIEW STATUS: NEEDS_REVISION\\nISSUES: Unsupported claim.\\n"
+                "REQUIRED CORRECTIONS: Correct it.\\n"
+                "FINAL QUALITY SUMMARY: Evidence and execution limits are represented correctly."
+            ),
+        ]
+
+        for review in invalid_reviews:
+            with self.subTest(review=review):
+                self.assertFalse(_review_is_substantive(review))
+
+        self.assertTrue(_review_is_substantive(PASS_REVIEW))
+
+    @patch("technical_department.ask_ai")
+    @patch("technical_department.run_specialist")
+    @patch("technical_department.run_technical_manager")
     def test_reviewer_rejection_blocks_final_report(
         self, manager_mock, specialist_mock, ask_ai_mock
     ):
