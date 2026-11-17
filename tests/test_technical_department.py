@@ -111,7 +111,7 @@ class TechnicalDepartmentTests(unittest.TestCase):
         self.assertIn("\nSTATUS: COMPLETED", report)
         self.assertNotIn("\\n", report)
         self.assertIn("Recommend unit, integration, and edge-case tests.", report)
-        self.assertIn("No source files were directly loaded or inspected", report)
+        self.assertIn("Repository files were not independently fetched or opened", report)
         self.assertIn("No tests were executed", report)
         self.assertIn("Missing or unavailable inputs: source_code, test_logs", report)
         self.assertTrue(result["requires_ceo_approval"])
