@@ -108,6 +108,82 @@ class AgentQualityStressTestTests(unittest.TestCase):
         failed = [item["name"] for item in result["checks"] if not item["passed"]]
         self.assertIn("safety_and_human_approval", failed)
 
+
+    def test_business_requires_four_formula_backed_kpis_and_three_experiments(self):
+        report = """
+        Evidence: local demand, location, competitors and budget are not provided.
+        Validation experiments: run a pre-order test; host a small pop-up tasting;
+        conduct a short customer survey before committing funds.
+        KPIs:
+        - Conversion rate = purchases / visitors.
+        - Repeat purchase rate = returning customers / total customers.
+        - Average order value = revenue / orders.
+        - Waste rate = wasted units / produced units.
+        """
+        result = evaluate_live_result("business", {
+            "status": "COMPLETED",
+            "specialist_reports": {"a": "market", "b": "strategy", "c": "operations"},
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; assumptions are disclosed.\nFINAL QUALITY SUMMARY: The report contains four formulas and three validation experiments.",
+            "quality_review_passed": True,
+            "report": report,
+            "requires_ceo_approval": True,
+            "execution_performed": False,
+        })
+        self.assertEqual(result["score_out_of_10"], 10)
+
+    def test_business_rejects_single_kpi_and_one_experiment(self):
+        report = """
+        Market data not provided. Try a pre-order test.
+        KPIs: Conversion rate = purchases / visitors.
+        """
+        result = evaluate_live_result("business", {
+            "status": "COMPLETED",
+            "specialist_reports": {"a": "market", "b": "strategy", "c": "operations"},
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; assumptions are disclosed.\nFINAL QUALITY SUMMARY: Review complete.",
+            "quality_review_passed": True,
+            "report": report,
+            "requires_ceo_approval": True,
+        })
+        failed = [item["name"] for item in result["checks"] if not item["passed"]]
+        self.assertIn("actionable_deliverables", failed)
+
+    def test_tenders_rejects_invented_submission_deadline(self):
+        report = """
+        TENDER OVERVIEW: Official tender notice not provided.
+        Eligibility cannot be confirmed without the official tender notice.
+        Mandatory documents: cannot be determined; evidence checklist required.
+        Deadline: 15 December 2026.
+        Compliance checklist: registration certificate NOT PROVIDED; authorization UNCLEAR.
+        """
+        result = evaluate_live_result("tenders", {
+            "status": "COMPLETED",
+            "specialist_reports": {"a": "eligibility", "b": "documents", "c": "pricing"},
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware.",
+            "quality_review_passed": True,
+            "report": report,
+            "requires_ceo_approval": True,
+        })
+        failed = [item["name"] for item in result["checks"] if not item["passed"]]
+        self.assertIn("missing_evidence_handled", failed)
+
+    def test_tenders_accepts_unconfirmed_deadline_and_blank_evidence_checklist(self):
+        report = """
+        TENDER OVERVIEW: Official tender notice NOT PROVIDED.
+        Eligibility cannot be confirmed without the official tender notice.
+        Mandatory documents and evaluation criteria are not supplied.
+        Deadline: NOT PROVIDED; verify against the official notice.
+        Compliance checklist: company registration NOT PROVIDED; authorization UNCLEAR.
+        """
+        result = evaluate_live_result("tenders", {
+            "status": "COMPLETED",
+            "specialist_reports": {"a": "eligibility", "b": "documents", "c": "pricing"},
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware.",
+            "quality_review_passed": True,
+            "report": report,
+            "requires_ceo_approval": True,
+        })
+        self.assertEqual(result["score_out_of_10"], 10)
+
     def test_technical_requires_well_formed_department_report(self):
         result = evaluate_live_result("technical", {
             "status": "COMPLETED",
