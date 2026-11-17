@@ -3,6 +3,73 @@ from technical_manager import run_technical_manager
 from technical_agents import run_specialist
 
 
+
+def _build_final_report(task, plan, specialist_results, context_data, status):
+    """Build a transparent department-level report from recorded outputs only."""
+    lines = [
+        "TECHNICAL DEPARTMENT — FINAL REPORT",
+        "",
+        f"STATUS: {status}",
+        f"TASK: {task}",
+        "",
+        "EXECUTIVE SUMMARY:",
+        str(plan.get("task_understanding") or "The task was routed for technical planning and specialist analysis."),
+        "",
+        "MANAGER PLAN:",
+    ]
+
+    for step in plan.get("execution_plan", []):
+        lines.append(f"- {step}")
+
+    lines.extend(["", "TESTING STRATEGY (PROPOSED; NOT EXECUTED):"])
+    for step in plan.get("testing_strategy", []):
+        lines.append(f"- {step}")
+
+    lines.extend(["", "SPECIALIST FINDINGS:"])
+    if not specialist_results:
+        lines.append("- No specialist analysis was completed.")
+    for item in specialist_results:
+        name = item.get("specialist_name") or item.get("specialist") or "Unspecified specialist"
+        lines.extend([
+            "",
+            f"{name} — {item.get('status', 'UNKNOWN')}:",
+            str(item.get("report") or item.get("error") or "No written findings were returned.")
+        ])
+
+    context_text = "\\n".join(
+        f"{key}: {value}" for key, value in context_data.items()
+    ).lower()
+    missing_markers = ("not provided", "not supplied", "missing", "unavailable")
+    missing_items = [
+        str(key) for key, value in context_data.items()
+        if any(marker in str(value).lower() for marker in missing_markers)
+    ]
+
+    lines.extend([
+        "",
+        "EVIDENCE LIMITATIONS:",
+        "- No source files were directly loaded or inspected by this workflow.",
+        "- Specific file paths, verified defects, and actual test results cannot be claimed from the supplied information alone.",
+    ])
+    if missing_items:
+        lines.append("- Missing or unavailable inputs: " + ", ".join(missing_items) + ".")
+    if not context_text:
+        lines.append("- No additional technical context was supplied.")
+
+    lines.extend([
+        "",
+        "EXECUTION AND APPROVAL:",
+        "- No code was modified.",
+        "- No tests were executed; the testing strategy above is a proposal only.",
+        "- No deployment or external system action was performed.",
+        "- CEO approval is required before implementation, execution, or deployment.",
+        "",
+        "RECOMMENDED NEXT STEP:",
+        "Provide repository/source files and relevant logs, then approve a scoped review and test plan before implementation."
+    ])
+    return "\\n".join(lines)
+
+
 def run_technical_department(task, context=None):
 
     task = str(task or "").strip()
@@ -38,6 +105,7 @@ def run_technical_department(task, context=None):
             "status": "REVIEW_REQUIRED",
             "manager_plan": plan,
             "specialist_results": [],
+            "report": _build_final_report(task, plan, [], context_data, "REVIEW_REQUIRED"),
             "execution_performed": False,
             "code_modified": False,
             "tests_executed": False,
@@ -116,12 +184,16 @@ def run_technical_department(task, context=None):
         status = "COMPLETED"
 
     # STEP 4: Final department report.
+    final_report = _build_final_report(
+        task, plan, specialist_results, context_data, status
+    )
     return {
         "department": "technical",
         "status": status,
         "task": task,
         "manager_plan": plan,
         "specialist_results": specialist_results,
+        "report": final_report,
         "summary": {
             "selected_specialists": len(selected_specialists),
             "completed_specialists": len(successful),
