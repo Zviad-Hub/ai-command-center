@@ -2,6 +2,7 @@
 import os
 import re
 import time
+from urllib.parse import urlsplit
 import requests
 
 
@@ -94,6 +95,9 @@ def _fallback_provider_config():
     model = os.getenv("AI_FALLBACK_MODEL", "").strip()
     if not (url and key and model):
         return None
+    parsed_url = urlsplit(url)
+    if parsed_url.scheme != "https" or not parsed_url.netloc:
+        raise RuntimeError("AI fallback endpoint must be a valid HTTPS URL.")
     token_field = os.getenv("AI_FALLBACK_TOKEN_FIELD", "max_tokens").strip()
     if token_field not in {"max_tokens", "max_completion_tokens"}:
         raise RuntimeError("AI fallback token field configuration is invalid.")
