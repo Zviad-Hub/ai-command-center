@@ -313,6 +313,62 @@ class TaskManagerTests(unittest.TestCase):
         ):
             self.assertNotIn(private_text, rendered)
 
+    def test_public_task_summary_exposes_safe_failure_diagnostics_only(self):
+        record = {
+            "id": "diag1234",
+            "overall_status": "REVIEW_REQUIRED",
+            "departments": ["media", "audit"],
+            "results": [{
+                "department": "media",
+                "status": "ERROR",
+                "failed_stage": "Research Agent",
+                "message": "PRIVATE PROVIDER ERROR WITH SECRET DATA",
+                "research": {
+                    "status": "NO_RESULTS",
+                    "source_count": 0,
+                    "full_page_count": 0,
+                    "snippet_count": 0,
+                    "query": "PRIVATE SEARCH QUERY",
+                    "sources": [{"url": "https://private.example"}],
+                },
+            }, {
+                "department": "audit",
+                "status": "REVIEW_REQUIRED",
+                "failed_checks": [
+                    {"auditor": "Evidence Auditor", "check": "Source verification", "passed": False, "details": "PRIVATE DETAILS"},
+                    {"auditor": "Integrity Auditor", "check": "Research data structure", "passed": False, "details": "PRIVATE DETAILS"},
+                ],
+            }],
+            "organization_audit": {"status": "REVIEW_REQUIRED", "department_checks": []},
+            "semantic_audit": {"status": "NOT_RUN"},
+            "human_review_required": True,
+        }
+
+        summary = build_public_task_summary(record)
+        media_row, audit_row = summary["department_results"]
+
+        self.assertEqual(media_row["failed_stage"], "Research Agent")
+        self.assertEqual(media_row["research_status"], "NO_RESULTS")
+        self.assertEqual(media_row["research_source_count"], 0)
+        self.assertEqual(audit_row["failed_check_names"], [
+            "Source verification",
+            "Research data structure",
+        ])
+        self.assertEqual(audit_row["failed_auditor_names"], [
+            "Evidence Auditor",
+            "Integrity Auditor",
+        ])
+
+        rendered = repr(summary)
+        for private_text in (
+            "PRIVATE PROVIDER ERROR",
+            "PRIVATE SEARCH QUERY",
+            "private.example",
+            "PRIVATE DETAILS",
+            "SECRET DATA",
+        ):
+            self.assertNotIn(private_text, rendered)
+
     def test_public_task_summary_fails_safely_for_invalid_input(self):
         summary = build_public_task_summary(None)
         self.assertEqual(summary["run_status"], "FAILED")
