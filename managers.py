@@ -23,7 +23,8 @@ class DepartmentManager:
                     "შეღწევადობის ტესტირება დაბლოკილია. "
                     "საჭიროა წერილობითი თანხმობა "
                     "და CEO-ს ცალკე ნებართვა."
-                )
+                ),
+                "execution_authorized": False
             }
 
         # MEDIA DEPARTMENT
@@ -76,6 +77,36 @@ class DepartmentManager:
                     "status": "ERROR",
                     "message": str(error),
                     "publication_approved": False
+                }
+
+        # TECHNICAL DEPARTMENT
+        if self.department == "technical":
+            try:
+                from technical_department import (
+                    run_technical_department
+                )
+
+                previous_results = context.get(
+                    "previous_results", []
+                )
+
+                return run_technical_department(
+                    task,
+                    context={
+                        "previous_results": previous_results
+                    }
+                )
+
+            except Exception as error:
+                return {
+                    "department": "technical",
+                    "status": "ERROR",
+                    "message": str(error),
+                    "execution_performed": False,
+                    "code_modified": False,
+                    "tests_executed": False,
+                    "requires_ceo_approval": True,
+                    "execution_authorized": False
                 }
 
         # OTHER DEPARTMENTS
