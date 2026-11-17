@@ -30,6 +30,10 @@ jobs:
           GROQ_MODEL: openai/gpt-oss-120b
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: gemini-3.8-flash
+          AI_FALLBACK_API_KEY: ${{ secrets.AI_FALLBACK_API_KEY }}
+          AI_FALLBACK_API_URL: ${{ secrets.AI_FALLBACK_API_URL }}
+          AI_FALLBACK_MODEL: ${{ secrets.AI_FALLBACK_MODEL }}
+          AI_FALLBACK_TOKEN_FIELD: max_tokens
         run: python scripts/provider_health_check.py
 
       - name: Run isolated health-check unit tests
