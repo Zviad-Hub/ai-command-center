@@ -145,6 +145,8 @@ The workflow runs `task_manager.submit_task()` with read-only repository permiss
 
 A successful GitHub Actions run means the workflow completed; it does **not** automatically mean every department completed its mission or that its output is factually correct. Download and inspect the task-report artifact and each manager's result.
 
+Each saved task record also contains an `organization_audit` and `overall_status`. This independent read-only layer checks that every routed department returned a matching result, required specialist/reviewer gates passed, expected deliverables are present, and safety/approval flags remain within bounds. A failed check sets `overall_status` to `REVIEW_REQUIRED` without rewriting the original department outputs. A structural PASS sets `overall_status` to `READY_FOR_HUMAN_REVIEW`, not a claim that the work is fully approved. It still keeps `content_alignment_status: HUMAN_REVIEW_REQUIRED`: only a human can decide whether the work truly satisfies the CEO's intent and whether consequential actions may proceed.
+
 ## How to write a good CEO task
 
 Give agents enough context to do useful work. A good request normally includes:
@@ -321,7 +323,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 162 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on every Python source change and every workflow change in pull requests. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 167 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on every Python source change and every workflow change in pull requests. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
