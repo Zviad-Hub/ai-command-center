@@ -264,7 +264,53 @@ class AskAITests(unittest.TestCase):
         self.assertIn("Gemini fallback provider daily quota", str(raised.exception))
         self.assertIn("OpenRouter fallback provider HTTP error: 402", str(raised.exception))
         self.assertNotIn("private billing detail", str(raised.exception))
+        self.assertEqual(
+            safe_error_code(raised.exception),
+            "PROVIDER_FALLBACK_CHAIN_EXHAUSTED_GEMINI_DAILY_QUOTA_OPENROUTER_HTTP_402",
+        )
 
+
+
+    @patch.dict(os.environ, {
+        "GROQ_API_KEY": "primary-key",
+        "AI_FALLBACK_API_URL": "https://fallback.example/v1/chat/completions",
+        "AI_FALLBACK_API_KEY": "fallback-key",
+        "AI_FALLBACK_MODEL": "fallback-model",
+    })
+    @patch("ai_brain.time.sleep")
+    @patch("ai_brain.requests.post")
+    def test_primary_503_uses_fallback_after_bounded_retries(self, post, sleep):
+        unavailable = Mock(status_code=503, ok=False, text='{"error":"temporarily unavailable"}')
+        post.side_effect = [unavailable, unavailable, unavailable, unavailable, unavailable, _response("fallback after primary outage")]
+        result = ai_brain.ask_ai("system prompt", "user prompt")
+        self.assertEqual(result, "fallback after primary outage")
+        self.assertEqual(post.call_count, 6)
+        self.assertEqual(post.call_args_list[-1].args[0], "https://fallback.example/v1/chat/completions")
+        self.assertEqual(sleep.call_count, 4)
+
+    @patch.dict(os.environ, {
+        "GROQ_API_KEY": "primary-key",
+        "AI_FALLBACK_API_URL": "https://fallback.example/v1/chat/completions",
+        "AI_FALLBACK_API_KEY": "fallback-key",
+        "AI_FALLBACK_MODEL": "fallback-model",
+    })
+    @patch("ai_brain.time.sleep")
+    @patch("ai_brain.requests.post")
+    def test_primary_timeout_uses_fallback_after_bounded_retries(self, post, sleep):
+        import requests
+        post.side_effect = [
+            requests.exceptions.Timeout("private timeout detail"),
+            requests.exceptions.Timeout("private timeout detail"),
+            requests.exceptions.Timeout("private timeout detail"),
+            requests.exceptions.Timeout("private timeout detail"),
+            requests.exceptions.Timeout("private timeout detail"),
+            _response("fallback after primary timeout"),
+        ]
+        result = ai_brain.ask_ai("system prompt", "user prompt")
+        self.assertEqual(result, "fallback after primary timeout")
+        self.assertEqual(post.call_count, 6)
+        self.assertEqual(post.call_args_list[-1].args[0], "https://fallback.example/v1/chat/completions")
+        self.assertEqual(sleep.call_count, 4)
 
 if __name__ == "__main__":
     unittest.main()
