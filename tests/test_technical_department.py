@@ -316,5 +316,37 @@ class TechnicalDepartmentTests(unittest.TestCase):
         self.assertEqual(result["report"], "")
 
 
+    @patch("technical_department.run_specialist")
+    @patch("technical_department.run_technical_manager")
+    def test_daily_quota_exhaustion_marks_remaining_specialists_not_run(
+        self, manager_mock, specialist_mock
+    ):
+        manager_mock.return_value = {
+            "status": "PLAN_CREATED",
+            "selected_specialists": [
+                {"specialist": "backend_developer", "mission": "Review API."},
+                {"specialist": "qa_engineer", "mission": "Review tests."},
+                {"specialist": "devops_engineer", "mission": "Review deployment."},
+            ],
+        }
+        specialist_mock.side_effect = RuntimeError(
+            "Groq daily quota has been exhausted."
+        )
+
+        result = run_technical_department("Review the service.")
+
+        self.assertEqual(specialist_mock.call_count, 1)
+        self.assertEqual(result["status"], "REVIEW_REQUIRED")
+        self.assertEqual(result["summary"]["failed_specialists"], 1)
+        self.assertEqual(result["summary"]["not_run_specialists"], 2)
+        self.assertEqual(
+            [item["status"] for item in result["specialist_results"]],
+            ["ERROR", "NOT_RUN", "NOT_RUN"],
+        )
+        self.assertEqual(result["report"], "")
+        self.assertFalse(result["execution_authorized"])
+
+
+
 if __name__ == "__main__":
     unittest.main()
