@@ -7,7 +7,7 @@ class DepartmentManager:
 
         context = context if isinstance(context, dict) else {}
 
-        print("\\n" + "=" * 45)
+        print("\n" + "=" * 45)
         print(f"{self.department.upper()} MANAGER")
         print("=" * 45)
         print("RECEIVED MISSION:", task)
