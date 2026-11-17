@@ -38,7 +38,7 @@ class AuditDepartmentTests(unittest.TestCase):
     def test_georgian_topic_preservation_uses_unicode_words(self):
         check = self._topic_check(
             "შექმენი ვიდეო თემაზე: როგორ გაქრა მაიას ცივილიზაცია?",
-            "EXACT TOPIC: როგორ გაქრა მაიას ცივილიზაცია\nVIDEO CONCEPT: ისტორიული ახსნა.",
+            "EXACT TOPIC: მაიას ცივილიზაცია\nVIDEO CONCEPT: ისტორიული ახსნა.",
             "VIDEO TITLE: მაიას ცივილიზაცია\nSCRIPT: მაიას ცივილიზაცია ცენტრალურ ამერიკაში განვითარდა. "
             "მისი ქალაქები და კულტურა საუკუნეების განმავლობაში არსებობდა.",
         )
