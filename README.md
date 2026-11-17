@@ -40,9 +40,9 @@ A department being selected does not mean every requested real-world action is a
 | **Audit** | Reviews the preceding Media result when one is available. | The current manager expects a Media result; a standalone audit request may return `REVIEW_REQUIRED`. |
 | **Technical** | Creates a technical plan and assigns selected specialist agents for analysis and reports. | The specialist workflow is advisory: it does not currently edit project files, execute tests or deploy code. |
 | **Pentester** | Runs four defensive specialists (scope/authorization, web security, infrastructure security, vulnerability/risk) followed by a Pentester Manager and an independent Security Quality Reviewer. | Passive analysis and planning only. No scanning, probing, target connections, exploit generation or active penetration testing. A supplied scope/reference is not verified authorization. |
-| **Finance** | Produces an AI-assisted advisory report with calculations, assumptions, risks and missing inputs; can attach optional Tavily research candidates. | No transactions, payments, investments or accounting-system changes. Professional review may be needed for regulated advice. |
-| **Tenders** | Prepares tender-analysis reports, eligibility/document checklists, compliance gaps and draft response plans. | Does not submit bids or contact contracting authorities. Actual tender documents are required for a specific compliance assessment. |
-| **Business** | Produces strategy reports, options, trade-offs, risks and measurable KPI recommendations, with optional research candidates. | Does not commit funds, sign agreements, contact third parties or execute business actions. |
+| **Finance** | Three specialists (financial analysis, risk control, budget/forecast planning) feed a Finance Manager; an independent reviewer checks the final advisory report. | No transactions, payments, investments or accounting-system changes. Research candidates are not independently verified; professional review may be needed for regulated advice. |
+| **Tenders** | Three specialists (eligibility, compliance/documents, pricing/risk) feed a Tender Manager; an independent reviewer checks the final draft. | Does not submit bids or contact contracting authorities. Actual official tender documents and attachments are required for a specific compliance assessment. |
+| **Business** | Three specialists (market/customer, strategy, operations/KPIs) feed a Business Manager; an independent reviewer checks the final advisory report. | Does not commit funds, sign agreements, contact third parties or execute business actions. Research candidates are not independently verified. |
 
 The Director automatically adds Audit to Media tasks for a separate quality review. Routing is currently based on keywords, so describe the subject and desired department clearly. If a task is ambiguous, inspect the routing result rather than assuming the intended department was selected.
 
@@ -300,7 +300,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 29 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department execution gates, CEO console report rendering, Finance/Business/Tenders advisory workflows, and Pentester specialist/reviewer safety gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 31 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department execution gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, and Pentester specialist/reviewer safety gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
