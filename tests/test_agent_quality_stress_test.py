@@ -5,6 +5,32 @@ from agent_quality_stress_test import evaluate_live_result
 
 class AgentQualityStressTestTests(unittest.TestCase):
 
+    def test_daily_quota_failure_is_blocked_not_scored_as_quality_failure(self):
+        result = evaluate_live_result("finance", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_reports": {"analyst": "partial output"},
+            "specialist_failures": [{
+                "specialist": "budget_planner",
+                "error": "Groq daily quota has been exhausted.",
+            }],
+            "report": "",
+        })
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIsNone(result["score_out_of_10"])
+        self.assertEqual(
+            result["blocked_reason"],
+            "PROVIDER_DAILY_QUOTA_EXHAUSTED",
+        )
+
+    def test_manager_daily_quota_failure_is_also_blocked(self):
+        result = evaluate_live_result("business", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_reports": {"a": "one", "b": "two", "c": "three"},
+            "error": "Groq daily quota has been exhausted.",
+        })
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIsNone(result["score_out_of_10"])
+
     def test_non_object_result_is_rejected(self):
         result = evaluate_live_result("finance", None)
         self.assertEqual(result["score_out_of_10"], 0)
