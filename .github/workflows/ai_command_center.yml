@@ -9,8 +9,7 @@ on:
         type: string
         default: "მომიძებნე საინტერესო საიდუმლო ისტორიის ვიდეოს იდეა"
 
-# The workflow may run the agents and upload its report,
-# but it must never push generated task history into a source branch.
+# Task content and reports are private. Never publish them from a public repository.
 permissions:
   contents: read
 
@@ -37,13 +36,42 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           CEO_TASK: ${{ inputs.task }}
+          AI_COMMAND_CENTER_TASKS_FILE: ${{ runner.temp }}/ai-command-center/tasks.json
         run: |
-          python -c "import os; from task_manager import submit_task; submit_task(os.environ['CEO_TASK'])"
+          python - <<'PY'
+          import contextlib
+          import io
+          import json
+          import os
+          import sys
 
-      - name: Upload task report
+          from task_manager import submit_task
+
+          try:
+              # Agent prompts and reports must not leak into public Actions logs.
+              with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                  record = submit_task(os.environ["CEO_TASK"])
+
+              print(json.dumps({
+                  "task_id": record.get("id"),
+                  "status": "FINISHED",
+                  "departments": record.get("departments", [])
+              }, ensure_ascii=False))
+          except Exception as error:
+              # Keep user prompts, provider responses and exception details out of logs.
+              print(json.dumps({
+                  "status": "FAILED",
+                  "error_type": type(error).__name__
+              }))
+              sys.exit(1)
+          PY
+
+      # Full reports are uploaded only for private repositories.
+      - name: Upload private task report
+        if: ${{ github.event.repository.private == true }}
         uses: actions/upload-artifact@v4
         with:
           name: ai-command-center-task-report
-          path: tasks.json
+          path: ${{ runner.temp }}/ai-command-center/tasks.json
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7
