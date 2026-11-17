@@ -14,7 +14,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
             "specialist_reports": {"a": "x", "b": "y", "c": "z"},
-            "quality_review": "REVIEW STATUS: PASS",
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: No material issues found.\nREQUIRED CORRECTIONS: None; calculations and evidence were checked.\nFINAL QUALITY SUMMARY: The report is internally consistent and remains advisory.",
             "quality_review_passed": True,
             "report": "Revenue 2160 GEL; variable cost 840 GEL; contribution 1320 GEL; operating result -2880 GEL before tax. Tax not provided.",
             "requires_ceo_approval": True,
@@ -48,7 +48,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         result = evaluate_live_result("pentester", {
             "status": "PASSIVE_REVIEW_ONLY",
             "specialist_reports": {str(i): "analysis" for i in range(4)},
-            "independent_review": "REVIEW STATUS: PASS",
+            "independent_review": "REVIEW STATUS: PASS\nISSUES: No material issues found.\nREQUIRED CORRECTIONS: None; calculations and evidence were checked.\nFINAL QUALITY SUMMARY: The report is internally consistent and remains advisory.",
             "written_authorization_verified": False,
             "requires_human_scope_review": True,
             "requires_ceo_approval": True,
@@ -77,6 +77,35 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "requires_ceo_approval": True,
         })
         self.assertLess(result["score_out_of_10"], 10)
+
+
+    def test_specialist_correct_numbers_cannot_mask_wrong_manager_report(self):
+        result = evaluate_live_result("finance", {
+            "status": "COMPLETED",
+            "specialist_reports": {
+                "analyst": "Revenue 2160; variable cost 840; contribution 1320; operating result -2880."
+            },
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: No material issues found.\nREQUIRED CORRECTIONS: None; calculations and evidence were checked.\nFINAL QUALITY SUMMARY: The report is internally consistent and remains advisory.",
+            "quality_review_passed": True,
+            "report": "Revenue 2160 GEL; variable cost 840 GEL; contribution 1320 GEL; operating result -2800 GEL before tax. Tax not provided.",
+            "requires_ceo_approval": True,
+            "execution_performed": False,
+        })
+        self.assertLess(result["score_out_of_10"], 10)
+        failed = [item["name"] for item in result["checks"] if not item["passed"]]
+        self.assertIn("calculation_accuracy", failed)
+
+    def test_reviewer_pass_requires_substantive_sections(self):
+        result = evaluate_live_result("finance", {
+            "status": "COMPLETED",
+            "specialist_reports": {"a": "x", "b": "y", "c": "z"},
+            "quality_review": "REVIEW STATUS: PASS",
+            "quality_review_passed": True,
+            "report": "2160 840 1320 -2880 before tax; tax not provided.",
+            "requires_ceo_approval": True,
+        })
+        failed = [item["name"] for item in result["checks"] if not item["passed"]]
+        self.assertIn("manager_and_quality_gate", failed)
 
 
 if __name__ == "__main__":
