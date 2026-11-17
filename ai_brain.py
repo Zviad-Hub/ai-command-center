@@ -15,6 +15,7 @@ GROQ_MODEL = os.getenv(
 
 MAX_RETRIES = 4
 MAX_LENGTH_RETRIES = 2
+FALLBACK_MAX_RETRIES = 2
 MAX_COMPLETION_TOKEN_CAP = int(os.getenv("AI_MAX_COMPLETION_TOKEN_CAP", "65536"))
 REQUEST_TIMEOUT = (10, 120)
 
@@ -124,20 +125,41 @@ def _ask_fallback_provider(system_prompt, user_prompt, token_limit, config):
         ],
         token_field: token_limit,
     }
-    try:
-        response = requests.post(
-            url,
-            headers={
-                "Authorization": f"Bearer {key}",
-                "Content-Type": "application/json",
-            },
-            json=payload,
-            timeout=REQUEST_TIMEOUT,
-        )
-    except requests.exceptions.Timeout as error:
-        raise RuntimeError("Fallback AI provider timed out; provider details were withheld.") from error
-    except requests.exceptions.RequestException as error:
-        raise RuntimeError("Fallback AI provider connection failed; provider details were withheld.") from error
+    response = None
+    for attempt in range(FALLBACK_MAX_RETRIES + 1):
+        try:
+            response = requests.post(
+                url,
+                headers={
+                    "Authorization": f"Bearer {key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=REQUEST_TIMEOUT,
+            )
+        except requests.exceptions.Timeout as error:
+            if attempt >= FALLBACK_MAX_RETRIES:
+                raise RuntimeError("Fallback AI provider timed out after bounded retries; provider details were withheld.") from error
+            time.sleep(min(2 ** (attempt + 1), 8))
+            continue
+        except requests.exceptions.RequestException as error:
+            if attempt >= FALLBACK_MAX_RETRIES:
+                raise RuntimeError("Fallback AI provider connection failed after bounded retries; provider details were withheld.") from error
+            time.sleep(min(2 ** (attempt + 1), 8))
+            continue
+
+        if response.status_code not in (500, 502, 503, 504) or attempt >= FALLBACK_MAX_RETRIES:
+            break
+
+        retry_after = response.headers.get("Retry-After")
+        try:
+            wait_time = min(max(float(retry_after), 1), 15) if retry_after else min(2 ** (attempt + 1), 8)
+        except (TypeError, ValueError):
+            wait_time = min(2 ** (attempt + 1), 8)
+        time.sleep(wait_time)
+
+    if response is None:
+        raise RuntimeError("Fallback AI provider request failed; provider details were withheld.")
 
     if response.status_code == 429:
         if is_daily_limit_error(response.text[:2000]):
