@@ -82,21 +82,50 @@ def _build_specialist_context(results):
 
 
 def _review_is_substantive(review):
+    """Require an explicit PASS and three distinct, populated review sections."""
     review_text = str(review or "").strip()
     lines = review_text.splitlines()
-    if not lines or lines[0].strip().upper() != "REVIEW STATUS: PASS":
+    if not lines or lines[0].strip() != "REVIEW STATUS: PASS":
         return False
 
-    lowered = review_text.lower()
     required_sections = (
         "issues",
         "required corrections",
         "final quality summary",
     )
-    return (
-        len(review_text) >= 100
-        and all(section in lowered for section in required_sections)
-    )
+    sections = {}
+    current_section = None
+
+    for line in lines[1:]:
+        stripped = line.strip()
+        matched = False
+
+        for section in required_sections:
+            prefix = f"{section}:"
+            if stripped.casefold().startswith(prefix):
+                if section in sections:
+                    return False
+                sections[section] = stripped[len(prefix):].strip()
+                current_section = section
+                matched = True
+                break
+
+        if not matched and stripped and current_section:
+            sections[current_section] = (
+                f"{sections[current_section]} {stripped}".strip()
+            )
+
+    if len(review_text) < 100 or set(sections) != set(required_sections):
+        return False
+
+    if not sections["issues"] or not sections["required corrections"]:
+        return False
+
+    summary = sections["final quality summary"].casefold()
+    generic_summaries = {
+        "none", "n/a", "no issues", "review complete", "looks good"
+    }
+    return len(summary) >= 30 and summary not in generic_summaries
 
 
 def _build_final_report(task, plan, specialist_results, context_data, status, manager_draft):
