@@ -180,53 +180,58 @@ def detect_departments(task):
         "ბიზნესის განვითარ"
     ]
 
-    # Explicit exclusions are evaluated inside the same sentence/clause.
-    # This supports "არ გაუშვა Media და Pentester" without accidentally
-    # excluding a department mentioned in a previous sentence.
+    # Explicit exclusions override keyword matches for every department.
+    # Evaluate each sentence/clause independently so a restriction does not
+    # accidentally suppress a department mentioned elsewhere in the task.
+    exclusion_patterns = {
+        "media": r"\\bmedia\\b|\\bმედია\\b",
+        "audit": r"\\baudit(?:or)?\\b|\\bაუდიტ(?:ი|ის|ის)?\\b",
+        "pentester": r"\\b(?:pentester|pentest)\\b|პენტესტ(?:ერი)?",
+        "finance": r"\\bfinance\\b|\\bfinancial\\b|\\bფინანს(?:ი|ები|ური|ურ)\\b",
+        "business": r"\\bbusiness\\b|\\bბიზნეს(?:ი|ის|ური)?\\b",
+        "tenders": r"\\btenders?\\b|\\bprocurement\\b|\\bტენდერ(?:ი|ის)?\\b|\\bშესყიდვ(?:ა|ის)\\b",
+        "technical": r"\\btechnical\\b|\\bტექნიკურ(?:ი|ის|ად)?\\b",
+    }
     excluded_departments = set()
-    for clause in re.split(r"[\n.!?;]+", text):
+    for clause in re.split(r"[\\n.!?;]+", text):
         has_exclusion = bool(re.search(
-            r"(?:არ\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|გააქტიურო(?:თ)?)"
-            r"|do\s+not\s+run|don't\s+run|exclude|skip|not\s+run)",
+            r"(?:არ\\s+(?:გაუშვა(?:თ)?|ჩართო(?:თ)?|გამოიყენო(?:თ)?|გააქტიურო(?:თ)?)"
+            r"|do\\s+not\\s+run|don't\\s+run|exclude|skip|not\\s+run)",
             clause,
         ))
         if not has_exclusion:
             continue
-        if re.search(r"\bmedia\b|\bმედია\b", clause):
-            excluded_departments.add("media")
-        if re.search(r"\b(?:pentester|pentest)\b|პენტესტ(?:ერი)?", clause):
-            excluded_departments.add("pentester")
+        for department, pattern in exclusion_patterns.items():
+            if re.search(pattern, clause):
+                excluded_departments.add(department)
 
-    media_excluded = "media" in excluded_departments
-    pentester_excluded = "pentester" in excluded_departments
-
-    # MEDIA ALWAYS GETS AN INDEPENDENT AUDIT when it is actually requested.
-    if not media_excluded and contains_any(text, media_keywords):
-
-        selected.extend([
-            "media",
-            "audit"
-        ])
-
-    # EXPLICIT AUDIT REQUEST
-
-    elif contains_any(text, audit_keywords):
-
+    # Media requires its independent audit gate. If either is explicitly
+    # excluded, do not route Media without the required quality control.
+    if (
+        "media" not in excluded_departments
+        and "audit" not in excluded_departments
+        and contains_any(text, media_keywords)
+    ):
+        selected.extend(["media", "audit"])
+    elif (
+        "audit" not in excluded_departments
+        and contains_any(text, audit_keywords)
+    ):
         selected.append("audit")
 
-    if contains_any(text, tender_keywords):
+    if "tenders" not in excluded_departments and contains_any(text, tender_keywords):
         selected.append("tenders")
 
-    if contains_any(text, finance_keywords):
+    if "finance" not in excluded_departments and contains_any(text, finance_keywords):
         selected.append("finance")
 
-    if not pentester_excluded and contains_any(text, pentester_keywords):
+    if "pentester" not in excluded_departments and contains_any(text, pentester_keywords):
         selected.append("pentester")
 
-    if contains_any(text, technical_keywords):
+    if "technical" not in excluded_departments and contains_any(text, technical_keywords):
         selected.append("technical")
 
-    if contains_any(text, business_keywords):
+    if "business" not in excluded_departments and contains_any(text, business_keywords):
         selected.append("business")
 
     # REMOVE DUPLICATES
