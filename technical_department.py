@@ -82,104 +82,50 @@ def _build_specialist_context(results):
 
 
 def _review_is_substantive(review):
-    """Accept explicit PASS reviews with colon or standalone section headings."""
+    """Require an explicit PASS and three distinct, populated review sections."""
     review_text = str(review or "").strip()
     lines = review_text.splitlines()
     if not lines or lines[0].strip() != "REVIEW STATUS: PASS":
         return False
-    required_sections = ("issues", "required corrections", "final quality summary")
+
+    required_sections = (
+        "issues",
+        "required corrections",
+        "final quality summary",
+    )
     sections = {}
     current_section = None
+
     for line in lines[1:]:
         stripped = line.strip()
-        normalized = stripped.casefold()
         matched = False
+
         for section in required_sections:
             prefix = f"{section}:"
-            if normalized == section or normalized.startswith(prefix):
+            if stripped.casefold().startswith(prefix):
                 if section in sections:
                     return False
-                sections[section] = stripped[len(prefix):].strip() if normalized.startswith(prefix) else ""
+                sections[section] = stripped[len(prefix):].strip()
                 current_section = section
                 matched = True
                 break
+
         if not matched and stripped and current_section:
-            sections[current_section] = f"{sections[current_section]} {stripped}".strip()
+            sections[current_section] = (
+                f"{sections[current_section]} {stripped}".strip()
+            )
+
     if len(review_text) < 100 or set(sections) != set(required_sections):
         return False
+
     if not sections["issues"] or not sections["required corrections"]:
         return False
+
     summary = sections["final quality summary"].casefold()
-    generic_summaries = {"none", "n/a", "no issues", "review complete", "looks good"}
+    generic_summaries = {
+        "none", "n/a", "no issues", "review complete", "looks good"
+    }
     return len(summary) >= 30 and summary not in generic_summaries
-def _build_final_report(task, plan, specialist_results, context_data, status, manager_draft):
-    """Wrap the manager synthesis in explicit, evidence-aware execution boundaries."""
-    lines = [
-        "TECHNICAL DEPARTMENT — FINAL REPORT",
-        "",
-        f"STATUS: {status}",
-        f"TASK: {task}",
-        "",
-        "MANAGER SYNTHESIS:",
-        str(manager_draft or "").strip(),
-        "",
-        "MANAGER PLAN:",
-    ]
-
-    for step in plan.get("execution_plan", []):
-        lines.append(f"- {step}")
-
-    lines.extend(["", "TESTING STRATEGY (PROPOSED; NOT EXECUTED):"])
-    for step in plan.get("testing_strategy", []):
-        lines.append(f"- {step}")
-
-    lines.extend(["", "SPECIALIST FINDINGS:"])
-    if not specialist_results:
-        lines.append("- No specialist analysis was completed.")
-    for item in specialist_results:
-        if not isinstance(item, dict):
-            lines.append(f"- Invalid specialist result: {item!r}")
-            continue
-        name = _specialist_name(item)
-        lines.extend([
-            "",
-            f"{name} — {item.get('status', 'UNKNOWN')}:",
-            str(item.get("report") or item.get("error") or "No written findings were returned.")
-        ])
-
-    context_text = "\n".join(
-        f"{key}: {value}" for key, value in context_data.items()
-    ).lower()
-    missing_markers = ("not provided", "not supplied", "missing", "unavailable")
-    missing_items = [
-        str(key) for key, value in context_data.items()
-        if any(marker in str(value).lower() for marker in missing_markers)
-    ]
-
-    lines.extend([
-        "",
-        "EVIDENCE LIMITATIONS:",
-        "- Repository files were not independently fetched or opened by this workflow; specialists can analyze only source material included in the supplied task or context.",
-        "- Repository state, file paths, and test outcomes are not independently verified unless explicit evidence is included in the supplied material.",
-    ])
-    if missing_items:
-        lines.append("- Missing or unavailable inputs: " + ", ".join(missing_items) + ".")
-    if not context_text:
-        lines.append("- No additional technical context was supplied.")
-
-    lines.extend([
-        "",
-        "EXECUTION AND APPROVAL:",
-        "- No code was modified.",
-        "- No tests were executed; the testing strategy above is a proposal only.",
-        "- No deployment or external system action was performed.",
-        "- CEO approval is required before implementation, execution, or deployment.",
-        "",
-        "RECOMMENDED NEXT STEP:",
-        "Provide any missing repository/source files and relevant logs, then approve a scoped review and test plan before implementation."
-    ])
-    return "\n".join(lines)
-
 
 def _review_required_result(base_result, message, **extra):
     return {
