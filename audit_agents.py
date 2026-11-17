@@ -250,7 +250,7 @@ def compliance_auditor(task, media):
     concept_lines = concept_text.splitlines()
     for index, line in enumerate(concept_lines):
         heading = re.match(
-            r"^\\s*(?:[-*]\\s*)?(?:#{1,6}\\s*)?(?:\\*\\*)?EXACT TOPIC\\s*:?[ \\t]*(?:\\*\\*)?\\s*(.*)$",
+            r"^\s*(?:[-*]\s*)?(?:#{1,6}\s*)?(?:\*\*)?EXACT TOPIC\s*:?[ \t]*(?:\*\*)?\s*(.*)$",
             line,
             re.IGNORECASE,
         )
@@ -287,8 +287,8 @@ def compliance_auditor(task, media):
 
     matched_terms = [
         term for term in topic_terms
-        if re.search(rf"\\b{re.escape(term)}\\b", task_text)
-        and re.search(rf"\\b{re.escape(term)}\\b", final_script)
+        if re.search(rf"\b{re.escape(term)}\b", task_text)
+        and re.search(rf"\b{re.escape(term)}\b", final_script)
     ]
     required_matches = max(1, math.ceil(len(topic_terms) * 0.6))
     topic_passed = (
