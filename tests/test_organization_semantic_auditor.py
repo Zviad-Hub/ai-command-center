@@ -85,5 +85,19 @@ class OrganizationSemanticAuditorTests(unittest.TestCase):
         ai_mock.assert_not_called()
 
 
+    @patch("organization_semantic_auditor.ask_ai")
+    def test_malformed_json_fails_closed(self, ai_mock):
+        ai_mock.return_value = "PASS - everything looks fine."
+        result = run_semantic_alignment_audit(
+            "Review the requested work.",
+            ["business"],
+            [{"department": "business", "status": "COMPLETED", "report": "Report."}],
+        )
+
+        self.assertEqual(result["status"], "UNAVAILABLE")
+        self.assertTrue(result["error_code"])
+        self.assertTrue(result["human_review_required"])
+
+
 if __name__ == "__main__":
     unittest.main()
