@@ -144,6 +144,19 @@ def submit_task(ceo_task):
     if not ceo_task:
         raise ValueError("CEO task cannot be empty.")
 
+    # Health checks use a non-production diagnostic path. They must not
+    # trigger Media research/script generation or Audit of a nonexistent asset.
+    from media_audit_health_check import (
+        is_system_health_check,
+        run_media_audit_health_check,
+    )
+    if is_system_health_check(ceo_task):
+        record = run_media_audit_health_check(ceo_task)
+        tasks = load_tasks()
+        tasks.append(record)
+        save_tasks(tasks)
+        return record
+
     # STEP 1: Director analyzes and routes the task.
     routing = route_task(ceo_task)
 
