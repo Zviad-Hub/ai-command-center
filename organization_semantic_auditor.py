@@ -5,7 +5,6 @@ opt-in because it consumes an additional provider request. It never authorizes
 publication, transactions, implementation, security testing, or deployment.
 """
 import json
-import re
 
 from ai_brain import ask_ai
 from error_diagnostics import safe_error_code
