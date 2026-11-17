@@ -89,7 +89,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         result = evaluate_live_result("finance", {
             "status": "REVIEW_REQUIRED",
             "specialist_reports": {"a": "x", "b": "y", "c": "z"},
-            "quality_review": "REVIEW STATUS: PASS\\nISSUES: None.\\nREQUIRED CORRECTIONS: None.\\nFINAL QUALITY SUMMARY: The review is complete and evidence-aware.",
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None.\nFINAL QUALITY SUMMARY: The review is complete and evidence-aware.",
             "quality_review_passed": True,
             "report": "Revenue 2160; variable cost 840; contribution 1320; operating result -2880 before tax. Tax not provided.",
             "requires_ceo_approval": True,
@@ -101,7 +101,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
             "specialist_reports": {"a": "x", "b": "y", "c": "z"},
-            "quality_review": "REVIEW STATUS: PASS\\nISSUES: None.\\nREQUIRED CORRECTIONS: None.\\nFINAL QUALITY SUMMARY: The review is complete and evidence-aware.",
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None.\nFINAL QUALITY SUMMARY: The review is complete and evidence-aware.",
             "quality_review_passed": True,
             "report": "Revenue 2160; variable cost 840; contribution 1320; operating result -2880 before tax. Tax not provided.",
         })
@@ -120,7 +120,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "specialist_results": [
                 {"status": "COMPLETED"}, {"status": "COMPLETED"}
             ],
-            "report": "TECHNICAL DEPARTMENT — FINAL REPORT\\nSTATUS: COMPLETED\\nEVIDENCE LIMITATIONS:\\nEXECUTION AND APPROVAL:",
+            "report": "TECHNICAL DEPARTMENT — FINAL REPORT\nSTATUS: COMPLETED\nEVIDENCE LIMITATIONS:\nEXECUTION AND APPROVAL:",
             "execution_performed": False,
             "code_modified": False,
             "tests_executed": False,
