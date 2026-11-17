@@ -33,8 +33,8 @@ SECURITY AND EVIDENCE RULES:
 
 Return ONLY valid JSON with this exact schema:
 {
-  "status": "PASS" or "NEEDS_REVISION",
-  "task_coverage": "COMPLETE", "PARTIAL" or "UNKNOWN",
+  "status": "NEEDS_REVISION",
+  "task_coverage": "PARTIAL",
   "summary": "Concise explanation",
   "missing_requirements": [],
   "unsupported_claims": [],
@@ -43,6 +43,8 @@ Return ONLY valid JSON with this exact schema:
   "human_review_required": true
 }
 
+Allowed status values: PASS, NEEDS_REVISION.
+Allowed task_coverage values: COMPLETE, PARTIAL, UNKNOWN.
 Use PASS only when coverage is COMPLETE and all four issue lists are empty.
 Otherwise use NEEDS_REVISION.
 """
@@ -152,10 +154,14 @@ def run_semantic_alignment_audit(original_task, departments, results):
         if coverage != "COMPLETE":
             status = "NEEDS_REVISION"
 
+        summary = str(parsed.get("summary") or "").strip()[:1200]
+        if not summary:
+            raise ValueError("Auditor summary is missing.")
+
         return {
             "status": status,
             "task_coverage": coverage,
-            "summary": str(parsed.get("summary") or "")[:1200],
+            "summary": summary,
             "missing_requirements": missing,
             "unsupported_claims": unsupported,
             "contradictions": contradictions,
