@@ -306,6 +306,31 @@ def run_technical_department(task, context=None):
                 context=context_text,
             )
             specialist_results.append(result)
+            if (
+                isinstance(result, dict)
+                and result.get("status") == "ERROR"
+                and result.get("error_code") == "PROVIDER_DAILY_QUOTA_EXHAUSTED"
+            ):
+                for remaining in selected_specialists[assignment_index + 1:]:
+                    if isinstance(remaining, dict):
+                        remaining_id = (
+                            remaining.get("id")
+                            or remaining.get("specialist")
+                            or remaining.get("name")
+                            or ""
+                        )
+                        remaining_name = remaining.get("name") or remaining_id
+                    else:
+                        remaining_id = str(remaining or "").strip()
+                        remaining_name = remaining_id
+                    specialist_not_run.append({
+                        "specialist": str(remaining_id),
+                        "specialist_name": str(remaining_name),
+                        "status": "NOT_RUN",
+                        "reason": "Daily provider quota was exhausted; no request was attempted.",
+                        "execution_performed": False,
+                    })
+                break
         except Exception as error:
             error_code = safe_error_code(error)
             specialist_results.append({
@@ -345,7 +370,8 @@ def run_technical_department(task, context=None):
     ]
     failed = [
         item for item in specialist_results
-        if not isinstance(item, dict) or item.get("status") != "COMPLETED"
+        if not isinstance(item, dict)
+        or item.get("status") not in ("COMPLETED", "NOT_RUN")
     ]
 
     base_result = {
