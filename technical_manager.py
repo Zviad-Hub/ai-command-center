@@ -1,6 +1,7 @@
 import json
 
 from ai_brain import ask_ai
+from error_diagnostics import safe_error_code
 
 
 TECHNICAL_SPECIALISTS = {
@@ -205,6 +206,7 @@ def run_technical_manager(task):
             "status": "ERROR",
             "message": "Technical planning provider call failed.",
             "error": "TECHNICAL_PLANNING_FAILED",
+            "error_code": safe_error_code(error),
             "selected_specialists": [],
             "requires_ceo_approval": True,
             "execution_authorized": False,
