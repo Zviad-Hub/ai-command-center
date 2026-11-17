@@ -162,15 +162,20 @@ class TaskManagerTests(unittest.TestCase):
         route_mock.assert_not_called()
 
 
-    def test_semantic_alignment_audit_is_disabled_by_default(self):
-        with patch.dict("os.environ", {"AI_ORGANIZATION_SEMANTIC_AUDIT": ""}), \
+    def test_semantic_alignment_audit_runs_by_default(self):
+        unavailable = {
+            "status": "UNAVAILABLE",
+            "summary": "Semantic review unavailable.",
+            "human_review_required": True,
+        }
+        with patch.dict("os.environ", {}, clear=True), \
              patch("task_manager.route_task", return_value={
                  "departments": ["technical"], "missions": {"technical": "Review the app."}
              }), \
              patch("task_manager.get_manager") as manager_factory, \
              patch("task_manager.load_tasks", return_value=[]), \
              patch("task_manager.save_tasks"), \
-             patch("task_manager.run_semantic_alignment_audit") as semantic_mock:
+             patch("task_manager.run_semantic_alignment_audit", return_value=unavailable) as semantic_mock:
             manager = Mock()
             manager.receive_task.return_value = {
                 "department": "technical", "status": "REVIEW_REQUIRED"
@@ -178,6 +183,44 @@ class TaskManagerTests(unittest.TestCase):
             manager_factory.return_value = manager
 
             record = submit_task("Review the app.")
+
+        semantic_mock.assert_called_once()
+        self.assertEqual(record["semantic_audit"]["status"], "UNAVAILABLE")
+        self.assertEqual(record["overall_status"], "REVIEW_REQUIRED")
+
+    def test_explicitly_disabled_semantic_audit_cannot_pass_overall_gate(self):
+        valid_finance_result = {
+            "department": "finance",
+            "status": "COMPLETED",
+            "report": "Finance report with calculations and assumptions.",
+            "requires_ceo_approval": True,
+            "execution_authorized": False,
+            "execution_performed": False,
+            "specialist_quality_validation": {"status": "PASS", "issues": []},
+            "quality_review_passed": True,
+        }
+        audit_pass = {
+            "status": "PASS",
+            "department_checks": [{"department": "finance", "status": "PASS", "issues": []}],
+            "issues": [],
+            "content_alignment_status": "HUMAN_REVIEW_REQUIRED",
+            "human_review_required": True,
+            "limitations": [],
+        }
+        with patch.dict("os.environ", {"AI_ORGANIZATION_SEMANTIC_AUDIT": "false"}), \
+             patch("task_manager.route_task", return_value={
+                 "departments": ["finance"], "missions": {"finance": "Prepare the financial review."}
+             }), \
+             patch("task_manager.get_manager") as manager_factory, \
+             patch("task_manager.load_tasks", return_value=[]), \
+             patch("task_manager.save_tasks"), \
+             patch("task_manager.audit_organization_task", return_value=audit_pass), \
+             patch("task_manager.run_semantic_alignment_audit") as semantic_mock:
+            manager = Mock()
+            manager.receive_task.return_value = valid_finance_result
+            manager_factory.return_value = manager
+
+            record = submit_task("Prepare the financial review.")
 
         semantic_mock.assert_not_called()
         self.assertEqual(record["semantic_audit"]["status"], "NOT_RUN")
@@ -297,6 +340,12 @@ class TaskManagerTests(unittest.TestCase):
             "PASS",
         )
         self.assertEqual(summary["organization_audit"]["department_checks"][0]["issue_count"], 1)
+        self.assertEqual(
+            summary["organization_audit"]["department_checks"][0]["issue_codes"],
+            ["ORCHESTRATION_INTEGRITY_ISSUE"],
+        )
+        self.assertEqual(summary["semantic_audit"]["status"], "NOT_RUN")
+        self.assertEqual(summary["semantic_audit"]["missing_requirement_count"], 0)
         media_row = summary["department_results"][1]
         self.assertEqual(media_row["script_validation"]["visual_scene_count_passed"], False)
         self.assertEqual(media_row["warning_count"], 1)
