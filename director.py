@@ -402,7 +402,7 @@ def route_task(task):
 
     except Exception as error:
 
-        print("\nDIRECTOR ROUTING ERROR:", error)
+        print("\nDIRECTOR ROUTING ERROR: internal details withheld.")
 
         # NEVER SILENTLY PRETEND ROUTING SUCCEEDED
 
