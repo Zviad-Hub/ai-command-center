@@ -18,6 +18,19 @@ class DirectorRoutingTests(unittest.TestCase):
         departments = detect_departments("Create a YouTube video script")
         self.assertEqual(departments, ["media", "audit"])
 
+    def test_explicitly_excluded_media_is_not_routed(self):
+        departments = detect_departments(
+            "Finance Business Technical Pentester Audit. Media არ გაუშვა."
+        )
+        self.assertNotIn("media", departments)
+        self.assertEqual(
+            set(departments),
+            {"finance", "business", "technical", "pentester", "audit"},
+        )
+
+    def test_business_department_name_routes_to_business(self):
+        self.assertEqual(detect_departments("Business"), ["business"])
+
     @patch("director.ai_route_task")
     def test_keyword_routing_does_not_call_ai(self, ai_route_mock):
         result = route_task("შეამოწმე ეს კოდი")
