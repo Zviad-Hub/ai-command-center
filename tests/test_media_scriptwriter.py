@@ -55,6 +55,15 @@ The old mystery remains unresolved.
             media_agents.requested_language_instruction(task)
         )
 
+    def test_explicit_english_instruction_can_request_georgian_output(self):
+        task = "Write a YouTube Shorts script in Georgian about the Maya."
+        self.assertTrue(media_agents.is_georgian_request(task))
+        self.assertFalse(
+            media_agents.narration_matches_requested_language(
+                task, "The Maya civilization developed over centuries."
+            )
+        )
+
     def test_scriptwriter_includes_language_requirement_in_provider_prompt(self):
         script = """VIDEO TITLE:
 მაიას ცივილიზაციის საიდუმლო
