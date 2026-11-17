@@ -6788,5 +6788,450 @@
                 "message": "დავალება მიღებულია. სპეციალიზებული აგენტები შემდეგ ეტაპზე დაემატება."
             }
         ]
+    },
+    {
+        "id": "085bacd0",
+        "created_at": "2026-11-17T08:14:57.451346+00:00",
+        "task": "TECHNICAL DEPARTMENT — SECOND INDEPENDENT STRESS TEST  A customer requests a small Task Management Web Application.  REQUIREMENTS:  1. Users can register, log in, and log out. 2. Users can create, edit, delete, and complete tasks. 3. Each task must have a title, description, priority, status, and due date. 4. Users can filter and search their tasks. 5. The application must use a database. 6. The interface must be responsive and user-friendly. 7. Users must not be able to access another user's private tasks.  CEO INSTRUCTIONS:  This is an independent Technical Department evaluation.  The Technical Manager must: - Analyze the requirements. - Select the appropriate technical specialists. - Give every selected specialist an individual mission. - Coordinate their reports. - Identify architectural, database, security, and testing risks. - Produce one consolidated technical report.  STRICT RULES:  - This is a Technical Department task only. - Do not create Media, Audit, or other department assignments. - Do not claim that code was written or modified. - Do not claim that tests were executed. - Do not deploy anything. - Clearly report any errors or missing capabilities. - CEO approval is mandatory before implementation.  Return a detailed, structured report.",
+        "departments": [
+            "media",
+            "audit",
+            "technical"
+        ],
+        "routing": {
+            "analysis": "დავალება გაანალიზებულია. დეპარტამენტები შეირჩა დავალების შინაარსის მიხედვით.",
+            "departments": [
+                "media",
+                "audit",
+                "technical"
+            ],
+            "missions": {
+                "media": "შექმენი CEO-ს მოთხოვნის შესაბამისი მედია პროდუქტი. არ შეცვალო ორიგინალური თემა. არ გამოიგონო ფაქტები ან წყაროები.\n\nCEO ORIGINAL TASK:\nTECHNICAL DEPARTMENT — SECOND INDEPENDENT STRESS TEST  A customer requests a small Task Management Web Application.  REQUIREMENTS:  1. Users can register, log in, and log out. 2. Users can create, edit, delete, and complete tasks. 3. Each task must have a title, description, priority, status, and due date. 4. Users can filter and search their tasks. 5. The application must use a database. 6. The interface must be responsive and user-friendly. 7. Users must not be able to access another user's private tasks.  CEO INSTRUCTIONS:  This is an independent Technical Department evaluation.  The Technical Manager must: - Analyze the requirements. - Select the appropriate technical specialists. - Give every selected specialist an individual mission. - Coordinate their reports. - Identify architectural, database, security, and testing risks. - Produce one consolidated technical report.  STRICT RULES:  - This is a Technical Department task only. - Do not create Media, Audit, or other department assignments. - Do not claim that code was written or modified. - Do not claim that tests were executed. - Do not deploy anything. - Clearly report any errors or missing capabilities. - CEO approval is mandatory before implementation.  Return a detailed, structured report.",
+                "audit": "დამოუკიდებლად შეამოწმე მიღებული შედეგი. შეამოწმე მოთხოვნების შესრულება, მტკიცებულებები, წყაროები, ტექსტის სისრულე და უსაფრთხოება. შეცდომები დააფიქსირე გულწრფელად.\n\nCEO ORIGINAL TASK:\nTECHNICAL DEPARTMENT — SECOND INDEPENDENT STRESS TEST  A customer requests a small Task Management Web Application.  REQUIREMENTS:  1. Users can register, log in, and log out. 2. Users can create, edit, delete, and complete tasks. 3. Each task must have a title, description, priority, status, and due date. 4. Users can filter and search their tasks. 5. The application must use a database. 6. The interface must be responsive and user-friendly. 7. Users must not be able to access another user's private tasks.  CEO INSTRUCTIONS:  This is an independent Technical Department evaluation.  The Technical Manager must: - Analyze the requirements. - Select the appropriate technical specialists. - Give every selected specialist an individual mission. - Coordinate their reports. - Identify architectural, database, security, and testing risks. - Produce one consolidated technical report.  STRICT RULES:  - This is a Technical Department task only. - Do not create Media, Audit, or other department assignments. - Do not claim that code was written or modified. - Do not claim that tests were executed. - Do not deploy anything. - Clearly report any errors or missing capabilities. - CEO approval is mandatory before implementation.  Return a detailed, structured report.",
+                "technical": "შეასრულე ტექნიკური დავალება. შეამოწმე კოდი, სისტემის მუშაობა და შეცდომები.\n\nCEO ORIGINAL TASK:\nTECHNICAL DEPARTMENT — SECOND INDEPENDENT STRESS TEST  A customer requests a small Task Management Web Application.  REQUIREMENTS:  1. Users can register, log in, and log out. 2. Users can create, edit, delete, and complete tasks. 3. Each task must have a title, description, priority, status, and due date. 4. Users can filter and search their tasks. 5. The application must use a database. 6. The interface must be responsive and user-friendly. 7. Users must not be able to access another user's private tasks.  CEO INSTRUCTIONS:  This is an independent Technical Department evaluation.  The Technical Manager must: - Analyze the requirements. - Select the appropriate technical specialists. - Give every selected specialist an individual mission. - Coordinate their reports. - Identify architectural, database, security, and testing risks. - Produce one consolidated technical report.  STRICT RULES:  - This is a Technical Department task only. - Do not create Media, Audit, or other department assignments. - Do not claim that code was written or modified. - Do not claim that tests were executed. - Do not deploy anything. - Clearly report any errors or missing capabilities. - CEO approval is mandatory before implementation.  Return a detailed, structured report."
+            },
+            "requires_ceo_approval": true,
+            "routing_method": "RULE_BASED"
+        },
+        "results": [
+            {
+                "department": "media",
+                "status": "ERROR",
+                "failed_stage": "Creative Strategist",
+                "message": "Creative Strategist failed: Groq daily quota has been exhausted. Wait for the quota reset or check your Groq plan.",
+                "original_ceo_topic": "TECHNICAL DEPARTMENT — SECOND INDEPENDENT STRESS TEST  A customer requests a small Task Management Web Application.  REQUIREMENTS:  1. Users can register, log in, and log out. 2. Users can create, edit, delete, and complete tasks. 3. Each task must have a title, description, priority, status, and due date. 4. Users can filter and search their tasks. 5. The application must use a database. 6. The interface must be responsive and user-friendly. 7. Users must not be able to access another user's private tasks.  CEO INSTRUCTIONS:  This is an independent Technical Department evaluation.  The Technical Manager must: - Analyze the requirements. - Select the appropriate technical specialists. - Give every selected specialist an individual mission. - Coordinate their reports. - Identify architectural, database, security, and testing risks. - Produce one consolidated technical report.  STRICT RULES:  - This is a Technical Department task only. - Do not create Media, Audit, or other department assignments. - Do not claim that code was written or modified. - Do not claim that tests were executed. - Do not deploy anything. - Clearly report any errors or missing capabilities. - CEO approval is mandatory before implementation.  Return a detailed, structured report.",
+                "concept": "",
+                "script": "",
+                "edited_script": "",
+                "initial_fact_check": "",
+                "fact_check": "",
+                "research": {
+                    "status": "COMPLETED",
+                    "original_ceo_topic": "TECHNICAL DEPARTMENT — SECOND INDEPENDENT STRESS TEST  A customer requests a small Task Management Web Application.  REQUIREMENTS:  1. Users can register, log in, and log out. 2. Users can create, edit, delete, and complete tasks. 3. Each task must have a title, description, priority, status, and due date. 4. Users can filter and search their tasks. 5. The application must use a database. 6. The interface must be responsive and user-friendly. 7. Users must not be able to access another user's private tasks.  CEO INSTRUCTIONS:  This is an independent Technical Department evaluation.  The Technical Manager must: - Analyze the requirements. - Select the appropriate technical specialists. - Give every selected specialist an individual mission. - Coordinate their reports. - Identify architectural, database, security, and testing risks. - Produce one consolidated technical report.  STRICT RULES:  - This is a Technical Department task only. - Do not create Media, Audit, or other department assignments. - Do not claim that code was written or modified. - Do not claim that tests were executed. - Do not deploy anything. - Clearly report any errors or missing capabilities. - CEO approval is mandatory before implementation.  Return a detailed, structured report.",
+                    "extracted_topic": "TECHNICAL DEPARTMENT — SECOND INDEPENDENT STRESS TEST  A customer requests a small Task Management Web Application.  REQUIREMENTS:  1. Users can register, log in, and log out. 2. Users can create, edit, delete, and complete tasks. 3. Each task must have a title, description, priority, status, and due date. 4. Users can filter and search their tasks",
+                    "query": "TECHNICAL DEPARTMENT — SECOND INDEPENDENT STRESS TEST  A customer requests a small Task Management Web Application.  REQUIREMENTS:  1. Users can register, log in, and log out. 2. Users can create, edit, delete, and complete tasks. 3. Each task must have a title, description, priority, status, and due date. 4. Users can filter and search their tasks reliable sources authoritative records official documentation primary evidence",
+                    "source_count": 15,
+                    "full_page_count": 8,
+                    "snippet_count": 7,
+                    "sources": [
+                        {
+                            "title": "Design A Task Management Application - System Design | Codemia",
+                            "url": "https://codemia.io/system-design/design-a-task-management-application/submissions/tahvx9",
+                            "domain": "codemia.io",
+                            "content": "Title: Design A Task Management Application - System Design | Codemia\n## Requirements. ### Functional Requirements:. * Create, update, and delete tasks. * Assign tasks to users or teams. * Set deadlines, start dates, and reminders (email/push/in-app). + Task dependencies (e.g., blocked until another task is complete). * Share tasks with external stakeholders (with permission control). * Notifications for task updates, deadlines, mentions. * **My Tasks:** personal task list, sorted by priority and deadline. * **Overdue Tasks:** list of tasks past due date. * Search tasks by title, description, assignee, or tag. * Filter by status, priority, project, due date, or team. * Admin: full access (create, update, delete any task, manage users). * Manager: assign tasks, edit tasks in their teams. * Staff/User: create tasks, update their own tasks, comment. ### Create Task. Provides a responsive and interactive interface for users to manage tasks from web browsers. React or Angular, with Redux or Zustand for state management; Tailwind CSS or Material UI for styling. * Displaying notifications and real-time updates via WebSocket. Delivers a native or hybrid mobile experience for managing tasks on smartphones and tablets. * Mobile-specific features like push notifications, offline caching, and camera integration (e.g., for task attachments). * Synchronization with backend services to reflect real-time updates. ## Task Management Service. * Querying tasks based on user, category, or status",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.5009303,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "How to Build a Task Management App in Hours | Lovable",
+                            "url": "https://lovable.dev/guides/how-to-build-a-task-management-app",
+                            "domain": "lovable.dev",
+                            "content": "[Log in](/login?redirect=%2Fguides%2Fhow-to-build-a-task-management-app)[Get started](/signup?redirect=%2Fguides%2Fhow-to-build-a-task-management-app)\n\n[Log in](/login?redirect=%2Fguides%2Fhow-to-build-a-task-management-app)[Get started](/signup?redirect=%2Fguides%2Fhow-to-build-a-task-management-app)\n\nPublished March 25, 2026 in Use Case Pages\n\n# How to Build a Task Management App\n\n![How to Build a Task Management App](https://lovable.dev/cdn-cgi/image/width=3840,f=auto,fit=scale-down,quality=95/https://assets.lovable.dev/content/guides/thumbnails/how-to-build-a-task-management-app.jpg)\n\nAuthor: Lovable Team at Lovable\n\nOff-the-shelf tools can get you part of the way there. For many teams and independent builders, though, they still force compromises on the features that matter most. So the default becomes an off-the-shelf tool, [Asana](https://asana.com/), [Trello](https://trello.com/), [ClickUp](https://clickup.com/), that almost fits the workflow but never matches it exactly.\n\nThere's another path between those two extremes. With Lovable, an AI-powered no-code builder, you can build a fully custom, deployable task management web application with authentication, real-time data, and role-based permissions in an afternoon, without hiring a developer. This guide walks through the process we use to take task managers from idea to production in a single session.\n\n## **What Your Task Management Web Application Actually Needs**\n\nA production-ready task management web application ",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.47341377,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - aqdas77/task-management-application: A task management application in which user can login after signup and after login, user can create, update and delete tasks. JWT is used for authentication during login and MongoDB and AWS DynamoDB is used as database. ReactJS is used for frontend part ",
+                            "url": "https://github.com/aqdas77/task-management-application",
+                            "domain": "github.com",
+                            "content": "NodeJS and Express is used for backend.\naqdas77 / **task-management-application** Public. A task management application in which user can login after signup and after login, user can create, update and delete tasks. JWT is used for authentication during login and MongoDB and AWS DynamoDB is used as database. 0 stars 1 fork Branches Tags Activity. # aqdas77/task-management-application. # Task App with JWT Authentication. Task App is a powerful and secure task management application designed to help you stay organized and productive. Easily create, update, and manage your tasks with this user-friendly web-based application, all while benefiting from JWT-based user authentication for enhanced security. JWT User Authentication: Securely create an account, log in, and access your tasks using JSON Web Tokens (JWT) for robust authentication and authorization. Task List: View and manage your tasks in a clear and organized list format. Task Details: Access detailed information about each task, including its description and due date. Task Editing: Edit task details, update due dates, and change priority levels as needed. Define the necessary environment variables, such as the JWT secret, database connection information, and session settings. Access the Application: Open your web browser and navigate to `` (or the specified port). ## JWT Authentication. Task App uses JSON Web Tokens (JWT) for user authentication and authorization. Here's how JWT authentication works:. **User Registratio",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.46857783,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - codedsaif/task-management-application: User-friendly task management app. Log in, create tasks, and manage them seamlessly. Perform CRUD operations effortlessly to stay organized and productive. Simplify your workflow with intuitive features. Get started now!",
+                            "url": "https://github.com/codedsaif/task-management-application",
+                            "domain": "github.com",
+                            "content": "## Navigation Menu. # Search code, repositories, users, issues, pull requests... You signed in with another tab or window. You signed out in another tab or window. You switched accounts on another tab or window. codedsaif / **task-management-application** Public. * Notifications You must be signed in to change notification settings. User-friendly task management app. Log in, create tasks, and manage them seamlessly. Perform CRUD operations effortlessly to stay organized and productive. Simplify your workflow with intuitive features. 0 stars 0 forks Branches Tags Activity. Notifications You must be signed in to change notification settings. # codedsaif/task-management-application. ## Folders and files. ## Repository files navigation. # MERN Stack Developer Live. ## Task Management Application. * This task management application is built using the MERN stack, which comprises MongoDB for data storage, Node.js and Express.js for the backend, and React.js for the frontend. The application allows users to create, update, delete, and view tasks. Authentication functionality is also implemented to ensure secure access to the application. #### Login. #### Add Task. #### Edit Task. ### Features:. * Users can sign up with a unique username and password. * Secure login and logout functionality is provided. * Authenticated users can create tasks with a title, description, and due date. * Users can view a list of their tasks. * CRUD operations (Create, Read, Update, Delete) are available f",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.42590368,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - parjuns/task-manager: Golang GIN Postgres API allows users to manage tasks, register, log in, and perform CRUD operations on tasks. · GitHub",
+                            "url": "https://github.com/parjuns/task-manager",
+                            "domain": "github.com",
+                            "content": "Title: GitHub - parjuns/task-manager: Golang GIN Postgres API allows users to manage tasks, register, log in, and perform CRUD operations on tasks. · GitHub\nYou signed in with another tab or window. You switched accounts on another tab or window. ## Repository navigation. * NotificationsYou must be signed in to change notification settings. * Star1 (1)You must be signed in to star a repository. Golang GIN Postgres API allows users to manage tasks, register, log in, and perform CRUD operations on tasks. ## Repository files navigation. # Task Manager API. This API allows users to manage tasks, register, log in, and perform CRUD operations on tasks. * Create a `app.env` file with your environment variables. * Add or change below mention environment varibles in the file:. 4. **Set up Database PostgreSQL in docker:**. * This commands run the database in docker with the tables created in them. * `Migrations` dir contains up and down files for database. Ensure database is up and then Run the API using:. * `POST /api/v1/auth/register`: Register a new user. * `POST /api/v1/auth/login`: Log in an existing user. * `GET /api/v1/tasks`: Get all tasks. * `POST /api/v1/tasks`: Create a new task. * `GET /api/v1/tasks/{id}`: Get a task by ID. * `PUT /api/v1/tasks/{id}`: Update a task by ID. * `DELETE /api/v1/tasks/{id}`: Delete a task by ID. Use tasks endpoint with query params in the API, for pagination, sorting, & filtering. `status`: Allows to filter based on status of task in list (e.g., ",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.42196864,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - KhadijaMakkaoui/Task-Management-API: Build an API to manage tasks where users can create, update, and delete tasks, and mark tasks as complete or incomplete. · GitHub",
+                            "url": "https://github.com/KhadijaMakkaoui/Task-Management-API",
+                            "domain": "github.com",
+                            "content": "## Navigation Menu\n\n![](https://github.githubassets.com/assets/platform-4ce65ae0bf273ce2.png)\n![](https://github.githubassets.com/assets/platform-dark-ac89fbf373737ed3.png)\n![](https://github.githubassets.com/assets/copilot-e2b89335a66dba00.png)\n![](https://github.githubassets.com/assets/copilot-dark-2b28403b6080e898.png)\n![](https://github.githubassets.com/assets/changelog-fd687bff072883b0.png)\n![](https://github.githubassets.com/assets/changelog-dark-b1c25ae971bd641b.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n\n## Repository navigation\n\n![KhadijaMakkaoui](https://avatars.githubusercontent.com/u/93976422?s=60&v=4)\n\n## About\n\nBuild an API to manage tasks where users can create, update, and delete tasks, and mark tasks as complete or incomplete.\n\n### Resources\n\n### Stars\n\n### Watchers\n\n### Forks\n\n## Latest commit\n\n## History\n\n## Folders and files\n\n| Name | | Name | Last commit message | Last commit date |\n| --- | --- | --- | --- | --- |\n| [task\\_management](/KhadijaMakkaoui/Task-Management-API/tree/main/task_management \"task_management\") | | [task\\_management](/KhadijaMakkaoui/Task-Management-API/tree/main/task_management \"task_management\") |  |  |\n| [Procfile](/KhadijaMakkaoui/Task-Management-API/blob/main/Procfile \"Procfile\") | | [Procfile](/KhadijaMakkaoui/Task-Management-API/blob/main/Procfile \"Procfile\") |  |  |\n| [README.md](/KhadijaMakkaoui/Task-Management-API/bl",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.42006418,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - NisreenSalameh/tasksmanager: 📋 A simple and intuitive task manager web application built with HTML, CSS, and JavaScript. This app allows users to add, edit, complete, and delete tasks with priority and due date tracking. It features sorting options by priority and due date, along with filte",
+                            "url": "https://github.com/NisreenSalameh/tasksmanager",
+                            "domain": "github.com",
+                            "content": "## Navigation Menu\n\n![](https://github.githubassets.com/assets/platform-4ce65ae0bf273ce2.png)\n![](https://github.githubassets.com/assets/platform-dark-ac89fbf373737ed3.png)\n![](https://github.githubassets.com/assets/copilot-e2b89335a66dba00.png)\n![](https://github.githubassets.com/assets/copilot-dark-2b28403b6080e898.png)\n![](https://github.githubassets.com/assets/changelog-fd687bff072883b0.png)\n![](https://github.githubassets.com/assets/changelog-dark-b1c25ae971bd641b.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n\n## Repository navigation\n\n![NisreenSalameh](https://avatars.githubusercontent.com/u/129335869?s=60&v=4)\n\n## About\n\n📋 A simple and intuitive task manager web application built with HTML, CSS, and JavaScript. This app allows users to add, edit, complete, and delete tasks with priority and due date tracking. It features sorting options by priority and due date, along with filtering tasks based on their status.\n\n### Topics\n\n### Resources\n\n### Stars\n\n### Watchers\n\n### Forks\n\n## Latest commit\n\n## History\n\n## Folders and files\n\n| Name | | Name | Last commit message | Last commit date |\n| --- | --- | --- | --- | --- |\n| [.vscode](/NisreenSalameh/tasksmanager/tree/main/.vscode \".vscode\") | | [.vscode](/NisreenSalameh/tasksmanager/tree/main/.vscode \".vscode\") |  |  |\n| [assets/images](/NisreenSalameh/tasksmanager/tree/main/assets/images \"This path skips through empty di",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.41970742,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - Praveenanand333/Task_management: The Task Management Project is a Node.js and React.js-based web app with Mysql. It enables users to manage tasks, featuring authentication, task creation, updating, deletion, completion tracking, filtering, and searching. · GitHub",
+                            "url": "https://github.com/Praveenanand333/Task_management",
+                            "domain": "github.com",
+                            "content": "## Navigation Menu\n\n![](https://github.githubassets.com/assets/platform-4ce65ae0bf273ce2.png)\n![](https://github.githubassets.com/assets/platform-dark-ac89fbf373737ed3.png)\n![](https://github.githubassets.com/assets/copilot-e2b89335a66dba00.png)\n![](https://github.githubassets.com/assets/copilot-dark-2b28403b6080e898.png)\n![](https://github.githubassets.com/assets/changelog-fd687bff072883b0.png)\n![](https://github.githubassets.com/assets/changelog-dark-b1c25ae971bd641b.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n\n## Repository navigation\n\n![Praveenanand333](https://avatars.githubusercontent.com/u/104721138?s=60&v=4)\n\n## About\n\nThe Task Management Project is a Node.js and React.js-based web app with Mysql. It enables users to manage tasks, featuring authentication, task creation, updating, deletion, completion tracking, filtering, and searching.\n\n### Topics\n\n### Resources\n\n### Stars\n\n### Watchers\n\n### Forks\n\n## Latest commit\n\n## History\n\n## Folders and files\n\n| Name | | Name | Last commit message | Last commit date |\n| --- | --- | --- | --- | --- |\n| [Task\\_management](/Praveenanand333/Task_management/tree/main/Task_management \"Task_management\") | | [Task\\_management](/Praveenanand333/Task_management/tree/main/Task_management \"Task_management\") |  |  |\n| [.gitignore](/Praveenanand333/Task_management/blob/main/.gitignore \".gitignore\") | | [.gitignore](/Praveenanand333/Ta",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.37559193,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - manishgupta416/task-board: Task Board is a web-application which allow users to manage tasks, User can add new task , edit existing task , delete task, and drag and drop functionality to group tasks into different stages (Ready, In Progress, Testing, Done). · GitHub",
+                            "url": "https://github.com/manishgupta416/task-board",
+                            "domain": "github.com",
+                            "content": "Title: GitHub - manishgupta416/task-board: Task Board is a web-application which allow users to manage tasks, User can add new task , edit existing task , delete task, and drag and drop functionality to group tasks into different stages (Ready, In Progress, Testing, Done). · GitHub\n## Navigation Menu. # Search code, repositories, users, issues, pull requests... You signed in with another tab or window. Reload to refresh your session. You switched accounts on another tab or window. * Notifications  You must be signed in to change notification settings. ## Folders and files. | Name | Name | Last commit message | Last commit date |. | Latest commit   History32 Commits 32 Commits |. ## Repository files navigation. # ⚛️ Task Board ⚛️. Task Board is a web-application which allow users to manage tasks, User can add new task , edit existing task , delete task, and drag and drop functionality to group tasks into different stages (Ready, In Progress, Testing, Done). Also User can see visual metrics of each group. ### Task Board Layout Page. * User can create new task. * User can edit existing task. * Drag and Drop tasks anywhere into different stages (Ready, In Progress, Testing, Done). * User can see visual metrics bar chart of each group ( like total number of task in that group, total no of high, medium and low priority task and total effort spent in that group). * Search functionality is implemented user can find task by task name. * User can Filter task by priority and assignee. *",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.37261936,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - FaheemOnHub/Task-Manager-MongoDB-Node.JS: Create: Users can create new tasks with a name and optional completion status. Read: Users can view all tasks or retrieve a specific task by its ID. Update: Users can update the name or completion status of a task. Delete: Users can delete a task by",
+                            "url": "https://github.com/FaheemOnHub/Task-Manager-MongoDB-Node.JS",
+                            "domain": "github.com",
+                            "content": "## Navigation Menu\n\n![](https://github.githubassets.com/assets/platform-4ce65ae0bf273ce2.png)\n![](https://github.githubassets.com/assets/platform-dark-ac89fbf373737ed3.png)\n![](https://github.githubassets.com/assets/copilot-e2b89335a66dba00.png)\n![](https://github.githubassets.com/assets/copilot-dark-2b28403b6080e898.png)\n![](https://github.githubassets.com/assets/changelog-fd687bff072883b0.png)\n![](https://github.githubassets.com/assets/changelog-dark-b1c25ae971bd641b.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n\n## Repository navigation\n\n![FaheemOnHub](https://avatars.githubusercontent.com/u/35933338?s=60&v=4)\n\n## About\n\nCreate: Users can create new tasks with a name and optional completion status. Read: Users can view all tasks or retrieve a specific task by its ID. Update: Users can update the name or completion status of a task. Delete: Users can delete a task by its ID.\n\n### Topics\n\n### Resources\n\n### Contributing\n\n### Stars\n\n### Watchers\n\n### Forks\n\n## Latest commit\n\n## History\n\n## Folders and files\n\n| Name | | Name | Last commit message | Last commit date |\n| --- | --- | --- | --- | --- |\n| [controllers](/FaheemOnHub/Task-Manager-MongoDB-Node.JS/tree/main/controllers \"controllers\") | | [controllers](/FaheemOnHub/Task-Manager-MongoDB-Node.JS/tree/main/controllers \"controllers\") |  |  |\n| [db](/FaheemOnHub/Task-Manager-MongoDB-Node.JS/tree/main/db \"db\") | | [db](/",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.36761075,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Task Management Web App Project Overview | PDF | Web Application | Databases",
+                            "url": "https://www.scribd.com/document/974486506/2210990937-Vansh-Jangra-pptx",
+                            "domain": "scribd.com",
+                            "content": "![Scribd](data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMTAwMCAyNDMuMTkiPgogIDxwYXRoIGQ9Ik0xOTMuMjUsMTUzLjMzYzAsMjUuOTMtMjEuOTgsNDcuODMtNTYuOTgsNDcuODNzLTU2LjU2LTIwLjQxLTU4LjktNDkuNTNoMjguMTdjMi41NiwxNS4zMSwxMy44NywyMy4xNywzMC43MywyMy4xN3MyOS4yNC04LjA4LDI5LjI0LTE5Ljc3YzAtOS41Ni01Ljk4LTE1Ljk0LTE5LjQyLTE4LjkybC0yNC45Ny01LjUzYy0zMC4wOS02LjM4LTQwLjEyLTIxLjktNDAuMTItNDIuMDksMC0yNC44NywyMS4xMy00Ni4zNCw1My4zNS00Ni4zNHM1Mi45MiwyMS4wNCw1NS4yNyw0OC4wNGgtMjguMzhjLTIuMzUtMTQuMDMtMTIuNTktMjEuNjgtMjYuODktMjEuNjhzLTI1LjM5LDcuNDQtMjUuMzksMTguMjhjMCw4LjkzLDUuNTUsMTQuMDMsMTguNTcsMTYuOGwyNC43Niw1LjUzYzMwLjMsNi44LDQwLjk3LDIzLjYsNDAuOTcsNDQuMjFoMFpNNzMyLjc2LDExOS45NmM5LjgyLTYuOCwxNS43OS0xOC4wNywxNS43OS0zMS40NnMtNC45MS0yMy42LTEzLjIzLTMxLjY4Yy03LjQ3LTcuNDQtMTguMzUtMTEuNjktMzUuNjQtMTEuNjloLTU0LjJ2MTUzLjA1aDU4LjA1YzE3LjI4LDAsMjguMzgtNC40NiwzNi4yOC0xMS45MSw4LjMyLTguMDgsMTIuOC0xOS4zNCwxMi44LTMyLjEsMC0xNS4zMS03LjQ3LTI3Ljg1LTE5Ljg1LTM0LjIyWk02NzMuMjEsNzEuNWgwczI2LjY3LDAsMjYuNjcsMGM4LjUzLDAsMTMuNDQsMi41NSwxNi42NCw2LjU5LDIuNzcsMy4xOSw0LjA1LDcuMjMsNC4wNSwxMS45MSwwLDUuMS0xLjUsOS43OC00LjcsMTIuOTctMy40MSwzLjYyLTkuODIsNS41My0xNi4wMSw1LjUzaC0yNi42N3YtMzYuOTlaTTcxOS4zMSwxNjYuNTFjLTMuNDEsMy4xOS04LjMyLDUuMS0xNS43OSw1LjFoLTMwLjN2LTM3Ljg0aDMwLjNjOC4zMiwwLDEzLjQ0LDIuMzQsMTYuNjQsNi4xNiwyLjc3LDMuNCw0LjY5LDcuNjUsNC42OSwxMi43NSwwLDUuNTMtMi4xMywxMC40Mi01LjU1LDEzLjgyaDBaTTkwOS4yOSw2OS43OWgwYy0xMS45NS0xNS4z",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.3203959,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Task Management Web Application: Why You Need It - TrackerSuite AI",
+                            "url": "https://www.trackersuite.ai/blog/task-management-web-application",
+                            "domain": "trackersuite.ai",
+                            "content": "A task management web application is software that runs in a web browser and lets a team create, assign, track and close tasks in one shared",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.31520876,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "GitHub - vikram0976/Employee-Registration-System: This is an Employee Management System application. It provides the functionality to register users, create tasks, update task details, assign tasks to users, mark tasks as complete, delete tasks and perform various search and filter operations on tas",
+                            "url": "https://github.com/vikram0976/Employee-Registration-System",
+                            "domain": "github.com",
+                            "content": "## Navigation Menu\n\n![](https://github.githubassets.com/assets/platform-4ce65ae0bf273ce2.png)\n![](https://github.githubassets.com/assets/platform-dark-ac89fbf373737ed3.png)\n![](https://github.githubassets.com/assets/copilot-e2b89335a66dba00.png)\n![](https://github.githubassets.com/assets/copilot-dark-2b28403b6080e898.png)\n![](https://github.githubassets.com/assets/changelog-fd687bff072883b0.png)\n![](https://github.githubassets.com/assets/changelog-dark-b1c25ae971bd641b.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n![](https://github.githubassets.com/assets/universe-a98cd54821b27569.png)\n\n## Repository navigation\n\n![vikram0976](https://avatars.githubusercontent.com/u/103572468?s=60&v=4)\n\n## About\n\nThis is an Employee Management System application. It provides the functionality to register users, create tasks, update task details, assign tasks to users, mark tasks as complete, delete tasks and perform various search and filter operations on tasks\n\n### Topics\n\n### Resources\n\n### Stars\n\n### Watchers\n\n### Forks\n\n## Latest commit\n\n## History\n\n## Folders and files\n\n| Name | | Name | Last commit message | Last commit date |\n| --- | --- | --- | --- | --- |\n| [.settings](/vikram0976/Employee-Registration-System/tree/main/.settings \".settings\") | | [.settings](/vikram0976/Employee-Registration-System/tree/main/.settings \".settings\") |  |  |\n| [src](/vikram0976/Employee-Registration-System/tree/main/src \"src\") | | [src](/vikram0976/Employee-Registration-S",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.31226513,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Need advice in developing a task management app",
+                            "url": "https://www.reddit.com/r/webdev/comments/gt1iov/need_advice_in_developing_a_task_management_app",
+                            "domain": "reddit.com",
+                            "content": "B1. The app must support adding, deleting, and marking tasks completed. B2. The app must work on multiple devices simultaneously (web app).",
+                            "content_type": "SEARCH_RESULT_SNIPPET",
+                            "score": 0.2961451,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        },
+                        {
+                            "title": "Developing A Task Management App: The Ultimate Guide",
+                            "url": "https://ozvid.com/blog/288/mobile-app-development/developing-a-task-management-app-the-ultimate-guide",
+                            "domain": "ozvid.com",
+                            "content": "[![OZVID Technologies](https://ozvid.com/logo.png)](/)\n\nWe use cookies, check our [Privacy Policies](/privacy).\n\n[Mobile App Development](/blog/category/type?id=3&title=mobile-app-development)\n\n# Developing A Task Management App: The Ultimate Guide\n\nMay 08, 2025 • 9 min read • 5352 views • Arpita Sharma\n\nShare this article\n\n![Developing A Task Management App: The Ultimate Guide](/blog/image/288?file=362)\n\nDid you ever wish to have a personal guide that can be available 24/7 for you? Well, the task management app is here to simplify your life and keep you on top of tasks.\n\nAccording to [Fortune Business Insights](https://www.fortunebusinessinsights.com/task-management-software-market-102249), the global task management software market is projected to reach $4,535.5 million by 2026, at a CAGR of 13.3%. We live in an era where staying ahead needs constant innovation and the use of cutting-edge technology. So, one such tool that has changed the ways business works is task management app management.\n\nA [task management app](https://ozvid.com/service/15/mobile-app-development-services) is a tool that helps people organize and keep their tasks in order. It allows you to make a list of tasks, set due dates, and see how much you have done. It is like a to-do list on your phone or computer but with extra features. This app helps you stay organized and make sure you don’t forget anything.\n\n## Key Takeaways\n\n* Task management apps are essential tools that help individuals and teams organ",
+                            "content_type": "FULL_PAGE_EXTRACT",
+                            "score": 0.2939109,
+                            "preferred_domain_candidate": false,
+                            "verification_status": "NOT_VERIFIED",
+                            "url_verification_status": "NOT_INDEPENDENTLY_VERIFIED"
+                        }
+                    ],
+                    "warning": "Research results are evidence candidates. A preferred domain does not prove a claim. URLs have not been independently verified. Fact-check every claim against supplied content."
+                },
+                "narration_word_count": 0,
+                "validation": {},
+                "publication_approved": false,
+                "specialists": [
+                    "Research Agent"
+                ],
+                "warnings": [
+                    "Pipeline stopped during: Creative Strategist.",
+                    "Previously completed work has been preserved.",
+                    "CEO review is required.",
+                    "Publication is not approved."
+                ]
+            },
+            {
+                "department": "audit",
+                "status": "REVIEW_REQUIRED",
+                "auditors": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "checks": [
+                            {
+                                "check": "Topic preservation",
+                                "passed": false,
+                                "details": "The original Roanoke Lost Colony topic must be preserved."
+                            },
+                            {
+                                "check": "Narration word count",
+                                "passed": false,
+                                "details": "Detected 0 words; required 125-140."
+                            },
+                            {
+                                "check": "Six visual scenes",
+                                "passed": false,
+                                "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                            },
+                            {
+                                "check": "Required content sections",
+                                "passed": false,
+                                "details": "Missing: video title, script, visual directions, facts to verify"
+                            },
+                            {
+                                "check": "Narration completeness",
+                                "passed": false,
+                                "details": "Final narration must be present."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "checks": [
+                            {
+                                "check": "Source verification",
+                                "passed": false,
+                                "details": "Sources: 15; valid URLs: 15; statuses: ['NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED']. URL structure does not prove source verification."
+                            },
+                            {
+                                "check": "Fact-check report present",
+                                "passed": false,
+                                "details": "Fact-check report is missing or empty."
+                            },
+                            {
+                                "check": "Fact-check statuses present",
+                                "passed": false,
+                                "details": "No explicit VERIFIED, NEEDS SOURCE or CONTRADICTED statuses found."
+                            },
+                            {
+                                "check": "Fact-check coverage",
+                                "passed": false,
+                                "details": "At least one explicitly VERIFIED claim is required."
+                            },
+                            {
+                                "check": "Unsupported claims",
+                                "passed": false,
+                                "details": "Cannot pass: fact-check report or explicit statuses are missing."
+                            },
+                            {
+                                "check": "Contradiction detection",
+                                "passed": false,
+                                "details": "Cannot pass: fact-check report or explicit statuses are missing."
+                            },
+                            {
+                                "check": "URL structure",
+                                "passed": true,
+                                "details": "No malformed URLs detected."
+                            }
+                        ],
+                        "passed": false
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "checks": [
+                            {
+                                "check": "Department identity",
+                                "passed": true,
+                                "details": "Received department: media"
+                            },
+                            {
+                                "check": "Media review status",
+                                "passed": false,
+                                "details": "Received status: ERROR"
+                            },
+                            {
+                                "check": "Publication safety",
+                                "passed": true,
+                                "details": "Media must never approve its own publication."
+                            },
+                            {
+                                "check": "Result structure",
+                                "passed": true,
+                                "details": "Media result must be a dictionary."
+                            },
+                            {
+                                "check": "Research data structure",
+                                "passed": true,
+                                "details": "Research results must be present."
+                            },
+                            {
+                                "check": "Specialist output",
+                                "passed": true,
+                                "details": "Received 1 specialists."
+                            }
+                        ],
+                        "passed": false
+                    }
+                ],
+                "summary": {
+                    "total_checks": 18,
+                    "passed_checks": 6,
+                    "failed_checks": 12
+                },
+                "failed_checks": [
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Topic preservation",
+                        "passed": false,
+                        "details": "The original Roanoke Lost Colony topic must be preserved."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration word count",
+                        "passed": false,
+                        "details": "Detected 0 words; required 125-140."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Six visual scenes",
+                        "passed": false,
+                        "details": "Detected 0 scenes. Expected exactly six consecutive 10-second scenes."
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Required content sections",
+                        "passed": false,
+                        "details": "Missing: video title, script, visual directions, facts to verify"
+                    },
+                    {
+                        "auditor": "Compliance Auditor",
+                        "check": "Narration completeness",
+                        "passed": false,
+                        "details": "Final narration must be present."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Source verification",
+                        "passed": false,
+                        "details": "Sources: 15; valid URLs: 15; statuses: ['NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED', 'NOT_VERIFIED']. URL structure does not prove source verification."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Fact-check report present",
+                        "passed": false,
+                        "details": "Fact-check report is missing or empty."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Fact-check statuses present",
+                        "passed": false,
+                        "details": "No explicit VERIFIED, NEEDS SOURCE or CONTRADICTED statuses found."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Fact-check coverage",
+                        "passed": false,
+                        "details": "At least one explicitly VERIFIED claim is required."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Unsupported claims",
+                        "passed": false,
+                        "details": "Cannot pass: fact-check report or explicit statuses are missing."
+                    },
+                    {
+                        "auditor": "Evidence Auditor",
+                        "check": "Contradiction detection",
+                        "passed": false,
+                        "details": "Cannot pass: fact-check report or explicit statuses are missing."
+                    },
+                    {
+                        "auditor": "Integrity Auditor",
+                        "check": "Media review status",
+                        "passed": false,
+                        "details": "Received status: ERROR"
+                    }
+                ],
+                "publication_approved": false,
+                "final_decision": "CEO_APPROVAL_REQUIRED",
+                "message": "აუდიტმა აღმოაჩინა პრობლემები. მასალა საჭიროებს შესწორებას ან დამატებით მტკიცებულებებს."
+            },
+            {
+                "department": "technical",
+                "status": "REVIEW_REQUIRED",
+                "manager_plan": {
+                    "department": "technical",
+                    "manager": "Technical Manager",
+                    "status": "ERROR",
+                    "message": "Technical planning failed.",
+                    "error": "ask_ai() missing 1 required positional argument: 'user_prompt'",
+                    "selected_specialists": [],
+                    "requires_ceo_approval": true,
+                    "execution_authorized": false
+                },
+                "specialist_results": [],
+                "execution_performed": false,
+                "code_modified": false,
+                "tests_executed": false,
+                "requires_ceo_approval": true,
+                "execution_authorized": false,
+                "final_decision": "CEO_APPROVAL_REQUIRED"
+            }
+        ]
     }
 ]
