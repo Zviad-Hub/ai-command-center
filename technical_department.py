@@ -71,6 +71,7 @@ from ai_brain import ask_ai
 from technical_manager import run_technical_manager
 from technical_agents import run_specialist
 from error_diagnostics import safe_error_code
+from department_quality import validate_technical_specialists
 
 
 TECHNICAL_REPORT_PROMPT = """
@@ -398,6 +399,17 @@ def run_technical_department(task, context=None):
         return _review_required_result(
             base_result,
             "One or more technical specialists failed; no final report was approved.",
+        )
+
+    specialist_quality_validation = validate_technical_specialists(
+        plan, specialist_results
+    )
+    base_result["specialist_quality_validation"] = specialist_quality_validation
+    if specialist_quality_validation["status"] != "PASS":
+        return _review_required_result(
+            base_result,
+            "Independent Technical specialist quality validation failed; manager synthesis and reviewer approval were blocked.",
+            specialist_quality_validation=specialist_quality_validation,
         )
 
     specialist_text = _build_specialist_context(specialist_results)
