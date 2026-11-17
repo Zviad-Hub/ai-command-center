@@ -367,6 +367,54 @@ def build_public_task_summary(record):
             row["specialist_count"] = len(specialist_results)
         elif isinstance(specialists, list):
             row["specialist_count"] = len(specialists)
+
+        # Publish aggregate specialist outcomes and safe error codes only.
+        # Never expose specialist reports, raw exception messages, or prompts.
+        specialist_failures = item.get("specialist_failures")
+        specialist_not_run = item.get("specialist_not_run")
+        completed_count = len(specialist_reports) if isinstance(specialist_reports, dict) else 0
+        failed_count = 0
+        not_run_count = len(specialist_not_run) if isinstance(specialist_not_run, list) else 0
+        failure_codes = []
+
+        if isinstance(specialist_results, list):
+            for specialist in specialist_results:
+                if not isinstance(specialist, dict):
+                    continue
+                status = str(specialist.get("status") or "").upper()
+                if status == "COMPLETED":
+                    completed_count += 1
+                elif status == "ERROR":
+                    failed_count += 1
+                    code = specialist.get("error_code")
+                    if isinstance(code, str) and re.fullmatch(r"[A-Z0-9_]{1,100}", code.strip().upper()):
+                        failure_codes.append(code.strip().upper())
+                elif status == "NOT_RUN":
+                    not_run_count += 1
+
+        if isinstance(specialist_failures, list):
+            failed_count += len(specialist_failures)
+            for failure in specialist_failures:
+                if not isinstance(failure, dict):
+                    continue
+                code = failure.get("error_code")
+                if isinstance(code, str) and re.fullmatch(r"[A-Z0-9_]{1,100}", code.strip().upper()):
+                    failure_codes.append(code.strip().upper())
+
+        has_specialist_diagnostics = (
+            isinstance(specialist_reports, dict)
+            or isinstance(specialist_results, list)
+            or isinstance(specialist_failures, list)
+            or isinstance(specialist_not_run, list)
+        )
+        if has_specialist_diagnostics:
+            row["specialist_completed_count"] = completed_count
+            row["specialist_failure_count"] = failed_count
+            row["specialist_not_run_count"] = not_run_count
+            row["specialist_selected_count"] = completed_count + failed_count + not_run_count
+            if failure_codes:
+                row["specialist_failure_codes"] = list(dict.fromkeys(failure_codes))[:20]
+
         if isinstance(auditors, list):
             row["auditor_count"] = len(auditors)
 
