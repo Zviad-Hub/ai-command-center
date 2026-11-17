@@ -233,9 +233,12 @@ def submit_task(ceo_task):
         ceo_task, departments, results
     )
 
+    # Semantic alignment is a required quality gate by default. It may be
+    # explicitly disabled for controlled cost/testing reasons, but NOT_RUN
+    # must never be treated as a successful audit.
     semantic_audit_enabled = os.getenv(
-        "AI_ORGANIZATION_SEMANTIC_AUDIT", ""
-    ).strip().casefold() in {"1", "true", "yes", "enabled"}
+        "AI_ORGANIZATION_SEMANTIC_AUDIT", "1"
+    ).strip().casefold() not in {"0", "false", "no", "disabled", "off"}
     if semantic_audit_enabled:
         semantic_audit = run_semantic_alignment_audit(
             ceo_task, departments, results
@@ -258,7 +261,7 @@ def submit_task(ceo_task):
     else:
         organization_audit["content_alignment_status"] = "HUMAN_REVIEW_REQUIRED"
 
-    semantic_gate_passed = semantic_status in {"PASS", "NOT_RUN"}
+    semantic_gate_passed = semantic_status == "PASS"
     overall_status = (
         "READY_FOR_HUMAN_REVIEW"
         if organization_audit["status"] == "PASS" and semantic_gate_passed
@@ -424,10 +427,36 @@ def build_public_task_summary(record):
         if not isinstance(check, dict):
             continue
         issues = check.get("issues")
+        issue_list = issues if isinstance(issues, list) else []
+        issue_codes = []
+        for issue in issue_list:
+            value = str(issue).casefold()
+            if "specialist quality validation" in value:
+                code = "SPECIALIST_QUALITY_GATE_FAILED"
+            elif "manager/reviewer quality gate" in value or "independent security review" in value:
+                code = "INDEPENDENT_REVIEW_FAILED"
+            elif "execution" in value or "unsafe or ambiguous" in value or "active_testing" in value:
+                code = "EXECUTION_SAFETY_GATE_FAILED"
+            elif "publication_approved" in value:
+                code = "PUBLICATION_APPROVAL_FLAG_INVALID"
+            elif "written authorization" in value or "human scope review" in value or "passive-only" in value:
+                code = "PENTESTER_SCOPE_GATE_FAILED"
+            elif "evidence validation" in value:
+                code = "EVIDENCE_VALIDATION_FAILED"
+            elif "audit:" in value:
+                code = "INDEPENDENT_AUDIT_GATE_FAILED"
+            elif "missing" in value or "not provided" in value:
+                code = "REQUIRED_EVIDENCE_MISSING"
+            elif "status" in value:
+                code = "DEPARTMENT_STATUS_NOT_ACCEPTED"
+            else:
+                code = "ORCHESTRATION_INTEGRITY_ISSUE"
+            issue_codes.append(code)
         organization_checks.append({
             "department": str(check.get("department") or "unknown"),
             "status": str(check.get("status") or "UNKNOWN"),
-            "issue_count": len(issues) if isinstance(issues, list) else 0,
+            "issue_count": len(issue_list),
+            "issue_codes": list(dict.fromkeys(issue_codes)),
         })
 
     semantic = record.get("semantic_audit")
@@ -452,6 +481,16 @@ def build_public_task_summary(record):
         "semantic_audit": {
             "status": str(semantic.get("status") or "UNKNOWN"),
             "task_coverage": str(semantic.get("task_coverage") or "UNKNOWN"),
+            "missing_requirement_count": len(semantic.get("missing_requirements", []))
+                if isinstance(semantic.get("missing_requirements"), list) else 0,
+            "unsupported_claim_count": len(semantic.get("unsupported_claims", []))
+                if isinstance(semantic.get("unsupported_claims"), list) else 0,
+            "contradiction_count": len(semantic.get("contradictions", []))
+                if isinstance(semantic.get("contradictions"), list) else 0,
+            "evidence_gap_count": len(semantic.get("evidence_gaps", []))
+                if isinstance(semantic.get("evidence_gaps"), list) else 0,
+            "error_code": str(semantic.get("error_code") or "")[:100]
+                if isinstance(semantic.get("error_code"), str) else "",
         },
         "human_review_required": record.get("human_review_required") is True,
     }
