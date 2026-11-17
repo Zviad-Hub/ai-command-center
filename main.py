@@ -38,7 +38,7 @@ def display_manager_result(item):
 
     report = item.get("report")
     if isinstance(report, str) and report.strip():
-        print("\\nDEPARTMENT REPORT:\\n")
+        print(chr(10) + "DEPARTMENT REPORT:" + chr(10))
         print(report.strip())
 
     summary = item.get("summary")
