@@ -24,7 +24,7 @@ class OrganizationSemanticAuditorTests(unittest.TestCase):
 
     @patch("organization_semantic_auditor.ask_ai")
     def test_pass_requires_complete_issue_free_task_alignment(self, ai_mock):
-        ai_mock.return_value = _pass_response()
+        ai_mock.return_value = _pass_response(human_review_required=False)
         result = run_semantic_alignment_audit(
             "Create a business plan with risks and KPIs.",
             ["business"],
