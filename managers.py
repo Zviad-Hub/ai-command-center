@@ -12,7 +12,7 @@ class DepartmentManager:
         print("=" * 45)
         print("RECEIVED MISSION:", task)
 
-        # PENTESTER DEPARTMENT — DEFENSIVE, PASSIVE-ONLY WORKFLOW
+        # PENTESTER DEPARTMENT — DEFENSIVE, PASSIVE-ONLY WORKFLOW; NO NETWORK OPERATIONS
         if self.department == "pentester":
             try:
                 from pentester_agents import run_pentester_department
