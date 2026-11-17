@@ -300,7 +300,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 63 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, and Pentester specialist/reviewer safety gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The current regression suite contains 67 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, and Pentester specialist/reviewer safety gates. The dedicated GitHub Actions test workflow runs the suite on relevant pull-request changes. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
@@ -336,8 +336,9 @@ score is not proof of factual correctness; human review remains mandatory.
 The opt-in live suite in `agent_quality_stress_test.py` evaluates real Finance,
 Business, Tenders, Pentester and Technical department outputs. It checks
 specialist participation, manager/reviewer gates, task-specific requirements,
-honest uncertainty, arithmetic in the controlled Finance scenario, and safety
-flags. It deliberately disables Tavily research so the test uses only the
+honest uncertainty, arithmetic in the controlled Finance scenario, four
+formula-backed Business KPIs and validation experiments, Tender deadline/evidence
+honesty, and safety flags. It deliberately disables Tavily research so the test uses only the
 controlled facts supplied in each scenario.
 
 Run locally only when you intentionally want to spend Groq API quota:
