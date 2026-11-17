@@ -38,6 +38,60 @@ The old mystery remains unresolved.
             "The old mystery remains unresolved."
         )
 
+    def test_detects_georgian_request_language(self):
+        task = "შექმენი ვიდეო ქართულ ენაზე მაიას ცივილიზაციაზე."
+        self.assertTrue(
+            media_agents.narration_matches_requested_language(
+                task, "მაიას ცივილიზაცია საუკუნეების განმავლობაში ვითარდებოდა."
+            )
+        )
+        self.assertFalse(
+            media_agents.narration_matches_requested_language(
+                task, "The Maya civilization developed over centuries."
+            )
+        )
+        self.assertIn(
+            "Georgian",
+            media_agents.requested_language_instruction(task)
+        )
+
+    def test_explicit_english_instruction_can_request_georgian_output(self):
+        task = "Write a YouTube Shorts script in Georgian about the Maya."
+        self.assertTrue(media_agents.is_georgian_request(task))
+        self.assertFalse(
+            media_agents.narration_matches_requested_language(
+                task, "The Maya civilization developed over centuries."
+            )
+        )
+
+    def test_scriptwriter_includes_language_requirement_in_provider_prompt(self):
+        script = """VIDEO TITLE:
+მაიას ცივილიზაციის საიდუმლო
+EXACT TOPIC:
+მაიას ცივილიზაცია
+HOOK:
+რა მოხდა სინამდვილეში?
+SCRIPT:
+მაიას ცივილიზაცია ცენტრალურ ამერიკაში განვითარდა.
+VISUAL DIRECTIONS:
+0:00-0:10 რუკა
+0:10-0:20 ქალაქი
+0:20-0:30 წარწერები
+0:30-0:40 ტყე
+0:40-0:50 არქეოლოგები
+0:50-1:00 ნანგრევები
+FACTS TO VERIFY:
+წყაროები
+"""
+        with patch.object(media_agents, "ask_ai", return_value=script) as mocked:
+            media_agents.scriptwriter(
+                "შექმენი ქართულენოვანი ვიდეო მაიას ცივილიზაციაზე",
+                "კონცეფცია",
+                {"status": "COMPLETED", "sources": []}
+            )
+        self.assertIn("Georgian", mocked.call_args.args[0])
+        self.assertIn("Do not translate the narration into English", mocked.call_args.args[0])
+
     def test_scriptwriter_retries_format_once(self):
         original = """VIDEO TITLE:
 A Historical Mystery

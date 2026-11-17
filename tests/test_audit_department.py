@@ -35,6 +35,31 @@ class AuditDepartmentTests(unittest.TestCase):
         )
         self.assertFalse(check["passed"])
 
+    def test_georgian_topic_preservation_uses_unicode_words(self):
+        check = self._topic_check(
+            "შექმენი ვიდეო თემაზე: როგორ გაქრა მაიას ცივილიზაცია?",
+            "EXACT TOPIC: მაიას ცივილიზაცია\nVIDEO CONCEPT: ისტორიული ახსნა.",
+            "VIDEO TITLE: მაიას ცივილიზაცია\nSCRIPT: მაიას ცივილიზაცია ცენტრალურ ამერიკაში განვითარდა. "
+            "მისი ქალაქები და კულტურა საუკუნეების განმავლობაში არსებობდა.",
+        )
+        self.assertTrue(check["passed"], check["details"])
+
+    def test_compliance_auditor_rejects_english_narration_for_georgian_task(self):
+        result = compliance_auditor(
+            "შექმენი ვიდეო ქართულ ენაზე მაიას ცივილიზაციაზე.",
+            {
+                "concept": "EXACT TOPIC: მაიას ცივილიზაცია",
+                "edited_script": (
+                    "VIDEO TITLE: The Maya\nSCRIPT: The Maya civilization developed in Mesoamerica."
+                ),
+            },
+        )
+        check = next(
+            item for item in result["checks"]
+            if item["check"] == "Narration language"
+        )
+        self.assertFalse(check["passed"])
+
     def test_topic_preservation_fails_closed_when_exact_topic_is_missing(self):
         check = self._topic_check(
             "Create a short video about the Library of Alexandria.",

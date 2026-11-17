@@ -27,6 +27,41 @@ MAX_WORDS = 140
 # TEXT UTILITIES
 # ==================================================
 
+def is_georgian_request(task):
+    """Detect Georgian text or an explicit Georgian-language instruction."""
+    task_text = str(task or "").casefold()
+    return bool(
+        re.search(r"[\u10A0-\u10FF]", task_text)
+        or re.search(r"\bgeorgian\b|ქართულ", task_text)
+    )
+
+
+def requested_language_instruction(task):
+    """Keep generated creative content in the CEO request's language."""
+    if is_georgian_request(task):
+        language = "Georgian"
+    else:
+        language = "the same language as the CEO's original request"
+
+    return (
+        "LANGUAGE REQUIREMENT (MANDATORY):\n"
+        f"- Write all user-facing creative content in {language}.\n"
+        "- The narration, hook, title, visual descriptions, concept, and editorial "
+        "explanations must use that language.\n"
+        "- Keep the required structural headings and machine-readable status labels "
+        "in English exactly as specified, so automated validation remains reliable.\n"
+        "- Do not translate the narration into English unless the CEO explicitly "
+        "requests English."
+    )
+
+
+def narration_matches_requested_language(task, narration):
+    """Return False when a Georgian request receives non-Georgian narration."""
+    if is_georgian_request(task):
+        return bool(re.search(r"[\u10A0-\u10FF]", str(narration or "")))
+    return True
+
+
 def normalize_text(text):
     text = str(text or "")
     return text.replace("\r\n", "\n").replace("\r", "\n")
@@ -377,6 +412,8 @@ Do not create alternative concepts.
 Maximum 220 words.
 """
 
+    prompt += "\n\n" + requested_language_instruction(task)
+
     user_prompt = (
         "CEO ORIGINAL REQUEST:\n"
         + str(task)
@@ -411,22 +448,30 @@ Maximum 220 words.
     ]
 
     if missing:
+        if is_georgian_request(task):
+            hook_text = "გამოიკვლიე ისტორიული საიდუმლო მტკიცებულებებზე დაყრდნობით და არა ვარაუდებით."
+            questions_text = "რომელი დეტალებია დადასტურებული მოწოდებული ისტორიული მტკიცებულებებით და რომელი რჩება გაურკვეველი?"
+            supported_text = "გამოიყენე მხოლოდ ის დეტალები, რომლებსაც მოწოდებული კვლევა პირდაპირ ადასტურებს."
+            uncertain_text = "საკმარისი მტკიცებულების გარეშე არსებული მტკიცებები საჭიროებს დამატებით გადამოწმებას."
+        else:
+            hook_text = "Investigate the central historical mystery using evidence rather than assumptions."
+            questions_text = "Which details are supported by the supplied historical evidence, and which remain uncertain?"
+            supported_text = "Use only details directly supported by supplied research."
+            uncertain_text = "Claims without sufficient supplied evidence require further verification."
+
         result = (
             "EXACT TOPIC:\n"
             + str(task)
             + "\n\nVIDEO CONCEPT:\n"
             + result
             + "\n\nHOOK:\n"
-            + "Investigate the central historical mystery using "
-              "evidence rather than assumptions."
+            + hook_text
             + "\n\nKEY QUESTIONS TO INVESTIGATE:\n"
-            + "Which details are supported by the supplied historical "
-              "evidence, and which remain uncertain?"
+            + questions_text
             + "\n\nSUPPORTED HISTORICAL DETAILS:\n"
-            + "Use only details directly supported by supplied research."
+            + supported_text
             + "\n\nUNCERTAIN DETAILS:\n"
-            + "Claims without sufficient supplied evidence require "
-              "further verification."
+            + uncertain_text
         )
 
         print(
@@ -449,7 +494,7 @@ def scriptwriter(task, concept, research):
     prompt = """
 You are a professional historical YouTube Shorts Scriptwriter.
 
-Create exactly ONE English YouTube Shorts video script.
+Create exactly ONE YouTube Shorts video script.
 
 TOPIC:
 The exact topic in the CEO request is mandatory.
@@ -458,7 +503,7 @@ Never replace or expand it.
 NARRATION:
 - 125-140 spoken words.
 - Aim for approximately 132 words.
-- Natural, engaging spoken English.
+- Natural, engaging spoken language matching the CEO request.
 - Do not count headings or visual directions.
 
 HISTORICAL ACCURACY:
@@ -496,6 +541,8 @@ FACTS TO VERIFY:
 Count the narration words before returning.
 """
 
+    prompt += "\n\n" + requested_language_instruction(task)
+
     user_prompt = (
         "CEO ORIGINAL REQUEST:\n"
         + str(task)
@@ -516,7 +563,12 @@ Count the narration words before returning.
     # Models sometimes omit the colon or use a Markdown heading. The parser
     # accepts both forms; if narration is still absent, make one bounded
     # format-only repair attempt before failing the stage.
-    if not validation["narration_found"]:
+    if (
+        not validation["narration_found"]
+        or not narration_matches_requested_language(
+            task, extract_narration(result)
+        )
+    ):
         repair_prompt = """
 Reformat the supplied response as a complete historical YouTube Shorts script.
 Do not add, remove, or alter historical claims. Do not invent facts.
@@ -532,6 +584,7 @@ The SCRIPT section must contain the spoken narration. Include all six timestampe
 visual scenes if they exist in the supplied response. If the original response
 contains no narration, say NO NARRATION PROVIDED rather than inventing one.
 """
+        repair_prompt += "\n\n" + requested_language_instruction(task)
         repaired = ask_ai(
             repair_prompt,
             "CEO ORIGINAL REQUEST:\n" + str(task)
@@ -540,13 +593,23 @@ contains no narration, say NO NARRATION PROVIDED rather than inventing one.
         if isinstance(repaired, str) and repaired.strip():
             repaired = repaired.strip()
             repaired_validation = validate_script(repaired)
-            if repaired_validation["narration_found"]:
+            if (
+                repaired_validation["narration_found"]
+                and narration_matches_requested_language(
+                    task, extract_narration(repaired)
+                )
+            ):
                 result = repaired
                 validation = repaired_validation
 
     if not validation["narration_found"]:
         raise RuntimeError(
             "Scriptwriter response contained no extractable narration after one format-repair attempt."
+        )
+
+    if not narration_matches_requested_language(task, extract_narration(result)):
+        raise RuntimeError(
+            "Scriptwriter narration language does not match the CEO request."
         )
 
     print("[SCRIPTWRITER] Narration words:", validation["narration_word_count"])
@@ -569,7 +632,7 @@ Improve the supplied script without changing its topic.
 
 Check:
 1. Exact topic preservation.
-2. English grammar and clarity.
+2. Grammar and clarity in the requested language.
 3. Narration word count.
 4. Unsupported historical claims.
 5. Invented or misleading details.
@@ -596,6 +659,7 @@ FACTS TO VERIFY:
 You may include a short editor review before the script.
 """
 
+    prompt += "\n\n" + requested_language_instruction(task)
     result = ask_ai(
         prompt,
         "CEO ORIGINAL REQUEST:\n"
@@ -613,6 +677,11 @@ You may include a short editor review before the script.
     if not validation["narration_found"]:
         raise RuntimeError(
             "Quality Editor did not return readable narration."
+        )
+
+    if not narration_matches_requested_language(task, extract_narration(edited)):
+        raise RuntimeError(
+            "Quality Editor changed the narration language requested by the CEO."
         )
 
     if not validation["word_count_passed"]:
@@ -639,6 +708,7 @@ VISUAL DIRECTIONS:
 FACTS TO VERIFY:
 """
 
+        repair_prompt += "\n\n" + requested_language_instruction(task)
         repaired = ask_ai(
             repair_prompt,
             "CEO TOPIC:\n"
@@ -652,8 +722,18 @@ FACTS TO VERIFY:
         if isinstance(repaired, str) and repaired.strip():
             repaired = repaired.strip()
 
-            if validate_script(repaired)["narration_found"]:
+            if (
+                validate_script(repaired)["narration_found"]
+                and narration_matches_requested_language(
+                    task, extract_narration(repaired)
+                )
+            ):
                 edited = repaired
+
+    if not narration_matches_requested_language(task, extract_narration(edited)):
+        raise RuntimeError(
+            "Quality Editor narration language does not match the CEO request."
+        )
 
     final_validation = validate_script(edited)
 
@@ -725,6 +805,7 @@ OVERALL RESULT must be REVIEW REQUIRED.
 If no claims can be checked, explicitly say so.
 """
 
+    prompt += "\n\n" + requested_language_instruction(task)
     result = ask_ai(
         prompt,
         "CEO ORIGINAL REQUEST:\n"
@@ -783,6 +864,7 @@ VISUAL DIRECTIONS:
 FACTS TO VERIFY:
 """
 
+    prompt += "\n\n" + requested_language_instruction(task)
     result = ask_ai(
         prompt,
         "CEO ORIGINAL REQUEST:\n"
@@ -803,6 +885,11 @@ FACTS TO VERIFY:
     if not validate_script(edited)["narration_found"]:
         raise RuntimeError(
             "Evidence Editor did not return readable narration."
+        )
+
+    if not narration_matches_requested_language(task, extract_narration(edited)):
+        raise RuntimeError(
+            "Evidence Editor changed the narration language requested by the CEO."
         )
 
     validation = validate_script(edited)
