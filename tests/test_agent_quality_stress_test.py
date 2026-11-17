@@ -177,7 +177,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         result = evaluate_live_result("tenders", {
             "status": "COMPLETED",
             "specialist_reports": {"a": "eligibility", "b": "documents", "c": "pricing"},
-            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware.",
+            "quality_review": "REVIEW STATUS: PASS\nISSUES: No unsupported claims.\nREQUIRED CORRECTIONS: None; all missing information is disclosed.\nFINAL QUALITY SUMMARY: The report is evidence-aware and avoids unsupported tender claims.",
             "quality_review_passed": True,
             "report": report,
             "requires_ceo_approval": True,
