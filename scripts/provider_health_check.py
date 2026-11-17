@@ -4,6 +4,7 @@
 import json
 import os
 import sys
+from urllib.parse import urlsplit
 
 import requests
 
@@ -74,6 +75,10 @@ def check_provider(name, url, api_key, model, token_field, post_fn=None):
     if not api_key:
         return {"provider": name, "status": "NOT_CONFIGURED"}
 
+    parsed_url = urlsplit(str(url or ""))
+    if parsed_url.scheme != "https" or not parsed_url.netloc:
+        return {"provider": name, "status": "INVALID_CONFIGURATION"}
+
     post = post_fn or requests.post
     payload = {
         "model": model,
@@ -111,39 +116,53 @@ def check_provider(name, url, api_key, model, token_field, post_fn=None):
 
 
 def run_health_check():
-    groq = check_provider(
-        "groq",
-        GROQ_URL,
-        os.getenv("GROQ_API_KEY", "").strip(),
-        os.getenv("GROQ_MODEL", "openai/gpt-oss-120b").strip(),
-        "max_completion_tokens",
-    )
-    gemini = check_provider(
-        "gemini",
-        GEMINI_URL,
-        os.getenv("GEMINI_API_KEY", "").strip(),
-        os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip(),
-        "max_tokens",
-    )
+    providers = [
+        check_provider(
+            "groq",
+            GROQ_URL,
+            os.getenv("GROQ_API_KEY", "").strip(),
+            os.getenv("GROQ_MODEL", "openai/gpt-oss-120b").strip(),
+            "max_completion_tokens",
+        ),
+        check_provider(
+            "gemini",
+            GEMINI_URL,
+            os.getenv("GEMINI_API_KEY", "").strip(),
+            os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip(),
+            "max_tokens",
+        ),
+    ]
 
-    statuses = (groq["status"], gemini["status"])
-    passing = statuses.count("PASS")
-    configured = sum(status != "NOT_CONFIGURED" for status in statuses)
-    if passing == 2:
+    secondary_url = os.getenv("AI_FALLBACK_API_URL", "").strip()
+    secondary_key = os.getenv("AI_FALLBACK_API_KEY", "").strip()
+    secondary_model = os.getenv("AI_FALLBACK_MODEL", "").strip()
+    if secondary_url and secondary_key and secondary_model:
+        host = urlsplit(secondary_url).netloc.lower()
+        secondary_name = "openrouter" if "openrouter.ai" in host else "secondary"
+        providers.append(check_provider(
+            secondary_name,
+            secondary_url,
+            secondary_key,
+            secondary_model,
+            os.getenv("AI_FALLBACK_TOKEN_FIELD", "max_tokens").strip(),
+        ))
+
+    configured = [item for item in providers if item["status"] != "NOT_CONFIGURED"]
+    passing = sum(item["status"] == "PASS" for item in configured)
+    if configured and passing == len(configured):
         overall = "PASS"
-    elif passing == 1:
+    elif passing:
         overall = "PARTIAL"
-    elif configured == 0:
+    elif not configured:
         overall = "NO_PROVIDERS_CONFIGURED"
     else:
         overall = "UNAVAILABLE"
 
     return {
         "overall_status": overall,
-        "providers": [groq, gemini],
-        "requests_sent": sum(status != "NOT_CONFIGURED" for status in statuses),
+        "providers": providers,
+        "requests_sent": len(configured),
     }
-
 
 if __name__ == "__main__":
     # A completed diagnostic is a successful workflow run even if an API is down.

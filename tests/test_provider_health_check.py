@@ -1,9 +1,10 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import requests
 
-from scripts.provider_health_check import check_provider
+from scripts import provider_health_check
+from scripts.provider_health_check import check_provider, run_health_check
 
 
 class ProviderHealthCheckTests(unittest.TestCase):
@@ -95,6 +96,47 @@ class ProviderHealthCheckTests(unittest.TestCase):
             check_provider("groq", "https://example.invalid", "secret", "model", "max_completion_tokens", post)["status"],
             "TRUNCATED_RESPONSE",
         )
+
+
+    def test_secondary_provider_uses_safe_https_and_small_request(self):
+        post = Mock(return_value=self.response(200))
+        result = check_provider("openrouter", "https://openrouter.ai/api/v1/chat/completions",
+                                "secret", "openrouter/auto", "max_tokens", post)
+        self.assertEqual(result["status"], "PASS")
+        self.assertEqual(post.call_args.kwargs["json"]["max_tokens"], 64)
+        self.assertEqual(post.call_args.kwargs["timeout"], 12)
+
+    def test_http_secondary_endpoint_is_rejected_without_sending_secret(self):
+        post = Mock()
+        result = check_provider("secondary", "http://example.com/chat", "secret", "model", "max_tokens", post)
+        self.assertEqual(result["status"], "INVALID_CONFIGURATION")
+        post.assert_not_called()
+
+    @patch.dict("os.environ", {
+        "GROQ_API_KEY": "groq-secret",
+        "GEMINI_API_KEY": "gemini-secret",
+        "AI_FALLBACK_API_KEY": "openrouter-secret",
+        "AI_FALLBACK_API_URL": "https://openrouter.ai/api/v1/chat/completions",
+        "AI_FALLBACK_MODEL": "openrouter/auto",
+    }, clear=True)
+    def test_run_health_check_reports_all_three_provider_statuses(self):
+        groq = self.response(200)
+        gemini = self.response(429, text="Daily quota exceeded")
+        openrouter = self.response(402, text="Private billing detail")
+        with patch.object(provider_health_check.requests, "post", side_effect=[groq, gemini, openrouter]) as post:
+            result = run_health_check()
+        self.assertEqual(result["overall_status"], "PARTIAL")
+        self.assertEqual(
+            result["providers"],
+            [
+                {"provider": "groq", "status": "PASS"},
+                {"provider": "gemini", "status": "DAILY_QUOTA"},
+                {"provider": "openrouter", "status": "HTTP_ERROR_402"},
+            ],
+        )
+        self.assertEqual(result["requests_sent"], 3)
+        self.assertEqual(post.call_count, 3)
+        self.assertNotIn("Private billing detail", str(result))
 
 
 if __name__ == "__main__":
