@@ -120,7 +120,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "specialist_results": [
                 {"status": "COMPLETED"}, {"status": "COMPLETED"}
             ],
-            "report": "TECHNICAL DEPARTMENT — FINAL REPORT\nSTATUS: COMPLETED\nNo source code was supplied.\nEVIDENCE LIMITATIONS:\nEXECUTION AND APPROVAL:",
+            "report": "TECHNICAL DEPARTMENT — FINAL REPORT\nSTATUS: COMPLETED\nMANAGER SYNTHESIS:\nNo source code was supplied.\nEVIDENCE LIMITATIONS:\nEXECUTION AND APPROVAL:",
             "quality_review": "REVIEW STATUS: PASS\nISSUES: None.\nREQUIRED CORRECTIONS: None; all evidence limits are clear.\nFINAL QUALITY SUMMARY: The technical report is accurate and advisory.",
             "quality_review_passed": True,
             "execution_performed": False,
