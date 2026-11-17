@@ -2,12 +2,6 @@ name: Technical Department Tests
 
 on:
   pull_request:
-    paths:
-      - "**.py"
-      - ".github/workflows/**"
-      - ".github/dependabot.yml"
-      - "README.md"
-      - "requirements.txt"
   workflow_dispatch:
     inputs:
       run_live_quality:
