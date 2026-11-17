@@ -31,6 +31,22 @@ class DirectorRoutingTests(unittest.TestCase):
     def test_business_department_name_routes_to_business(self):
         self.assertEqual(detect_departments("Business"), ["business"])
 
+    def test_technical_only_prompt_excludes_all_other_departments(self):
+        task = (
+            "TECHNICAL DEPARTMENT — CONTROLLED LIVE QUALITY TEST. "
+            "Analyze the AI Command Center provider reliability and fallback architecture. "
+            "Restrictions: Do not run Media, Audit, Pentester, Finance, Business or Tenders. "
+            "Do not modify files, execute commands or perform external actions."
+        )
+        self.assertEqual(detect_departments(task), ["technical"])
+
+    def test_exclusions_do_not_hide_positive_department_outside_restriction_clause(self):
+        task = (
+            "Review the finance budget. "
+            "Restrictions: Do not run Media, Audit, Pentester, Business or Tenders."
+        )
+        self.assertEqual(detect_departments(task), ["finance"])
+
     @patch("director.ai_route_task")
     def test_keyword_routing_does_not_call_ai(self, ai_route_mock):
         result = route_task("შეამოწმე ეს კოდი")
