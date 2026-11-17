@@ -422,7 +422,7 @@ def route_task(task):
             },
             "requires_ceo_approval": True,
             "routing_method": "SAFE_FALLBACK",
-            "routing_error": str(error)
+            "routing_error": "AI_ROUTING_FAILED"
         }
 
 
