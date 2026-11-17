@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import ai_brain
+from error_diagnostics import safe_error_code
 
 
 def _response(content, finish_reason="stop"):
@@ -124,6 +125,24 @@ class AskAITests(unittest.TestCase):
         self.assertEqual(result, "fallback only result")
         self.assertEqual(post.call_count, 1)
         self.assertEqual(post.call_args.args[0], "https://fallback.example/v1/chat/completions")
+
+    def test_safe_error_code_identifies_fallback_http_status_without_details(self):
+        self.assertEqual(
+            safe_error_code("Fallback AI provider HTTP error: 401; provider details were withheld."),
+            "FALLBACK_PROVIDER_HTTP_401",
+        )
+
+    def test_safe_error_code_identifies_primary_http_status_without_details(self):
+        self.assertEqual(
+            safe_error_code("Groq API HTTP error: 503; provider details were withheld."),
+            "PRIMARY_PROVIDER_HTTP_503",
+        )
+
+    def test_safe_error_code_identifies_groq_server_error(self):
+        self.assertEqual(
+            safe_error_code("Groq server error: HTTP 502; provider details were withheld."),
+            "PRIMARY_PROVIDER_HTTP_502",
+        )
 
     def test_token_limit_detection_for_director(self):
         self.assertEqual(
