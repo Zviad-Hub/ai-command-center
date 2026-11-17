@@ -329,9 +329,14 @@ class TechnicalDepartmentTests(unittest.TestCase):
                 {"specialist": "devops_engineer", "mission": "Review deployment."},
             ],
         }
-        specialist_mock.side_effect = RuntimeError(
-            "Groq daily quota has been exhausted."
-        )
+        specialist_mock.return_value = {
+            "specialist": "backend_developer",
+            "specialist_name": "Backend Developer",
+            "status": "ERROR",
+            "error": "SPECIALIST_FAILED",
+            "error_code": "PROVIDER_DAILY_QUOTA_EXHAUSTED",
+            "execution_performed": False,
+        }
 
         result = run_technical_department("Review the service.")
 
