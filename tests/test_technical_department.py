@@ -125,8 +125,8 @@ class TechnicalDepartmentTests(unittest.TestCase):
         reviewer_prompt = ask_ai_mock.call_args_list[1].args[1]
 
         for evidence in (
-            "BACKEND EVIDENCE: Retry behavior is not documented.",
-            "QA EVIDENCE: No failure-mode test cases were supplied.",
+            "BACKEND EVIDENCE: API retry behavior and error handling reliability are not documented; evidence is missing.",
+            "QA EVIDENCE: No failure-mode test cases or regression coverage were supplied; edge-case validation is missing.",
             "PLAN_CREATED",
             "INC-204",
         ):
