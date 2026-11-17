@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from task_manager import submit_task
+from task_manager import build_public_task_summary, submit_task
 
 
 class TaskManagerTests(unittest.TestCase):
@@ -231,6 +231,65 @@ class TaskManagerTests(unittest.TestCase):
             record["organization_audit"]["content_alignment_status"],
             "AI_REVIEW_NEEDS_REVISION",
         )
+
+
+    def test_public_task_summary_exposes_gate_statuses_without_private_content(self):
+        record = {
+            "id": "safe1234",
+            "task": "PRIVATE CEO TASK",
+            "overall_status": "REVIEW_REQUIRED",
+            "departments": ["finance"],
+            "results": [{
+                "department": "finance",
+                "status": "COMPLETED",
+                "report": "PRIVATE FINANCIAL REPORT",
+                "specialist_reports": {"analyst": "PRIVATE SPECIALIST OUTPUT"},
+                "specialist_quality_validation": {"status": "PASS"},
+                "quality_review_passed": True,
+                "requires_ceo_approval": True,
+                "execution_performed": False,
+            }],
+            "organization_audit": {
+                "status": "REVIEW_REQUIRED",
+                "content_alignment_status": "HUMAN_REVIEW_REQUIRED",
+                "department_checks": [{
+                    "department": "finance",
+                    "status": "REVIEW_REQUIRED",
+                    "issues": ["PRIVATE AUDIT DETAIL"],
+                }],
+            },
+            "semantic_audit": {
+                "status": "NOT_RUN",
+                "summary": "PRIVATE SEMANTIC SUMMARY",
+            },
+            "human_review_required": True,
+        }
+
+        summary = build_public_task_summary(record)
+        rendered = repr(summary)
+
+        self.assertEqual(summary["run_status"], "FINISHED")
+        self.assertEqual(summary["overall_status"], "REVIEW_REQUIRED")
+        self.assertEqual(
+            summary["department_results"][0]["specialist_validation_status"],
+            "PASS",
+        )
+        self.assertEqual(summary["organization_audit"]["department_checks"][0]["issue_count"], 1)
+        self.assertTrue(summary["human_review_required"])
+        for private_text in (
+            "PRIVATE CEO TASK",
+            "PRIVATE FINANCIAL REPORT",
+            "PRIVATE SPECIALIST OUTPUT",
+            "PRIVATE AUDIT DETAIL",
+            "PRIVATE SEMANTIC SUMMARY",
+        ):
+            self.assertNotIn(private_text, rendered)
+
+    def test_public_task_summary_fails_safely_for_invalid_input(self):
+        summary = build_public_task_summary(None)
+        self.assertEqual(summary["run_status"], "FAILED")
+        self.assertEqual(summary["error_code"], "INVALID_TASK_RECORD")
+        self.assertTrue(summary["human_review_required"])
 
 
 if __name__ == "__main__":
