@@ -320,6 +320,33 @@ def build_public_task_summary(record):
                 evidence_validation.get("status") or "UNKNOWN"
             )
 
+        validation = item.get("validation")
+        if isinstance(validation, dict):
+            script_gates = (
+                "word_count_passed",
+                "visual_scene_count_passed",
+                "timestamps_passed",
+                "narration_found",
+            )
+            row["script_validation"] = {
+                field: validation[field]
+                for field in script_gates
+                if isinstance(validation.get(field), bool)
+            }
+
+        audit_summary = item.get("summary")
+        if isinstance(audit_summary, dict):
+            for field in ("total_checks", "passed_checks", "failed_checks"):
+                value = audit_summary.get(field)
+                if isinstance(value, int) and not isinstance(value, bool):
+                    row[f"audit_{field}"] = value
+        final_decision = item.get("final_decision")
+        if isinstance(final_decision, str):
+            row["final_decision"] = final_decision
+        warnings = item.get("warnings")
+        if isinstance(warnings, list):
+            row["warning_count"] = len(warnings)
+
         for field in (
             "quality_review_passed",
             "publication_approved",
