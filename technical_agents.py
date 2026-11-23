@@ -143,13 +143,15 @@ ADDITIONAL CONTEXT:
 INSTRUCTIONS:
 
 1. Analyze only your assigned technical responsibility.
-2. Give practical, specific recommendations.
-3. Identify risks, missing information, and dependencies.
-4. Clearly distinguish facts from assumptions.
-5. If source code is not provided, do not claim to have inspected it.
-6. Do not claim that code was modified or tests were executed.
-7. Do not deploy, execute, or modify anything.
-8. Any real implementation or execution requires separate CEO approval.
+2. Keep your report concise (maximum 350 words); prioritize evidence, material risks,
+   concrete recommendations, and missing inputs over repeated background.
+3. Give practical, specific recommendations.
+4. Identify risks, missing information, and dependencies.
+5. Clearly distinguish facts from assumptions.
+6. If source code is not provided, do not claim to have inspected it.
+7. Do not claim that code was modified or tests were executed.
+8. Do not deploy, execute, or modify anything.
+9. Any real implementation or execution requires separate CEO approval.
 
 Return a structured report with these sections:
 
