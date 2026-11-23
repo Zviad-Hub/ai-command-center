@@ -139,26 +139,22 @@ def _specialist_name(item):
 
 
 def _build_specialist_context(results):
-    sections = []
+    reports = []
     for item in results:
         if not isinstance(item, dict):
-            sections.append(f"Invalid specialist result: {item!r}")
+            reports.append(("Invalid specialist result", str(item)))
             continue
 
-        name = _specialist_name(item)
         report = str(item.get("report") or item.get("error") or "").strip()
-        sections.append(
-            (
-                f"Status: {item.get('status', 'UNKNOWN')}\n"
-                f"Assigned specialist: {item.get('specialist', 'unknown')}\n"
-                f"{report if report else 'No report returned.'}"
-            )
+        detail = (
+            f"Status: {item.get('status', 'UNKNOWN')}\n"
+            f"Assigned specialist: {item.get('specialist', 'unknown')}\n"
+            f"{report if report else 'No report returned.'}"
         )
+        reports.append((_specialist_name(item), detail))
+
     return build_bounded_report_context(
-        [
-            (_specialist_name(item), section)
-            for item, section in zip(results, sections)
-        ],
+        reports,
         max_chars_per_report=2200,
         max_total_chars=9500,
     )
