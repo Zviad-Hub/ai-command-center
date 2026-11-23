@@ -468,16 +468,16 @@ def run_department_workflow(department, task, context=None):
 DEPARTMENT: {department.upper()}
 
 DEPARTMENT MISSION:
-{task}
+{bounded_text(task, 4500)}
 
 ORIGINAL CEO TASK:
 {bounded_text(context.get("original_task", task), 5000)}
 
 ADDITIONAL CONTEXT:
-{context}
+{bounded_text(str(context), 3000)}
 
 RESEARCH MATERIAL:
-{research_text}
+{bounded_text(research_text, 4000)}
 
 SPECIALIST ANALYSES:
 {specialist_text}
@@ -497,16 +497,16 @@ calculations, sources, requirements or completed external actions.
             f"""
 DEPARTMENT: {department.upper()}
 ORIGINAL MISSION:
-{task}
+{bounded_text(task, 4500)}
 
 SPECIALIST REPORTS:
 {specialist_text}
 
 MANAGER DRAFT:
-{draft.strip()}
+{bounded_text(draft.strip(), 7000)}
 
 RESEARCH CANDIDATES:
-{research_text}
+{bounded_text(research_text, 4000)}
 
 Review the draft independently. The report must remain advisory only.
 """
