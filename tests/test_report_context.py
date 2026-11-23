@@ -31,7 +31,17 @@ class ReportContextTests(unittest.TestCase):
             max_chars_per_report=500,
             max_total_chars=1300,
         )
+        self.assertLessEqual(len(result), 1300)
         self.assertIn("additional specialist report(s) omitted", result)
+
+    def test_report_context_never_exceeds_small_exact_budget(self):
+        for budget in range(0, 500):
+            result = build_bounded_report_context(
+                [("A", "a" * 300), ("B", "b" * 300)],
+                max_chars_per_report=300,
+                max_total_chars=budget,
+            )
+            self.assertLessEqual(len(result), budget, f"budget={budget}")
 
 
 if __name__ == "__main__":
