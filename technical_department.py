@@ -423,16 +423,16 @@ def run_technical_department(task, context=None):
     specialist_text = _build_specialist_context(specialist_results)
     manager_prompt = f"""
 ORIGINAL CEO TASK:
-{task}
+{bounded_text(task, 4500)}
 
 CEO CONTEXT:
-{context_text or "No additional context supplied."}
+{bounded_text(context_text, 3000) or "No additional context supplied."}
 
 TECHNICAL MANAGER PLAN:
-{plan}
+{bounded_text(str(plan), 3500)}
 
 SPECIALIST REPORTS:
-{specialist_text}
+{bounded_text(specialist_text, 9500)}
 
 Prepare the final technical department report. Do not claim that analysis
 recommendations were implemented or tests were executed.
@@ -456,19 +456,19 @@ recommendations were implemented or tests were executed.
             TECHNICAL_REVIEWER_PROMPT,
             f"""
 ORIGINAL CEO TASK:
-{task}
+{bounded_text(task, 4500)}
 
 MANAGER PLAN:
-{plan}
+{bounded_text(str(plan), 3500)}
 
 SUPPLIED CONTEXT:
-{context_text or "No additional context supplied."}
+{bounded_text(context_text, 3000) or "No additional context supplied."}
 
 SPECIALIST REPORTS:
-{specialist_text}
+{bounded_text(specialist_text, 9500)}
 
 COMPLETE PROPOSED FINAL REPORT:
-{candidate_report}
+{bounded_text(candidate_report, 11000)}
 
 Independently review the complete proposed report against the supplied evidence.
 """
