@@ -30,7 +30,10 @@ def _build_final_report(task, plan, specialist_results, context_data, status, ma
         lines.extend([
             "",
             f"{name} — {item.get('status', 'UNKNOWN')}:",
-            str(item.get("report") or item.get("error") or "No written findings were returned.")
+            bounded_text(
+                item.get("report") or item.get("error") or "No written findings were returned.",
+                2200,
+            )
         ])
 
     context_text = "\n".join(
@@ -72,6 +75,7 @@ from technical_manager import run_technical_manager
 from technical_agents import run_specialist
 from error_diagnostics import safe_error_code
 from department_quality import validate_technical_specialists
+from report_context import build_bounded_report_context, bounded_text
 
 
 TECHNICAL_REPORT_PROMPT = """
@@ -144,12 +148,20 @@ def _build_specialist_context(results):
         name = _specialist_name(item)
         report = str(item.get("report") or item.get("error") or "").strip()
         sections.append(
-            f"### {name}\n"
-            f"Status: {item.get('status', 'UNKNOWN')}\n"
-            f"Assigned specialist: {item.get('specialist', 'unknown')}\n"
-            f"{report if report else 'No report returned.'}"
+            (
+                f"Status: {item.get('status', 'UNKNOWN')}\n"
+                f"Assigned specialist: {item.get('specialist', 'unknown')}\n"
+                f"{report if report else 'No report returned.'}"
+            )
         )
-    return "\n\n".join(sections)
+    return build_bounded_report_context(
+        [
+            (_specialist_name(item), section)
+            for item, section in zip(results, sections)
+        ],
+        max_chars_per_report=2200,
+        max_total_chars=9500,
+    )
 
 
 def _review_is_substantive(review):
