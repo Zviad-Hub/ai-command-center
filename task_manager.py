@@ -12,6 +12,7 @@ from director import route_task
 from managers import get_manager
 from organization_quality import audit_organization_task
 from organization_semantic_auditor import run_semantic_alignment_audit
+from agent_performance_scorecard import build_agent_performance_scorecard
 
 
 def _default_tasks_file():
@@ -274,8 +275,14 @@ def submit_task(ceo_task):
         else "REVIEW_REQUIRED"
     )
 
-    # STEP 4: Save task record. Department outputs remain unchanged; both
-    # organization audits are read-only and never authorize consequential actions.
+    # STEP 4: Build a read-only scorecard from recorded gate outcomes. It is
+    # observability only: it cannot rewrite results, retry agents, or authorize actions.
+    agent_scorecard = build_agent_performance_scorecard(
+        results, organization_audit, semantic_audit
+    )
+
+    # STEP 5: Save task record. Department outputs remain unchanged; audits
+    # and scorecards never authorize consequential actions.
     record = {
         "id": str(uuid.uuid4())[:8],
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -285,6 +292,7 @@ def submit_task(ceo_task):
         "results": results,
         "organization_audit": organization_audit,
         "semantic_audit": semantic_audit,
+        "agent_scorecard": agent_scorecard,
         "overall_status": overall_status,
         "human_review_required": True,
     }
