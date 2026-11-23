@@ -1,6 +1,7 @@
 
 from ai_brain import ask_ai
 from error_diagnostics import safe_error_code
+from report_context import bounded_text
 
 
 # ==================================================
@@ -135,10 +136,10 @@ def run_specialist(specialist, mission=None, context=None):
 SPECIALIST: {specialist_name}
 
 ASSIGNED MISSION:
-{actual_mission}
+{bounded_text(actual_mission, 4500)}
 
 ADDITIONAL CONTEXT:
-{context_text if context_text else "No additional context provided."}
+{bounded_text(context_text, 3000) if context_text else "No additional context provided."}
 
 INSTRUCTIONS:
 
