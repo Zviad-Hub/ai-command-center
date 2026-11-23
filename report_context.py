@@ -27,19 +27,23 @@ def build_bounded_report_context(
     used = 0
     omitted = 0
 
-    for label, report in reports:
+    report_items = list(reports)
+    for index, (label, report) in enumerate(report_items):
         heading = f"### {str(label or 'Specialist').strip()}\n"
         remaining = int(max_total_chars) - used
-        if remaining <= len(heading) + 100:
-            omitted += 1
-            continue
+        # Reserve room for a short notice if later reports must be omitted.
+        reserve = 160 if index < len(report_items) - 1 else 0
+        body_budget = remaining - len(heading) - reserve
+        if body_budget < 100:
+            omitted += len(report_items) - index
+            break
 
-        body_limit = min(int(max_chars_per_report), remaining - len(heading))
+        body_limit = min(int(max_chars_per_report), body_budget)
         body = bounded_text(report, body_limit)
         section = heading + (body or "No written report was returned.")
         if used + len(section) > int(max_total_chars):
-            omitted += 1
-            continue
+            omitted += len(report_items) - index
+            break
         sections.append(section)
         used += len(section) + 2
 
