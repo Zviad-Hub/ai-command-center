@@ -146,6 +146,12 @@ def _business_kpi_quality(report_text):
         "average transaction", "customer interest rate",
         "price acceptance ratio", "conversion intent score",
         "net cost per valid lead", "lead conversion", "average selling price",
+        # Accept common KPI labels used in launch-validation and small-business
+        # plans, while still requiring an adjacent formula for every counted KPI.
+        "purchase-intent rate", "intent-to-buy rate", "willingness-to-pay rate",
+        "wtp-rate", "pi-rate", "cost-share", "break-even units",
+        "sample conversion ratio", "average willingness-to-pay",
+        "product preference score", "cost-per-sample",
     )
     formula_markers = ("=", "/", "divided by", "formula", "per ", "calculated as")
     lines = report_text.casefold().splitlines()
