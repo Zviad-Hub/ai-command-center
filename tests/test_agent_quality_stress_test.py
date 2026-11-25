@@ -509,6 +509,45 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertLess(result["score_out_of_10"], 10)
 
 
+    def test_finance_accepts_correct_result_with_formula_operands_in_specialist_lines(self):
+        result = evaluate_live_result("finance", {
+            "status": "COMPLETED",
+            "specialist_reports": {
+                "financial_analyst": (
+                    "Calculation formula: revenue 2160; variable cost 840; "
+                    "contribution 1320; operating result -2880. "
+                    "Inputs, assumptions, units and missing tax are identified."
+                ),
+                "risk_controller": (
+                    "Risk and liquidity review; downside sensitivity and mitigation. "
+                    "Operating result before tax: 1,320 GEL - 4,200 GEL = -2,880 GEL."
+                ),
+                "budget_planner": (
+                    "Budget forecast and cash flow scenario; assumptions, missing inputs "
+                    "and cost sensitivity. Operating result before tax: "
+                    "1,320 GEL - 4,200 GEL = -2,880 GEL."
+                ),
+            },
+            "quality_review": (
+                "REVIEW STATUS: PASS\\n"
+                "ISSUES: No material issues found.\\n"
+                "REQUIRED CORRECTIONS: None; calculations and evidence were checked.\\n"
+                "FINAL QUALITY SUMMARY: The report is internally consistent and remains advisory."
+            ),
+            "quality_review_passed": True,
+            "report": (
+                "Revenue 2160 GEL; variable cost 840 GEL; contribution 1320 GEL; "
+                "operating result -2880 GEL before tax. Tax not provided."
+            ),
+            "requires_ceo_approval": True,
+            "execution_performed": False,
+        })
+        calculation = next(
+            item for item in result["checks"]
+            if item["name"] == "calculation_accuracy"
+        )
+        self.assertTrue(calculation["passed"], calculation["detail"])
+
     def test_specialist_correct_numbers_cannot_mask_wrong_manager_report(self):
         result = evaluate_live_result("finance", {
             "status": "COMPLETED",
