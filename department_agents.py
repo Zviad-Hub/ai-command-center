@@ -34,6 +34,7 @@ from error_diagnostics import safe_error_code
 from ai_brain import ask_ai
 from research_agent import run_research
 from department_quality import validate_specialist_reports
+from report_context import build_bounded_report_context, bounded_text
 
 
 DEPARTMENT_PROMPTS = {
@@ -329,16 +330,18 @@ SPECIALIST: {specialist['name']}
 DEPARTMENT: {department.upper()}
 
 DEPARTMENT MISSION:
-{task}
+{bounded_text(task, 5000)}
 
 CEO CONTEXT AND SUPPLIED MATERIAL:
-{context}
+{bounded_text(str(context), 3500)}
 
 RESEARCH CANDIDATES (UNVERIFIED):
-{research_text}
+{bounded_text(research_text, 4500)}
 
 Analyze only relevant evidence. Explicitly label facts, assumptions,
 estimates, hypotheses and missing information. Do not perform external actions.
+Keep the report concise (maximum 350 words). Prioritize concrete evidence,
+material risks, calculations or requirements, and missing inputs over repetition.
 """
     result = ask_ai(specialist["prompt"], prompt)
     if not isinstance(result, str) or not result.strip():
@@ -452,25 +455,29 @@ def run_department_workflow(department, task, context=None):
             "report": "",
         }
 
-    specialist_text = "\n\n".join(
-        f"### {SPECIALISTS[department][key]['name']}\n{value}"
-        for key, value in specialist_reports.items()
+    specialist_text = build_bounded_report_context(
+        [
+            (SPECIALISTS[department][key]["name"], value)
+            for key, value in specialist_reports.items()
+        ],
+        max_chars_per_report=3000,
+        max_total_chars=10000,
     )
 
     manager_prompt = f"""
 DEPARTMENT: {department.upper()}
 
 DEPARTMENT MISSION:
-{task}
+{bounded_text(task, 4500)}
 
 ORIGINAL CEO TASK:
-{context.get("original_task", task)}
+{bounded_text(context.get("original_task", task), 5000)}
 
 ADDITIONAL CONTEXT:
-{context}
+{bounded_text(str(context), 3000)}
 
 RESEARCH MATERIAL:
-{research_text}
+{bounded_text(research_text, 4000)}
 
 SPECIALIST ANALYSES:
 {specialist_text}
@@ -490,16 +497,16 @@ calculations, sources, requirements or completed external actions.
             f"""
 DEPARTMENT: {department.upper()}
 ORIGINAL MISSION:
-{task}
+{bounded_text(task, 4500)}
 
 SPECIALIST REPORTS:
 {specialist_text}
 
 MANAGER DRAFT:
-{draft.strip()}
+{bounded_text(draft.strip(), 7000)}
 
 RESEARCH CANDIDATES:
-{research_text}
+{bounded_text(research_text, 4000)}
 
 Review the draft independently. The report must remain advisory only.
 """

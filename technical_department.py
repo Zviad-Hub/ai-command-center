@@ -30,7 +30,10 @@ def _build_final_report(task, plan, specialist_results, context_data, status, ma
         lines.extend([
             "",
             f"{name} — {item.get('status', 'UNKNOWN')}:",
-            str(item.get("report") or item.get("error") or "No written findings were returned.")
+            bounded_text(
+                item.get("report") or item.get("error") or "No written findings were returned.",
+                2200,
+            )
         ])
 
     context_text = "\n".join(
@@ -72,6 +75,7 @@ from technical_manager import run_technical_manager
 from technical_agents import run_specialist
 from error_diagnostics import safe_error_code
 from department_quality import validate_technical_specialists
+from report_context import build_bounded_report_context, bounded_text
 
 
 TECHNICAL_REPORT_PROMPT = """
@@ -135,21 +139,25 @@ def _specialist_name(item):
 
 
 def _build_specialist_context(results):
-    sections = []
+    reports = []
     for item in results:
         if not isinstance(item, dict):
-            sections.append(f"Invalid specialist result: {item!r}")
+            reports.append(("Invalid specialist result", str(item)))
             continue
 
-        name = _specialist_name(item)
         report = str(item.get("report") or item.get("error") or "").strip()
-        sections.append(
-            f"### {name}\n"
+        detail = (
             f"Status: {item.get('status', 'UNKNOWN')}\n"
             f"Assigned specialist: {item.get('specialist', 'unknown')}\n"
             f"{report if report else 'No report returned.'}"
         )
-    return "\n\n".join(sections)
+        reports.append((_specialist_name(item), detail))
+
+    return build_bounded_report_context(
+        reports,
+        max_chars_per_report=2200,
+        max_total_chars=9500,
+    )
 
 
 def _review_is_substantive(review):
@@ -415,16 +423,16 @@ def run_technical_department(task, context=None):
     specialist_text = _build_specialist_context(specialist_results)
     manager_prompt = f"""
 ORIGINAL CEO TASK:
-{task}
+{bounded_text(task, 4500)}
 
 CEO CONTEXT:
-{context_text or "No additional context supplied."}
+{bounded_text(context_text, 3000) or "No additional context supplied."}
 
 TECHNICAL MANAGER PLAN:
-{plan}
+{bounded_text(str(plan), 3500)}
 
 SPECIALIST REPORTS:
-{specialist_text}
+{bounded_text(specialist_text, 9500)}
 
 Prepare the final technical department report. Do not claim that analysis
 recommendations were implemented or tests were executed.
@@ -448,19 +456,19 @@ recommendations were implemented or tests were executed.
             TECHNICAL_REVIEWER_PROMPT,
             f"""
 ORIGINAL CEO TASK:
-{task}
+{bounded_text(task, 4500)}
 
 MANAGER PLAN:
-{plan}
+{bounded_text(str(plan), 3500)}
 
 SUPPLIED CONTEXT:
-{context_text or "No additional context supplied."}
+{bounded_text(context_text, 3000) or "No additional context supplied."}
 
 SPECIALIST REPORTS:
-{specialist_text}
+{bounded_text(specialist_text, 9500)}
 
 COMPLETE PROPOSED FINAL REPORT:
-{candidate_report}
+{bounded_text(candidate_report, 11000)}
 
 Independently review the complete proposed report against the supplied evidence.
 """
