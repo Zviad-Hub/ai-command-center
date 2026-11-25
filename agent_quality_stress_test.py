@@ -184,18 +184,18 @@ def _tender_deadline_is_evidence_aware(report_text):
         "no deadline",
     )
     lines = [line.casefold().strip().strip("*#:- ") for line in str(report_text or "").splitlines()]
-    deadline_indexes = [
+    # Only evaluate an explicit deadline declaration. Planning rows such as
+    # "complete this task by the deadline" are not claims about the tender's
+    # actual submission date and must not be mistaken for one.
+    declaration_indexes = [
         index for index, line in enumerate(lines)
-        if any(term in line for term in ("deadline", "submission date", "closing date"))
-        and line not in ("deadline", "deadlines", "submission date", "closing date")
+        if re.search(r"\b(deadline|submission date|closing date)\s*[:—-]", line)
     ]
-    if not deadline_indexes:
+    if not declaration_indexes:
         return False
 
-    for index in deadline_indexes:
+    for index in declaration_indexes:
         line = lines[index]
-        # A concrete date/time in a no-documents scenario is unsupported, even
-        # if a later sentence adds a generic caveat.
         has_date = bool(re.search(
             r"\b(?:\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|"
             r"\d{1,2}\s+(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|"
