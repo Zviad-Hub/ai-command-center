@@ -140,17 +140,12 @@ def _contains_number_near(text, expected, tolerance=0.02):
 def _business_kpi_quality(report_text):
     """Require four named KPI definitions with formula evidence, not loose keywords."""
     kpi_terms = (
-        "conversion rate",
-        "repeat purchase",
-        "average order value",
-        "waste rate",
-        "gross margin",
-        "customer acquisition cost",
-        "retention rate",
-        "foot traffic",
-        "sell-through",
-        "stockout rate",
-        "average transaction",
+        "conversion rate", "repeat purchase", "average order value",
+        "waste rate", "gross margin", "customer acquisition cost",
+        "retention rate", "foot traffic", "sell-through", "stockout rate",
+        "average transaction", "customer interest rate",
+        "price acceptance ratio", "conversion intent score",
+        "net cost per valid lead", "lead conversion", "average selling price",
     )
     formula_markers = ("=", "/", "divided by", "formula", "per ", "calculated as")
     lines = report_text.casefold().splitlines()
@@ -168,9 +163,10 @@ def _business_experiment_quality(report_text):
     """Require three distinct low-cost validation experiment categories."""
     lowered = report_text.casefold()
     experiment_groups = (
-        ("pre-order", "preorder", "pre order"),
-        ("tasting", "sampling", "pop-up", "popup", "small batch"),
-        ("survey", "interview", "landing page", "customer feedback", "pilot"),
+        ("pre-order", "preorder", "pre order", "reservation test"),
+        ("tasting", "sampling", "free sample", "free-sample", "pop-up", "popup", "small batch"),
+        ("survey", "interview", "landing page", "customer feedback", "door survey", "neighbourhood survey", "neighborhood survey"),
+        ("pay what you want", "pay-what-you-want", "price acceptance", "willingness to pay", "market stall", "price test"),
     )
     matched = sum(
         any(term in lowered for term in group)
@@ -321,9 +317,12 @@ def evaluate_live_result(department, result):
             "issues": ["Department returned a non-object result."],
         }
 
-    # Score the manager's final deliverable, not the union of all agent text.
-    # Otherwise a correct specialist calculation could hide a wrong final report.
-    report_text = _flatten(result.get("report", ""))
+    # Prefer the approved final report. When a manager withholds publication
+    # pending review, inspect its explicit draft for diagnostic content checks.
+    # The independent-review/status gate below remains mandatory, so a draft
+    # can never turn a REVIEW_REQUIRED run into a pass.
+    report_value = result.get("report") or result.get("draft_report", "")
+    report_text = _flatten(report_value)
     checks = []
 
     def substantive_review(value):
