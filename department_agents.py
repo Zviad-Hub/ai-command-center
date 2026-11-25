@@ -241,6 +241,10 @@ REQUIRED_REPORT_SECTIONS = {
 def _missing_report_sections(department, report):
     """Return mandatory manager-report sections absent from the final draft."""
     lowered = str(report or "").casefold()
+    # Normalize Unicode dash variants used by generated headings so a
+    # typographic non-breaking hyphen does not create a false missing-section
+    # result (for example, "OPTIONS AND TRADE‑OFFS").
+    lowered = re.sub(r"[\\u2010-\\u2015\\u2212]", "-", lowered)
     return [
         section for section in REQUIRED_REPORT_SECTIONS[department]
         if section.casefold() not in lowered
