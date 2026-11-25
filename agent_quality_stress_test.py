@@ -474,7 +474,10 @@ def evaluate_live_result(department, result):
                     re.IGNORECASE,
                 ):
                     values = _numeric_values(match.group(0))
-                    if values and not any(abs(value - (-2880)) <= 0.02 for value in values):
+                    # A formula line can contain several valid intermediate
+                    # values (e.g. 1,320 - 4,200 = -2,880). Reconcile the
+                    # final numeric result, not every operand in that line.
+                    if values and abs(values[-1] - (-2880)) > 0.02:
                         specialist_conflicts.append(specialist_id)
                         break
         numeric_ok = numeric_ok and not specialist_conflicts
