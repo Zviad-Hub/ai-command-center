@@ -779,9 +779,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "status": "COMPLETED",
             "specialist_reports": specialists,
             "quality_review": (
-                "REVIEW STATUS: PASS\\n"
-                "ISSUES: Specialist arithmetic conflicts with the manager calculation.\\n"
-                "REQUIRED CORRECTIONS: Reconcile the budget planner calculation.\\n"
+                "REVIEW STATUS: PASS\n"
+                "ISSUES: Specialist arithmetic conflicts with the manager calculation.\n"
+                "REQUIRED CORRECTIONS: Reconcile the budget planner calculation.\n"
                 "FINAL QUALITY SUMMARY: The finance report must be internally consistent before approval."
             ),
             "quality_review_passed": True,
@@ -794,9 +794,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
 
     def test_markdown_bold_review_labels_are_parsed_without_weakening_pass_gate(self):
         review = (
-            "REVIEW STATUS: PASS\\n"
-            "**ISSUES:** No material issues found in the supplied evidence.\\n"
-            "**REQUIRED CORRECTIONS:** None; arithmetic and assumptions were checked.\\n"
+            "REVIEW STATUS: PASS\n"
+            "**ISSUES:** No material issues found in the supplied evidence.\n"
+            "**REQUIRED CORRECTIONS:** None; arithmetic and assumptions were checked.\n"
             "**FINAL QUALITY SUMMARY:** The report is internally consistent and appropriately advisory."
         )
         result = evaluate_live_result("finance", {
@@ -822,7 +822,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
 
     def test_pentester_accepts_bold_standalone_required_headings(self):
         from pentester_agents import _missing_report_sections, REQUIRED_REPORT_SECTIONS
-        report = "\\n".join(f"**{section.title()}**" for section in REQUIRED_REPORT_SECTIONS)
+        report = "\n".join(f"**{section.title()}**" for section in REQUIRED_REPORT_SECTIONS)
         self.assertEqual(_missing_report_sections(report), [])
 
 
