@@ -244,7 +244,7 @@ def _missing_report_sections(department, report):
     # Normalize Unicode dash variants used by generated headings so a
     # typographic non-breaking hyphen does not create a false missing-section
     # result (for example, "OPTIONS AND TRADE‑OFFS").
-    lowered = re.sub(r"[\\u2010-\\u2015\\u2212]", "-", lowered)
+    lowered = lowered.translate(str.maketrans({"‑": "-", "–": "-", "—": "-", "−": "-"}))
     return [
         section for section in REQUIRED_REPORT_SECTIONS[department]
         if section.casefold() not in lowered
