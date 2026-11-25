@@ -37,7 +37,7 @@ A department being selected does not mean every requested real-world action is a
 | Department | Current behavior | Important limitation |
 |---|---|---|
 | **Media** | Runs the media production pipeline for content tasks. | Content must be independently checked before publication. |
-| **Audit** | Reviews the preceding Media result when one is available. | The current manager expects a Media result; a standalone audit request may return `REVIEW_REQUIRED`. |
+| **Audit** | Runs after the other selected departments and independently reviews their recorded outputs. | Audit checks evidence and workflow quality; it does not certify factual truth or replace CEO review. |
 | **Technical** | Creates a technical plan, assigns specialists, synthesizes their findings through an AI Technical Manager, and requires an independent Technical Quality Reviewer PASS before releasing the final report. | The workflow is advisory: it does not independently fetch repository files, edit project files, execute tests or deploy code. Specialists can analyze source material supplied in the task/context. |
 | **Pentester** | Runs four defensive specialists (scope/authorization, web security, infrastructure security, vulnerability/risk) followed by a Pentester Manager and an independent Security Quality Reviewer. | Passive analysis and planning only. No scanning, probing, target connections, exploit generation or active penetration testing. A supplied scope/reference is not verified authorization. |
 | **Finance** | Three specialists (financial analysis, risk control, budget/forecast planning) feed a Finance Manager; an independent reviewer checks the final advisory report. | No transactions, payments, investments or accounting-system changes. Research candidates are not independently verified; professional review may be needed for regulated advice. |
@@ -230,7 +230,7 @@ List each issue with evidence and a recommended correction.
 Do not rewrite the original task or approve publication automatically.
 ```
 
-**Note:** The current Audit manager is wired to review a preceding Media result. A standalone audit request may not have the input it needs.
+**Note:** Audit runs after the other selected departments and reviews their recorded results. If no other department was selected, its report may correctly identify that there is no substantive output to audit.
 
 ### Business or financial analysis
 
@@ -336,7 +336,7 @@ Use the task ID to identify a run. Treat the saved record as an execution log, n
 
 ## Development status
 
-This is an actively developed project. The current regression suite contains 221 automated tests across Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on every Python source change and every workflow change in pull requests. Department coverage and specialist capabilities are being expanded incrementally.
+This is an actively developed project. The automated regression suite covers Director routing, Task Manager orchestration, Technical Manager planning, Technical Department specialist orchestration, manager synthesis and independent-review gates, CEO console report rendering, Finance/Business/Tenders multi-specialist and independent-review workflows, Pentester specialist/reviewer safety gates, performance-scorecard validation, and redaction of internal provider and workflow errors across managers, specialists, research, routing, and CLI output. The dedicated GitHub Actions test workflow runs the suite on pull requests. Department coverage and specialist capabilities are being expanded incrementally.
 
 When contributing:
 
