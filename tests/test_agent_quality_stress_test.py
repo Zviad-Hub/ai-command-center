@@ -382,6 +382,38 @@ class AgentQualityStressTestTests(unittest.TestCase):
         })
         self.assertEqual(result["score_out_of_10"], 10)
 
+    def test_business_accepts_formula_backed_launch_validation_kpi_labels(self):
+        report = """
+        Location, demand, competitors and budget are unknown and not provided.
+        Experiment 1: Digital pre-order and survey test.
+        Experiment 2: Small pop-up sampling and tasting.
+        Experiment 3: Customer survey and price-acceptance test.
+        KPIs:
+        - KPI-1 Purchase-Intent Rate (PI-Rate): PI-Rate = yes responses / tasters × 100.
+        - KPI-2 Willingness-to-Pay Rate (WTP-Rate): WTP-Rate = price-accepted responses / respondents × 100.
+        - KPI-3 Cost-Share: Cost-Share = ingredient cost per unit / target selling price × 100.
+        - KPI-4 Break-Even Units: BE-Units = fixed daily cost / contribution per unit.
+        """
+        result = evaluate_live_result("business", {
+            "status": "COMPLETED",
+            "specialist_reports": _good_department_specialists("business"),
+            "quality_review": (
+                "REVIEW STATUS: PASS\\n"
+                "ISSUES: No unsupported claims.\\n"
+                "REQUIRED CORRECTIONS: None; assumptions are disclosed.\\n"
+                "FINAL QUALITY SUMMARY: The report contains four formula-backed KPIs and three validation experiments."
+            ),
+            "quality_review_passed": True,
+            "report": report,
+            "requires_ceo_approval": True,
+            "execution_performed": False,
+        })
+        actionable = next(
+            item for item in result["checks"]
+            if item["name"] == "actionable_deliverables"
+        )
+        self.assertTrue(actionable["passed"], actionable["detail"])
+
     def test_business_rejects_single_kpi_and_one_experiment(self):
         report = """
         Market data not provided. Try a pre-order test.
