@@ -29,6 +29,7 @@ def _research_context(task, department):
 
 
 import os
+import re
 
 from error_diagnostics import safe_error_code
 from ai_brain import ask_ai
