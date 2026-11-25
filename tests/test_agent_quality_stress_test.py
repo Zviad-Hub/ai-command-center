@@ -493,6 +493,37 @@ class AgentQualityStressTestTests(unittest.TestCase):
         })
         self.assertEqual(result["score_out_of_10"], 10)
 
+    def test_technical_qa_contract_accepts_test_strategy_and_acceptance_matrix(self):
+        passed, issues = _department_specialist_quality(
+            "technical",
+            manager_plan={
+                "selected_specialists": [{"id": "qa_engineer"}],
+            },
+            specialist_results=[{
+                "specialist": "qa_engineer",
+                "status": "COMPLETED",
+                "report": (
+                    "QA test strategy and test matrix: each test scenario maps to "
+                    "an expected result, measurable acceptance criteria, negative "
+                    "cases and failure paths. Test data is missing."
+                ),
+            }],
+        )
+        self.assertTrue(passed, issues)
+
+        generic_pass, _ = _department_specialist_quality(
+            "technical",
+            manager_plan={
+                "selected_specialists": [{"id": "qa_engineer"}],
+            },
+            specialist_results=[{
+                "specialist": "qa_engineer",
+                "status": "COMPLETED",
+                "report": "A general technical overview with recommendations.",
+            }],
+        )
+        self.assertFalse(generic_pass)
+
     def test_technical_rejects_missing_final_report(self):
         result = evaluate_live_result("technical", {
             "status": "COMPLETED",
