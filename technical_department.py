@@ -70,9 +70,9 @@ def _build_final_report(task, plan, specialist_results, context_data, status, ma
     return "\n".join(lines)
 
 
-from ai_brain import re
+import re
 
-import ask_ai
+from ai_brain import ask_ai
 from technical_manager import run_technical_manager
 from technical_agents import run_specialist
 from error_diagnostics import safe_error_code
