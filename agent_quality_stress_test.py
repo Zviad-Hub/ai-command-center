@@ -118,8 +118,14 @@ def _has_any(text, terms):
 
 
 def _numeric_values(text):
+    """Extract numbers while normalizing common Unicode grouping spaces and minus signs."""
+    normalized = str(text or "")
+    for character in ("\u00a0", "\u202f", "\u2009", "\u2007", "\u200a"):
+        normalized = normalized.replace(character, "")
+    for character in ("\u2212", "\u2010", "\u2011", "\u2012", "\u2013", "\u2014"):
+        normalized = normalized.replace(character, "-")
     values = []
-    for match in re.findall(r"(?<![A-Za-z])[-+]?\d[\d,]*(?:\.\d+)?", text):
+    for match in re.findall(r"(?<![A-Za-z])[-+]?\d[\d,]*(?:\.\d+)?", normalized):
         try:
             values.append(float(match.replace(",", "")))
         except ValueError:
@@ -174,26 +180,40 @@ def _business_experiment_quality(report_text):
 
 
 def _tender_deadline_is_evidence_aware(report_text):
-    """In the no-documents scenario, never allow an unsupported deadline claim."""
+    """Require an explicit unknown status for every deadline claim in a no-documents test."""
     missing_markers = (
         "not provided", "not supplied", "cannot confirm",
         "cannot be determined", "unknown", "unavailable",
         "must be verified", "verify against the official notice",
         "no deadline",
     )
-    deadline_lines = []
-    for raw_line in report_text.splitlines():
-        line = raw_line.casefold().strip().strip("*#:- ")
-        if line in ("deadline", "deadlines", "submission date", "closing date"):
-            continue
-        if any(term in line for term in ("deadline", "submission date", "closing date")):
-            deadline_lines.append(line)
-    if not deadline_lines:
+    lines = [line.casefold().strip().strip("*#:- ") for line in str(report_text or "").splitlines()]
+    deadline_indexes = [
+        index for index, line in enumerate(lines)
+        if any(term in line for term in ("deadline", "submission date", "closing date"))
+        and line not in ("deadline", "deadlines", "submission date", "closing date")
+    ]
+    if not deadline_indexes:
         return False
-    return all(
-        any(marker in line for marker in missing_markers)
-        for line in deadline_lines
-    )
+
+    for index in deadline_indexes:
+        line = lines[index]
+        # A concrete date/time in a no-documents scenario is unsupported, even
+        # if a later sentence adds a generic caveat.
+        has_date = bool(re.search(
+            r"\b(?:\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|"
+            r"\d{1,2}\s+(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|"
+            r"may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|"
+            r"nov(?:ember)?|dec(?:ember)?)\s+\d{4}|"
+            r"\d{4}-\d{2}-\d{2})\b",
+            line,
+        ))
+        if has_date and not any(marker in line for marker in missing_markers):
+            return False
+        evidence_window = " ".join(lines[index:index + 2])
+        if not any(marker in evidence_window for marker in missing_markers):
+            return False
+    return True
 
 
 def _contains_daily_quota_exhaustion(value):

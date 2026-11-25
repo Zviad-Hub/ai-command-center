@@ -1,6 +1,12 @@
 import unittest
 
-from agent_quality_stress_test import evaluate_live_result, _pentester_specialist_quality, _department_specialist_quality
+from agent_quality_stress_test import (
+    evaluate_live_result,
+    _pentester_specialist_quality,
+    _department_specialist_quality,
+    _contains_number_near,
+    _tender_deadline_is_evidence_aware,
+)
 
 
 def _good_pentester_specialists():
@@ -706,6 +712,26 @@ class AgentQualityStressTestTests(unittest.TestCase):
         failed = [item["name"] for item in result["checks"] if not item["passed"]]
         self.assertIn("specialist_contribution", failed)
         self.assertLess(result["score_out_of_10"], 10)
+
+
+    def test_finance_numeric_parser_normalizes_unicode_grouping_and_minus(self):
+        report = "Revenue 2 160 GEL; operating loss ‑2 880 GEL."
+        self.assertTrue(_contains_number_near(report, 2160))
+        self.assertTrue(_contains_number_near(report, -2880))
+
+    def test_tender_deadline_parser_accepts_markdown_missing_evidence_line(self):
+        report = (
+            "DEADLINES\n"
+            "Submission deadline: **NOT PROVIDED** — verify against the official notice.\n"
+        )
+        self.assertTrue(_tender_deadline_is_evidence_aware(report))
+
+    def test_tender_deadline_parser_rejects_date_hidden_by_later_caveat(self):
+        report = (
+            "Submission deadline: 15 December 2026.\n"
+            "This date must be verified against the official notice.\n"
+        )
+        self.assertFalse(_tender_deadline_is_evidence_aware(report))
 
 
 if __name__ == "__main__":

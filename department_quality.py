@@ -25,8 +25,10 @@ ROLE_REQUIREMENTS = {
             ("validation", "evidence", "unknown", "assumption", "research"),
         ),
         "strategy_planner": (
-            ("strategy", "positioning", "value proposition", "options", "trade-off"),
-            ("assumption", "dependency", "risk", "recommendation", "execution"),
+            ("strategy", "positioning", "value proposition", "options", "trade-off",
+             "go-to-market", "strategic direction", "launch strategy", "business model"),
+            ("assumption", "dependency", "risk", "recommendation", "execution",
+             "implementation", "competitive advantage"),
         ),
         "operations_kpi_analyst": (
             ("kpi", "operations", "process", "capacity", "staffing"),
