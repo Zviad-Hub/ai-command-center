@@ -469,7 +469,7 @@ def evaluate_live_result(department, result):
             for specialist_id, specialist_text in specialist_reports.items():
                 for match in re.finditer(
                     r"(?:operating result|operating profit|result before tax)"
-                    r"[^\\n]{0,70}",
+                    r"[^\n]{0,70}",
                     str(specialist_text or ""),
                     re.IGNORECASE,
                 ):
