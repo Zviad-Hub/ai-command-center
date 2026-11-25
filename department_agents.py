@@ -47,6 +47,10 @@ Rules:
 - Never invent figures, tax rules, fees, rates, or legal requirements.
 - Separate user-provided facts, calculations, assumptions, estimates, and unknowns.
 - Show formulas and units for every material calculation.
+- For unit economics, calculate revenue, variable cost, contribution, and
+  operating result in a visible sequence. Operating result before tax is
+  contribution minus fixed operating costs; independently recompute every
+  total and reconcile any specialist disagreement before review.
 - Flag missing inputs and explain how they affect confidence.
 - For tax, accounting, legal, investment, or regulated questions, clearly state
   that qualified local professional review may be required.
