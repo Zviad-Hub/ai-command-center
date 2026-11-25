@@ -340,7 +340,7 @@ def evaluate_live_result(department, result):
         current_section = None
 
         for line in lines[1:]:
-            stripped = re.sub(r"[*_\x60]", "", line.strip()).strip()
+            stripped = line.translate(str.maketrans("", "", "*_" + chr(96))).strip()
             matched = False
             for section in required_sections:
                 prefix = f"{section}:"
