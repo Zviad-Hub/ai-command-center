@@ -462,10 +462,27 @@ def evaluate_live_result(department, result):
     if department == "finance":
         expected = [2160, 840, 1320, -2880]
         numeric_ok = all(_contains_number_near(report_text, n) for n in expected)
+        # A correct manager total must not conceal a contradictory specialist
+        # operating result. Reconcile every explicitly stated specialist result.
+        specialist_conflicts = []
+        if isinstance(specialist_reports, dict):
+            for specialist_id, specialist_text in specialist_reports.items():
+                for match in re.finditer(
+                    r"(?:operating result|operating profit|result before tax)"
+                    r"[^\\n]{0,70}",
+                    str(specialist_text or ""),
+                    re.IGNORECASE,
+                ):
+                    values = _numeric_values(match.group(0))
+                    if values and not any(abs(value - (-2880)) <= 0.02 for value in values):
+                        specialist_conflicts.append(specialist_id)
+                        break
+        numeric_ok = numeric_ok and not specialist_conflicts
         add(
             "calculation_accuracy",
             numeric_ok,
-            "Checks revenue 2,160; variable cost 840; contribution 1,320; operating result -2,880 GEL.",
+            "Checks revenue 2,160; variable cost 840; contribution 1,320; operating result -2,880 GEL, including specialist-to-manager reconciliation."
+            + (f" Conflicting specialist result: {', '.join(specialist_conflicts)}." if specialist_conflicts else ""),
         )
         uncertainty_ok = _has_any(
             report_text,
