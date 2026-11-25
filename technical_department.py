@@ -180,7 +180,7 @@ def _review_is_substantive(review):
     for line in lines[1:]:
         # Formatting is presentation, not a quality signal. Normalize bold,
         # italic and inline-code wrappers before matching required labels.
-        stripped = re.sub(r"[*_\x60]", "", line.strip()).strip()
+        stripped = line.translate(str.maketrans("", "", "*_" + chr(96))).strip()
         matched = False
 
         for section in required_sections:
