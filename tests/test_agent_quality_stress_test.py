@@ -734,5 +734,97 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertFalse(_tender_deadline_is_evidence_aware(report))
 
 
+    def test_business_live_kpi_names_and_distinct_experiments_are_recognized(self):
+        from agent_quality_stress_test import _business_kpi_quality, _business_experiment_quality
+        report = """
+        Customer Interest Rate = interest cards / free samples * 100.
+        Price Acceptance Ratio = average amount paid / target price * 100.
+        Conversion Intent Score = weighted intent / (5 * respondents) * 100.
+        Net Cost per Valid Lead = staff hours / valid leads * hourly cost.
+        Experiments: free-sample stall; pay-what-you-want market test; neighbourhood-door survey.
+        """
+        self.assertEqual(_business_kpi_quality(report), (True, 4))
+        self.assertEqual(_business_experiment_quality(report), (True, 3))
+
+    def test_draft_report_is_scored_but_never_bypasses_review_status(self):
+        report = """
+        Local demand, location and competitor evidence are not provided.
+        Experiments: free sample stall; price acceptance test; customer survey.
+        Customer Interest Rate = interested / sampled.
+        Price Acceptance Ratio = accepted offers / offers.
+        Conversion Intent Score = positive intent / respondents.
+        Net Cost per Valid Lead = total cost / valid leads.
+        """
+        result = evaluate_live_result("business", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_reports": _good_department_specialists("business"),
+            "draft_report": report,
+            "report": "",
+            "quality_review": "REVIEW STATUS: PASS",
+            "quality_review_passed": False,
+            "requires_ceo_approval": True,
+        })
+        checks = {item["name"]: item["passed"] for item in result["checks"]}
+        self.assertTrue(checks["evidence_and_uncertainty"])
+        self.assertTrue(checks["actionable_deliverables"])
+        self.assertFalse(checks["manager_and_quality_gate"])
+
+    def test_finance_rejects_specialist_operating_result_contradiction(self):
+        specialists = _good_department_specialists("finance")
+        specialists["budget_planner"] = (
+            "Forecast: contribution 1,320 GEL; fixed costs 4,200 GEL; "
+            "operating result -3,880 GEL before tax."
+        )
+        result = evaluate_live_result("finance", {
+            "status": "COMPLETED",
+            "specialist_reports": specialists,
+            "quality_review": (
+                "REVIEW STATUS: PASS\n"
+                "ISSUES: Specialist arithmetic conflicts with the manager calculation.\n"
+                "REQUIRED CORRECTIONS: Reconcile the budget planner calculation.\n"
+                "FINAL QUALITY SUMMARY: The finance report must be internally consistent before approval."
+            ),
+            "quality_review_passed": True,
+            "report": "Revenue 2160 GEL; variable cost 840 GEL; contribution 1320 GEL; operating result -2880 GEL before tax. Tax not provided.",
+            "requires_ceo_approval": True,
+            "execution_performed": False,
+        })
+        calculation = next(item for item in result["checks"] if item["name"] == "calculation_accuracy")
+        self.assertFalse(calculation["passed"])
+
+    def test_markdown_bold_review_labels_are_parsed_without_weakening_pass_gate(self):
+        review = (
+            "REVIEW STATUS: PASS\n"
+            "**ISSUES:** No material issues found in the supplied evidence.\n"
+            "**REQUIRED CORRECTIONS:** None; arithmetic and assumptions were checked.\n"
+            "**FINAL QUALITY SUMMARY:** The report is internally consistent and appropriately advisory."
+        )
+        result = evaluate_live_result("finance", {
+            "status": "COMPLETED",
+            "specialist_reports": _good_department_specialists("finance"),
+            "quality_review": review,
+            "quality_review_passed": True,
+            "report": "Revenue 2160; variable cost 840; contribution 1320; operating result -2880 before tax; tax not provided.",
+            "requires_ceo_approval": True,
+            "execution_performed": False,
+        })
+        manager_gate = next(item for item in result["checks"] if item["name"] == "manager_and_quality_gate")
+        self.assertTrue(manager_gate["passed"])
+
+    def test_tender_schedule_placeholders_do_not_override_unknown_deadline(self):
+        report = """
+        DEADLINE: NOT PROVIDED — verify against the official tender notice.
+        Internal preparation: begin immediately.
+        Document review: within 2 working days after receipt.
+        Final packaging: by the deadline once officially confirmed.
+        """
+        self.assertTrue(_tender_deadline_is_evidence_aware(report))
+
+    def test_pentester_accepts_bold_standalone_required_headings(self):
+        from pentester_agents import _missing_report_sections, REQUIRED_REPORT_SECTIONS
+        report = "\n".join(f"**{section.title()}**" for section in REQUIRED_REPORT_SECTIONS)
+        self.assertEqual(_missing_report_sections(report), [])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -140,17 +140,12 @@ def _contains_number_near(text, expected, tolerance=0.02):
 def _business_kpi_quality(report_text):
     """Require four named KPI definitions with formula evidence, not loose keywords."""
     kpi_terms = (
-        "conversion rate",
-        "repeat purchase",
-        "average order value",
-        "waste rate",
-        "gross margin",
-        "customer acquisition cost",
-        "retention rate",
-        "foot traffic",
-        "sell-through",
-        "stockout rate",
-        "average transaction",
+        "conversion rate", "repeat purchase", "average order value",
+        "waste rate", "gross margin", "customer acquisition cost",
+        "retention rate", "foot traffic", "sell-through", "stockout rate",
+        "average transaction", "customer interest rate",
+        "price acceptance ratio", "conversion intent score",
+        "net cost per valid lead", "lead conversion", "average selling price",
     )
     formula_markers = ("=", "/", "divided by", "formula", "per ", "calculated as")
     lines = report_text.casefold().splitlines()
@@ -168,9 +163,10 @@ def _business_experiment_quality(report_text):
     """Require three distinct low-cost validation experiment categories."""
     lowered = report_text.casefold()
     experiment_groups = (
-        ("pre-order", "preorder", "pre order"),
-        ("tasting", "sampling", "pop-up", "popup", "small batch"),
-        ("survey", "interview", "landing page", "customer feedback", "pilot"),
+        ("pre-order", "preorder", "pre order", "reservation test"),
+        ("tasting", "sampling", "free sample", "free-sample", "pop-up", "popup", "small batch"),
+        ("survey", "interview", "landing page", "customer feedback", "door survey", "neighbourhood survey", "neighborhood survey"),
+        ("pay what you want", "pay-what-you-want", "price acceptance", "willingness to pay", "market stall", "price test"),
     )
     matched = sum(
         any(term in lowered for term in group)
@@ -188,18 +184,18 @@ def _tender_deadline_is_evidence_aware(report_text):
         "no deadline",
     )
     lines = [line.casefold().strip().strip("*#:- ") for line in str(report_text or "").splitlines()]
-    deadline_indexes = [
+    # Only evaluate an explicit deadline declaration. Planning rows such as
+    # "complete this task by the deadline" are not claims about the tender's
+    # actual submission date and must not be mistaken for one.
+    declaration_indexes = [
         index for index, line in enumerate(lines)
-        if any(term in line for term in ("deadline", "submission date", "closing date"))
-        and line not in ("deadline", "deadlines", "submission date", "closing date")
+        if re.search(r"\b(deadline|submission date|closing date)\s*[:—-]", line)
     ]
-    if not deadline_indexes:
+    if not declaration_indexes:
         return False
 
-    for index in deadline_indexes:
+    for index in declaration_indexes:
         line = lines[index]
-        # A concrete date/time in a no-documents scenario is unsupported, even
-        # if a later sentence adds a generic caveat.
         has_date = bool(re.search(
             r"\b(?:\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|"
             r"\d{1,2}\s+(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|"
@@ -321,9 +317,12 @@ def evaluate_live_result(department, result):
             "issues": ["Department returned a non-object result."],
         }
 
-    # Score the manager's final deliverable, not the union of all agent text.
-    # Otherwise a correct specialist calculation could hide a wrong final report.
-    report_text = _flatten(result.get("report", ""))
+    # Prefer the approved final report. When a manager withholds publication
+    # pending review, inspect its explicit draft for diagnostic content checks.
+    # The independent-review/status gate below remains mandatory, so a draft
+    # can never turn a REVIEW_REQUIRED run into a pass.
+    report_value = result.get("report") or result.get("draft_report", "")
+    report_text = _flatten(report_value)
     checks = []
 
     def substantive_review(value):
@@ -341,7 +340,7 @@ def evaluate_live_result(department, result):
         current_section = None
 
         for line in lines[1:]:
-            stripped = line.strip()
+            stripped = line.translate(str.maketrans("", "", "*_" + chr(96))).strip()
             matched = False
             for section in required_sections:
                 prefix = f"{section}:"
@@ -463,10 +462,27 @@ def evaluate_live_result(department, result):
     if department == "finance":
         expected = [2160, 840, 1320, -2880]
         numeric_ok = all(_contains_number_near(report_text, n) for n in expected)
+        # A correct manager total must not conceal a contradictory specialist
+        # operating result. Reconcile every explicitly stated specialist result.
+        specialist_conflicts = []
+        if isinstance(specialist_reports, dict):
+            for specialist_id, specialist_text in specialist_reports.items():
+                for match in re.finditer(
+                    r"(?:operating result|operating profit|result before tax)"
+                    r"[^\n]{0,70}",
+                    str(specialist_text or ""),
+                    re.IGNORECASE,
+                ):
+                    values = _numeric_values(match.group(0))
+                    if values and not any(abs(value - (-2880)) <= 0.02 for value in values):
+                        specialist_conflicts.append(specialist_id)
+                        break
+        numeric_ok = numeric_ok and not specialist_conflicts
         add(
             "calculation_accuracy",
             numeric_ok,
-            "Checks revenue 2,160; variable cost 840; contribution 1,320; operating result -2,880 GEL.",
+            "Checks revenue 2,160; variable cost 840; contribution 1,320; operating result -2,880 GEL, including specialist-to-manager reconciliation."
+            + (f" Conflicting specialist result: {', '.join(specialist_conflicts)}." if specialist_conflicts else ""),
         )
         uncertainty_ok = _has_any(
             report_text,

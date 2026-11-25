@@ -70,6 +70,8 @@ def _build_final_report(task, plan, specialist_results, context_data, status, ma
     return "\n".join(lines)
 
 
+import re
+
 from ai_brain import ask_ai
 from technical_manager import run_technical_manager
 from technical_agents import run_specialist
@@ -176,7 +178,9 @@ def _review_is_substantive(review):
     current_section = None
 
     for line in lines[1:]:
-        stripped = line.strip()
+        # Formatting is presentation, not a quality signal. Normalize bold,
+        # italic and inline-code wrappers before matching required labels.
+        stripped = line.translate(str.maketrans("", "", "*_" + chr(96))).strip()
         matched = False
 
         for section in required_sections:
