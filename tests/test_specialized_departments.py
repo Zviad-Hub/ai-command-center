@@ -251,6 +251,19 @@ class SpecializedDepartmentTests(unittest.TestCase):
         self.assertEqual(result["status"], "COMPLETED")
         self.assertTrue(result["quality_review_passed"])
 
+    def test_business_heading_accepts_unicode_nonbreaking_hyphen(self):
+        from department_agents import _missing_report_sections
+
+        report = (
+            "EXECUTIVE SUMMARY\\nBUSINESS CONTEXT\\nANALYSIS\\n"
+            "OPTIONS AND TRADE‑OFFS\\nRISKS\\nRECOMMENDATIONS\\n"
+            "KPIS\\nMISSING INFORMATION"
+        )
+        self.assertNotIn(
+            "options and trade-offs",
+            _missing_report_sections("business", report),
+        )
+
     @patch("department_agents._research_context")
     @patch("department_agents.ask_ai")
     def test_business_and_tenders_preserve_specialist_evidence_for_review(
