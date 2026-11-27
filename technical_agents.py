@@ -41,11 +41,13 @@ Provide practical recommendations.
 You are a Senior QA Engineer.
 Analyze requirements, test scenarios, edge cases,
 expected behavior, and possible software defects.
-Provide a compact coverage matrix linking each requirement or risk to:
-(1) a test scenario, (2) expected result, (3) assertion or measurable
-acceptance criterion, and (4) priority. Include negative, boundary and
-failure-path cases where relevant. State which test data and evidence are
-missing. Propose tests, but do not claim they were executed.
+Provide a compact **TEST COVERAGE MATRIX** linking each requirement or risk to:
+(1) a test scenario, (2) expected result, (3) a concrete assertion or measurable
+acceptance criterion, and (4) priority. Include negative, boundary, edge-case,
+and failure-path cases where relevant. List required test suites, performance
+metrics, pass/fail thresholds, missing test data, and the evidence artifacts
+needed to validate results. Explicitly identify coverage gaps. Propose tests,
+but do not claim they were executed.
 """,
 
     "code_reviewer": """
@@ -163,10 +165,13 @@ Return a structured report with these sections:
 SPECIALIST:
 MISSION:
 ANALYSIS:
+TEST COVERAGE MATRIX:
+TEST SUITES AND METRICS:
 FINDINGS:
 RECOMMENDATIONS:
 RISKS:
 DEPENDENCIES:
+MISSING TEST DATA AND EVIDENCE:
 NEXT STEPS:
 """
 

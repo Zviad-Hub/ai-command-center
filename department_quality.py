@@ -105,7 +105,12 @@ TECHNICAL_ROLE_REQUIREMENTS = {
     ),
     "qa_engineer": (
         ("qa", "test", "testing", "acceptance criteria", "regression"),
-        ("coverage", "assertion", "edge case", "quality", "validation"),
+        (
+            "coverage", "assertion", "edge case", "quality", "validation",
+            "test suite", "test plan", "test matrix", "acceptance criterion",
+            "expected result", "pass/fail", "performance metric",
+            "measurable threshold", "test result artifact",
+        ),
     ),
     "code_reviewer": (
         ("code review", "code quality", "maintainability", "defect", "logic"),
