@@ -8,7 +8,7 @@ from agent_quality_stress_test import (
 )
 from department_quality import validate_technical_specialists
 from department_agents import _missing_report_sections as missing_business_sections
-from pentester_agents import _missing_report_sections as missing_pentester_sections
+from pentester_agents import SPECIALISTS, _missing_report_sections as missing_pentester_sections
 
 
 PASS_REVIEW = (
@@ -111,6 +111,17 @@ class QualityGateRegressionTests(unittest.TestCase):
         }
         passed, issues = _pentester_specialist_quality(reports)
         self.assertTrue(passed, issues)
+
+    def test_pentester_no_artifact_prompts_require_explicit_evidence_statements(self):
+        web_prompt = SPECIALISTS["web_security"]["prompt"]
+        infrastructure_prompt = SPECIALISTS["infrastructure_security"]["prompt"]
+
+        self.assertIn('"No artifacts supplied."', web_prompt)
+        self.assertIn('"No verified vulnerabilities."', web_prompt)
+        self.assertIn('"No artifacts supplied."', infrastructure_prompt)
+        self.assertIn('"No verified infrastructure issues."', infrastructure_prompt)
+        self.assertIn("Do not substitute implied wording", web_prompt)
+        self.assertIn("Do not substitute implied wording", infrastructure_prompt)
 
     def test_business_required_heading_accepts_unicode_nonbreaking_hyphen(self):
         report = """
