@@ -274,7 +274,7 @@ def _pentester_specialist_quality(specialist_reports):
         "infrastructure_security": (
             ("no artifacts supplied", "no architecture", "artifacts not provided"),
             ("no verified", "no confirmed", "cannot confirm"),
-            ("hypothesis", "checklist", "not confirmed", "missing evidence"),
+            ("hypothesis", "hypotheses", "checklist", "not confirmed", "missing evidence"),
             ("remediation", "hardening", "defensive recommendation"),
         ),
         "vulnerability_analyst": (
@@ -284,7 +284,7 @@ def _pentester_specialist_quality(specialist_reports):
              "no vulnerability can be assigned", "no vulnerabilities can be confirmed"),
             ("no cve", "do not invent cve", "cve not verified", "no cve assigned"),
             ("no severity", "severity not assigned", "cannot assign severity",
-             "cannot be assigned a severity"),
+             "cannot be assigned a severity", "can be assigned a severity"),
             ("confidence", "low confidence", "confidence cannot", "unassessed"),
             ("remediation", "defensive fix", "mitigation"),
             ("safe retest", "safe validation", "code-review check",
