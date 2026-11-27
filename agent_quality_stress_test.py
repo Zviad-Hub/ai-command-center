@@ -280,7 +280,8 @@ def _pentester_specialist_quality(specialist_reports):
         "vulnerability_analyst": (
             ("no artifacts supplied", "no evidence supplied", "artifacts not provided",
              "no cves", "no scan reports", "no proof-of-concept data"),
-            ("no verified", "no confirmed", "cannot confirm"),
+            ("no verified", "no confirmed", "cannot confirm",
+             "no vulnerability can be assigned", "no vulnerabilities can be confirmed"),
             ("no cve", "do not invent cve", "cve not verified", "no cve assigned"),
             ("no severity", "severity not assigned", "cannot assign severity",
              "cannot be assigned a severity"),
