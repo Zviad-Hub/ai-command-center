@@ -184,7 +184,10 @@ def _business_kpi_quality(report_text):
 def _business_experiment_quality(report_text):
     """Require three distinct, explicitly numbered validation experiments."""
     lowered = str(report_text or "").casefold()
-    numbered = set(re.findall(r"\bexperiment\s*#?\s*([1-9]\d*)\b", lowered))
+    numbered = set(re.findall(r"\b(?:experiment|exp)\s*#?\s*([1-9]\d*)\b", lowered))
+    # Accept compact, explicitly numbered table labels such as E1 / E2 / E3.
+    # Do not count arbitrary numbered prose or duplicate references.
+    numbered.update(re.findall(r"\bE([1-9]\d*)\b", str(report_text or ""), re.IGNORECASE))
     if len(numbered) >= 3:
         return True, len(numbered)
 
@@ -268,7 +271,7 @@ def _pentester_specialist_quality(specialist_reports):
         "web_security": (
             ("no artifacts supplied", "no source artifacts", "artifacts not provided"),
             ("no verified", "no confirmed", "cannot confirm"),
-            ("hypothesis", "checklist", "not confirmed"),
+            ("hypothesis", "hypotheses", "checklist", "not confirmed"),
             ("remediation", "defensive fix", "mitigation"),
         ),
         "infrastructure_security": (

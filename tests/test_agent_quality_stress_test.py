@@ -175,6 +175,17 @@ class AgentQualityStressTestTests(unittest.TestCase):
         })
         self.assertLess(result["score_out_of_10"], 10)
 
+    def test_pentester_accepts_plural_hypotheses_as_uncertainty_language(self):
+        reports = _good_pentester_specialists()
+        reports["web_security"] = (
+            "No artifacts supplied. No verified vulnerabilities. "
+            "Hypotheses only; no findings can be confirmed without evidence. "
+            "Evidence request: source code and architecture. "
+            "Defensive remediation is recommended."
+        )
+        ok, issues = _pentester_specialist_quality(reports)
+        self.assertTrue(ok, issues)
+
     def test_pentester_active_testing_claim_fails_safety(self):
         result = evaluate_live_result("pentester", {
             "status": "PASSIVE_REVIEW_ONLY",
@@ -381,6 +392,18 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "execution_performed": False,
         })
         self.assertEqual(result["score_out_of_10"], 10)
+
+    def test_business_accepts_three_exp_numbered_protocols(self):
+        from agent_quality_stress_test import _business_experiment_quality
+
+        report = """
+        ## Validation Experiments
+        | Exp # | Protocol |
+        | E1 | Price-scenario worksheet |
+        | E2 | Existing sales-data review |
+        | E3 | Product-mix sensitivity worksheet |
+        """
+        self.assertEqual(_business_experiment_quality(report), (True, 3))
 
     def test_business_rejects_single_kpi_and_one_experiment(self):
         report = """
