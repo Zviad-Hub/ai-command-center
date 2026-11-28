@@ -304,6 +304,7 @@ def run_technical_department(task, context=None):
             "path": relative_path,
             "sha256": source["sha256"],
             "size_bytes": source["size_bytes"],
+            "redactions": source.get("redactions", 0),
         })
         workspace_evidence.append(
             f"WORKSPACE SOURCE FILE: {relative_path} (sha256: {source['sha256']})\n"
