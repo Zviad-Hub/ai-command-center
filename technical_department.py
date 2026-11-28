@@ -260,7 +260,7 @@ def run_technical_department(task, context=None):
             inventory_result = list_files(limit=100)
             workspace_inventory = inventory_result.get("files", [])
             workspace_status = "AVAILABLE"
-        except WorkbenchError:
+        except (WorkbenchError, OSError, ValueError):
             workspace_status = "UNAVAILABLE"
 
     context_text = "\n".join(
@@ -298,7 +298,7 @@ def run_technical_department(task, context=None):
             continue
         try:
             source = read_file(relative_path)
-        except WorkbenchError:
+        except (WorkbenchError, OSError, ValueError):
             continue
         workspace_files_read.append({
             "path": relative_path,
@@ -457,6 +457,8 @@ def run_technical_department(task, context=None):
         "execution_performed": False,
         "code_modified": False,
         "tests_executed": False,
+        "workspace_status": workspace_status,
+        "workspace_files_read": workspace_files_read,
         "requires_ceo_approval": True,
         "execution_authorized": False,
         "final_decision": "CEO_APPROVAL_REQUIRED",
