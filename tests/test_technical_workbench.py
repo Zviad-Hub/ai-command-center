@@ -43,10 +43,10 @@ class TechnicalWorkbenchTests(unittest.TestCase):
 
     def test_read_redacts_common_credentials_before_returning_source(self):
         source = (
-            "GROQ_API_KEY = 'example-secret-value'\\n"
-            "Authorization: Bearer abc.def.ghi\\n"
-            "TOKEN_VALUE = 'ghp_123456789012345678901234567890123456'\\n"
-            "ordinary_setting = True\\n"
+            "GROQ_API_KEY = 'example-secret-value'\n"
+            "Authorization: Bearer abc.def.ghi\n"
+            "TOKEN_VALUE = 'ghp_123456789012345678901234567890123456'\n"
+            "ordinary_setting = True\n"
         )
         (self.root / "config.py").write_text(source, encoding="utf-8")
 
