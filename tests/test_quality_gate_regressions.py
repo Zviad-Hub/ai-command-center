@@ -35,6 +35,21 @@ class QualityGateRegressionTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "PASS", result["issues"])
 
+    def test_qa_test_strategy_and_failure_paths_meet_contract(self):
+        result = validate_technical_specialists(
+            {"selected_specialists": [{"specialist": "qa_engineer"}]},
+            [{
+                "specialist": "qa_engineer",
+                "status": "COMPLETED",
+                "report": (
+                    "QA test strategy and test matrix: each test scenario maps to "
+                    "an expected result, measurable acceptance criteria, negative "
+                    "cases and failure paths. Test data is missing."
+                ),
+            }],
+        )
+        self.assertEqual(result["status"], "PASS", result["issues"])
+
     def test_finance_reconciliation_uses_final_calculation_value_not_inputs(self):
         specialists = {
             "financial_analyst": (
