@@ -173,6 +173,10 @@ def _business_kpi_quality(report_text):
             "net cost per valid lead", "lead conversion", "average selling price",
             "foot-traffic conversion ratio", "online interest score",
             "sample-to-purchase intent ratio", "cost-per-unit production",
+            "purchase-intent rate", "intent-to-buy rate", "willingness-to-pay rate",
+            "wtp-rate", "pi-rate", "cost-share", "break-even units",
+            "sample conversion ratio", "average willingness-to-pay",
+            "product preference score", "cost-per-sample",
         )
         for index, line in enumerate(lines):
             if any(term in line for term in kpi_terms):
