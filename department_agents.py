@@ -96,14 +96,22 @@ Rules:
 - Do not suggest a future step that contradicts the current task's restrictions.
   Any later real-world validation requires separate CEO approval and any
   applicable human/legal/regulatory review.
-- Define at least four named KPIs in a dedicated KPI section. Write each
-  formula explicitly, name every required input, and distinguish proposed
-  thresholds from measured results; use NOT SET when no threshold was supplied.
-  Never invent baseline values, prices, costs, currencies, or market statistics.
-- Add a dedicated DATA CAPTURE PROCEDURE describing the blank recording
-  template, responsible human role, source of each measurement, and review
-  before calculating KPIs. Do not imply that anyone was contacted or that an
-  experiment was already performed.
+- Include a dedicated Markdown heading exactly "### KEY PERFORMANCE INDICATORS (KPIs)".
+  Under it, provide a Markdown table with at least four distinct KPI rows and
+  columns for KPI name, explicit mathematical formula, every required input,
+  unit, proposed threshold, and current status. Every formula must contain
+  an unambiguous calculation operator (=, /, or ×); do not count prose mentions
+  as KPI definitions. Use NOT SET for thresholds and NOT PROVIDED for missing
+  inputs. Never invent baseline values, penetration rates, prices, costs,
+  currencies, market statistics, or numeric targets.
+- Add a dedicated DATA CAPTURE PROCEDURE with a table mapping EACH KPI to its
+  exact input fields, permitted evidence source, responsible human role, and
+  review/verification step. Use only data explicitly supplied by the CEO or
+  confirmed existing internal records. Do not assume an internal data lake,
+  census extract, USDA dataset, workbook, or stored data exists unless supplied.
+  If a source is unavailable, mark it NOT PROVIDED / BLOCKED; do not imply it
+  was accessed, collected, or verified. Do not imply that anyone was contacted
+  or that an experiment was already performed.
 - Discuss sample-size limits, selection bias, repeat observations, and
   uncertainty for each protocol. Do not invent confidence intervals or
   statistical precision without the required sample data.
@@ -619,11 +627,18 @@ For a no-spend/no-contact business task, the final report MUST contain exactly
 three separate desk-based validation protocol rows labelled E1, E2, and E3;
 each must identify its hypothesis, method, required inputs, KPI/metric,
 limitation, and BLOCKED / DATA NOT PROVIDED status when inputs are absent.
-The report MUST contain at least four formula-backed KPIs, a data-capture
-procedure, and a conditional go / iterate / pause decision rule. Do not claim
-that any experiment, survey, outreach, sale, or external action occurred.
-Before returning the draft, verify the three protocol labels and all required
-sections are present and mutually consistent.
+The report MUST contain a standalone heading "### KEY PERFORMANCE INDICATORS (KPIs)"
+followed by a table with at least four distinct formula-backed KPI rows. Each
+row MUST include its formula, exact inputs, unit, threshold (NOT SET if none
+was supplied), and current status. The DATA CAPTURE PROCEDURE MUST map every
+KPI to exact fields, an evidence source that is actually available, a human
+owner, and a verification step. Never invent numeric assumptions or claim
+that public datasets or internal repositories were accessed unless they were
+explicitly supplied. Missing sources must be marked NOT PROVIDED / BLOCKED.
+Include a conditional go / iterate / pause decision rule. Do not claim that
+any experiment, survey, outreach, sale, or external action occurred.
+Before returning the draft, verify the three protocol labels, four KPI rows,
+input-to-KPI mapping, and all required sections are present and consistent.
 """
 
     try:
