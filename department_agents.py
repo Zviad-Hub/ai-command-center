@@ -422,6 +422,46 @@ risks, calculations or requirements, and missing inputs over repetition.
     return result.strip()
 
 
+def _business_no_contact_constraint_violations(task, context, specialist_reports):
+    """Detect externally participatory recommendations when CEO forbids spend/contact."""
+    context_text = str(context or {})
+    mission = f"{task or ''} {context_text}".casefold()
+    restricted = bool(re.search(
+        r"no[- ]spend|no[- ]contact|no outreach|without spending|no external actions|"
+        r"do not spend|do not contact|no surveys|no interviews",
+        mission,
+    ))
+    if not restricted or not isinstance(specialist_reports, dict):
+        return []
+
+    prohibited = re.compile(
+        r"free taste tests?|tasting event|sampling event|free samples?|sample day|"
+        r"pop[- ]?up|sidewalk stall|community room|public survey|google form|"
+        r"neighbou?rhood group poll|social media (?:poll|test|post)|"
+        r"door[- ]to[- ]door|partner request|customer interviews?|"
+        r"contact customers|ask customers|distribute samples",
+        re.IGNORECASE,
+    )
+    negation = re.compile(
+        r"\\b(?:no|not|never|do not|don't|must not|prohibited|forbidden|"
+        r"avoid|cannot|can't|will not)\\b",
+        re.IGNORECASE,
+    )
+    violations = []
+    for specialist_id, report in specialist_reports.items():
+        for sentence in re.split(r"(?<=[.!?])\\s+|\\n+", str(report or "")):
+            for match in prohibited.finditer(sentence):
+                if negation.search(sentence[:match.start()]):
+                    continue
+                violations.append(
+                    f"{specialist_id}: externally participatory recommendation conflicts with CEO constraints"
+                )
+                break
+            if any(item.startswith(f"{specialist_id}:") for item in violations):
+                break
+    return violations
+
+
 def run_department_workflow(department, task, context=None):
     department = str(department or "").strip().lower()
     task = str(task or "").strip()
@@ -515,6 +555,19 @@ def run_department_workflow(department, task, context=None):
             "message": "One or more specialists failed; no manager report was approved.",
             "report": ""
         }
+
+    if department == "business":
+        constraint_violations = _business_no_contact_constraint_violations(
+            task, context, specialist_reports
+        )
+        if constraint_violations:
+            return {
+                **base_result,
+                "status": "REVIEW_REQUIRED",
+                "message": "Business specialists proposed actions prohibited by the CEO task; manager synthesis was blocked.",
+                "constraint_violations": constraint_violations,
+                "report": "",
+            }
 
     specialist_quality_validation = validate_specialist_reports(
         department, specialist_reports
