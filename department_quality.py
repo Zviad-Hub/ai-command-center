@@ -109,7 +109,8 @@ TECHNICAL_ROLE_REQUIREMENTS = {
             "coverage", "assertion", "edge case", "quality", "validation",
             "test suite", "test plan", "test matrix", "acceptance criterion",
             "expected result", "pass/fail", "performance metric",
-            "measurable threshold", "test result artifact",
+            "measurable threshold", "test result artifact", "test strategy",
+            "test scenario", "failure path", "verification",
         ),
     ),
     "code_reviewer": (
