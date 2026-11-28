@@ -555,11 +555,13 @@ def evaluate_live_result(department, result):
                         labelled = re.search(
                             r"(?:operating result(?: before tax)?|"
                             r"operating profit(?: before tax)?|result before tax)"
-                            r"\s*(?::|=)?\s*([-+]?\d[\d,]*(?:\.\d+)?)",
+                            r"\s*(?::|=|\|)?\s*([-+]?\d[\d,]*(?:\.\d+)?(?:.*)?)$",
                             raw_line,
                             re.IGNORECASE,
                         )
                         if labelled:
+                            # Reconcile against the final numeric result, not
+                            # the input operands in a calculation expression.
                             values = _numeric_values(labelled.group(1))
                     if values and abs(values[-1] - (-2880)) > 0.02:
                         specialist_conflicts.append(specialist_id)
