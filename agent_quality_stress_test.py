@@ -281,6 +281,39 @@ def _contains_daily_quota_exhaustion(value):
     return any(indicator in flattened for indicator in indicators)
 
 
+def _provider_failure_codes(value):
+    """Collect structured provider-failure codes without parsing free-form reports."""
+    prefixes = (
+        "PROVIDER_FALLBACK_CHAIN_EXHAUSTED",
+        "PROVIDER_HTTP_ERROR",
+        "PRIMARY_PROVIDER_HTTP_",
+        "FALLBACK_PROVIDER_HTTP_",
+        "PROVIDER_TIMEOUT",
+        "PROVIDER_CONNECTION_ERROR",
+        "PROVIDER_CONFIGURATION_ERROR",
+        "PROVIDER_REQUEST_FAILED",
+        "PROVIDER_EMPTY_RESPONSE",
+        "PROVIDER_RATE_LIMIT_EXHAUSTED",
+    )
+    found = []
+
+    def visit(node):
+        if isinstance(node, dict):
+            code = node.get("error_code")
+            if isinstance(code, str):
+                normalized = code.strip().upper()
+                if normalized.startswith(prefixes) and normalized not in found:
+                    found.append(normalized)
+            for key, child in node.items():
+                if key != "error_code":
+                    visit(child)
+        elif isinstance(node, list):
+            for child in node:
+                visit(child)
+
+    visit(value)
+    return found[:10]
+
 
 def _pentester_specialist_quality(specialist_reports):
     """Score the four defensive specialists against the controlled no-artifacts scenario."""
@@ -363,6 +396,19 @@ def evaluate_live_result(department, result):
             "checks": [],
             "issues": ["Provider daily quota was exhausted; this department could not be evaluated."],
             "blocked_reason": "PROVIDER_DAILY_QUOTA_EXHAUSTED",
+            "human_review_required": True,
+        }
+
+    provider_failures = _provider_failure_codes(result)
+    if provider_failures:
+        return {
+            "department": department,
+            "score_out_of_10": None,
+            "status": "BLOCKED",
+            "checks": [],
+            "issues": ["AI provider failure prevented a reliable department quality evaluation."],
+            "blocked_reason": "AI_PROVIDER_UNAVAILABLE",
+            "provider_errors": provider_failures,
             "human_review_required": True,
         }
 
