@@ -41,7 +41,8 @@ jobs:
           python -c "from stress_test_suite import run_routing_stress_tests; import json; report = run_routing_stress_tests(); print(json.dumps(report, ensure_ascii=False, indent=2)); raise SystemExit(0 if report['status'] == 'PASS' else 1)"
 
       - name: Run opt-in live AI department quality tests
-        # The dedicated provider-preflight branch gets one live validation run; all other PRs remain offline-only.\n        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_live_quality) || (github.event_name == 'pull_request' && github.head_ref == 'fix/live-quality-provider-preflight') }}
+        # The dedicated provider-preflight branch gets one live validation run; all other PRs remain offline-only.
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.run_live_quality) || (github.event_name == 'pull_request' && github.head_ref == 'fix/live-quality-provider-preflight') }}
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
