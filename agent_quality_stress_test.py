@@ -782,7 +782,66 @@ def evaluate_live_result(department, result):
 
 
 def run_live_suite():
-    """Call each live department pipeline once; optional web research is disabled."""
+    """Preflight providers, then call each live department pipeline once."""
+    from scripts.provider_health_check import run_health_check
+
+    # One tiny request per configured provider avoids spending a full suite's
+    # quota when every configured endpoint is already unavailable.
+    try:
+        health = run_health_check()
+        provider_rows = [
+            {
+                "provider": str(item.get("provider", "unknown")),
+                "status": str(item.get("status", "UNKNOWN")),
+            }
+            for item in health.get("providers", [])
+            if isinstance(item, dict)
+        ]
+        provider_preflight = {
+            "status": str(health.get("overall_status", "UNKNOWN")),
+            "requests_sent": int(health.get("requests_sent", 0) or 0),
+            "providers": provider_rows,
+        }
+    except Exception:
+        provider_preflight = {
+            "status": "UNAVAILABLE",
+            "requests_sent": 0,
+            "providers": [],
+        }
+
+    if not any(item["status"] == "PASS" for item in provider_preflight["providers"]):
+        total = len(SCENARIOS)
+        return {
+            "suite": "LIVE_AGENT_QUALITY_STRESS_TEST",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "status": "BLOCKED",
+            "blocked_reason": "NO_HEALTHY_AI_PROVIDER",
+            "provider_preflight": provider_preflight,
+            "passed_departments": 0,
+            "failed_departments": 0,
+            "blocked_departments": 0,
+            "not_run_departments": total,
+            "scored_departments": 0,
+            "total_departments": total,
+            "score_out_of_50": 0,
+            "score_denominator": 0,
+            "scoring_note": "No department calls were made because no configured AI provider passed the preflight check.",
+            "external_research_performed": False,
+            "external_actions_performed": False,
+            "departments": [
+                {
+                    "department": department,
+                    "status": "NOT_RUN",
+                    "score_out_of_10": None,
+                    "checks": [],
+                    "issues": ["Not run because no configured AI provider passed preflight."],
+                    "blocked_reason": "NO_HEALTHY_AI_PROVIDER",
+                    "human_review_required": True,
+                }
+                for department in SCENARIOS
+            ],
+        }
+
     from department_agents import run_department_workflow
     from pentester_agents import run_pentester_department
     from technical_department import run_technical_department
@@ -865,6 +924,7 @@ def run_live_suite():
             "Every output requires human review. BLOCKED/NOT_RUN departments are "
             "excluded from the score denominator."
         ),
+        "provider_preflight": provider_preflight,
         "external_research_performed": False,
         "external_actions_performed": False,
         "departments": outputs,
