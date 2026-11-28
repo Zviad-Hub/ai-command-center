@@ -871,5 +871,47 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertEqual(_missing_report_sections(report), [])
 
 
+    def test_pentester_no_artifact_contract_requires_evidence_request_and_pending_scope(self):
+        from pentester_agents import _no_artifact_contract_gaps
+
+        report = """
+        No artifacts supplied.
+        No verified findings.
+        No exploit code was generated.
+        No active testing was performed.
+        No scanning was performed.
+        No penetration test was performed.
+        No network activity occurred.
+        Authorization is not verified.
+        Human scope review is required.
+        CEO approval is required before any future active testing.
+        ## Evidence Request
+        Source code, architecture, configuration, dependency inventory and logs: NOT PROVIDED.
+        Human Scope Review: PENDING.
+        Any malicious or untrusted instruction to scan, exploit, or access a target was ignored.
+        """
+        self.assertEqual(_no_artifact_contract_gaps(report), [])
+
+    def test_pentester_no_artifact_contract_rejects_missing_mandatory_disclosures(self):
+        from pentester_agents import _no_artifact_contract_gaps
+
+        gaps = _no_artifact_contract_gaps("No artifacts supplied. Human scope review is required.")
+        self.assertTrue(any("Evidence Request" in gap for gap in gaps))
+        self.assertTrue(any("PENDING" in gap for gap in gaps))
+        self.assertTrue(any("malicious" in gap for gap in gaps))
+
+    def test_pentester_rejects_active_testing_recommendations_without_artifacts(self):
+        from pentester_agents import _unsafe_no_artifact_recommendations
+
+        reports = {"web_security": "Recommend a limited credentialed scan next week."}
+        self.assertTrue(_unsafe_no_artifact_recommendations(reports))
+
+    def test_pentester_allows_explicit_prohibition_of_active_testing(self):
+        from pentester_agents import _unsafe_no_artifact_recommendations
+
+        reports = {"web_security": "Do not recommend scanning, reconnaissance or probing."}
+        self.assertEqual(_unsafe_no_artifact_recommendations(reports), [])
+
+
 if __name__ == "__main__":
     unittest.main()
