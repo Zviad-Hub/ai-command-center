@@ -455,11 +455,15 @@ Run locally only when you intentionally want to spend Groq API quota:
 python agent_quality_stress_test.py --live
 ```
 
-The command writes `agent_quality_stress_report.json`. It is not run on every
-pull request. In GitHub Actions, open **Actions → Technical Department Tests →
-Run workflow**, set **Run real AI department quality tests** to `true`, and
-start the run. The workflow uses the existing `GROQ_API_KEY` repository secret
-and uploads `live-agent-quality-stress-report` for 14 days.
+The command writes `agent_quality_stress_report.json`. Before calling
+departments, the suite sends one small health-check request to each configured
+provider. If none passes, the report is marked `BLOCKED` and no department
+workflow is called; the preflight itself still uses a small amount of API
+quota. It is not run on every pull request. In GitHub Actions, open
+**Actions → Technical Department Tests → Run workflow**, set
+**Run real AI department quality tests** to `true`, and start the run. The
+workflow uses the existing `GROQ_API_KEY` repository secret and uploads
+`live-agent-quality-stress-report` for 14 days.
 
 The live score is a heuristic quality gate, not proof that a factual claim is
 true. A passing score never replaces human review. The suite does not perform
