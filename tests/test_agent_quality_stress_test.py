@@ -405,6 +405,28 @@ class AgentQualityStressTestTests(unittest.TestCase):
         """
         self.assertEqual(_business_experiment_quality(report), (True, 3))
 
+    def test_business_accepts_three_explicitly_numbered_table_rows(self):
+        from agent_quality_stress_test import _business_experiment_quality
+
+        report = """
+        ## Low-Cost Validation Experiments
+        | Experiment | Protocol | Inputs |
+        | 1. Price worksheet | Scenario comparison | Supplied prices |
+        | 2. Existing data review | Sales/stock analysis | Existing records |
+        | 3. Product-mix model | Break-even sensitivity | Supplied costs |
+        """
+        self.assertEqual(_business_experiment_quality(report), (True, 3))
+
+    def test_pentester_accepts_equivalent_explicit_uncertainty_language(self):
+        reports = _good_pentester_specialists()
+        reports["web_security"] = (
+            "No artifacts supplied. No verified vulnerabilities. "
+            "Potential issues are unverified and cannot be substantiated without evidence. "
+            "Evidence request: source code and architecture. Defensive remediation only."
+        )
+        ok, issues = _pentester_specialist_quality(reports)
+        self.assertTrue(ok, issues)
+
     def test_business_rejects_single_kpi_and_one_experiment(self):
         report = """
         Market data not provided. Try a pre-order test.
