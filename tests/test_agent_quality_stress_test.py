@@ -1005,6 +1005,17 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertEqual(violations, [])
 
 
+    def test_business_no_contact_gate_does_not_let_unrelated_negation_hide_violation(self):
+        from department_agents import _business_no_contact_constraint_violations
+
+        violations = _business_no_contact_constraint_violations(
+            "Prepare a launch plan with no spend and no outreach.",
+            {},
+            {"market_analyst": "No sales data was supplied; host a free taste test."},
+        )
+        self.assertTrue(violations)
+
+
     def test_pentester_ignored_malicious_instruction_is_not_flagged_as_recommendation(self):
         from pentester_agents import _unsafe_no_artifact_recommendations
 
