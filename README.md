@@ -358,9 +358,11 @@ The Technical Department now has a bounded local workbench API in
 `technical_workbench.py`. It can list and inspect UTF-8 source files in an
 explicitly configured workspace, atomically update an existing file after
 explicit approval, and run only the repository's `unittest` suite or one
-`tests.test_<name>` module. It is an operator-controlled capability; it is
-not an autonomous model tool and agents must not claim to have used it unless
-a human-operated controller actually invokes it.
+`tests.test_<name>` module. When the workspace is configured, the Technical
+Manager can select up to six exact paths from the safe file inventory; only
+those selected files are read and passed to specialists as untrusted evidence.
+File changes and test execution remain operator-controlled and are not
+autonomously invoked by model prompts.
 
 Configure the project directory and a private approval token in the local
 process environment (never commit either value):
