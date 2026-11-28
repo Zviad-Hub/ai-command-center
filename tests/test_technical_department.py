@@ -77,6 +77,64 @@ class TechnicalDepartmentTests(unittest.TestCase):
         self.assertFalse(result["tests_executed"])
         self.assertFalse(result["execution_authorized"])
 
+    @patch.dict("os.environ", {"AI_COMMAND_CENTER_WORKSPACE": "/controlled/test/workspace"})
+    @patch("technical_department.read_file")
+    @patch("technical_department.list_files")
+    @patch("technical_department.ask_ai")
+    @patch("technical_department.run_specialist")
+    @patch("technical_department.run_technical_manager")
+    def test_selected_workspace_source_is_supplied_to_specialists_and_report(
+        self, manager_mock, specialist_mock, ask_ai_mock, list_files_mock, read_file_mock
+    ):
+        list_files_mock.return_value = {
+            "files": ["src/service.py", "tests/test_service.py"],
+            "truncated": False,
+        }
+        manager_mock.return_value = {
+            "status": "PLAN_CREATED",
+            "selected_specialists": [
+                {"specialist": "backend_developer", "mission": "Review the service implementation."},
+                {"specialist": "qa_engineer", "mission": "Identify service regression cases."},
+            ],
+            "workspace_files": ["src/service.py", "../../.env"],
+            "execution_plan": ["Review selected source evidence."],
+            "testing_strategy": ["Propose regression tests; do not execute them."],
+        }
+        read_file_mock.return_value = {
+            "path": "src/service.py",
+            "content": "def handler():\\n    return True\\n",
+            "sha256": "a" * 64,
+            "size_bytes": 31,
+        }
+        specialist_mock.side_effect = [
+            {
+                "specialist": "backend_developer",
+                "status": "COMPLETED",
+                "report": "Backend review: the supplied handler returns a constant value; verify the intended API behavior and error handling.",
+            },
+            {
+                "specialist": "qa_engineer",
+                "status": "COMPLETED",
+                "report": "QA test coverage review: add unit tests for expected handler results, invalid input and error-path behavior.",
+            },
+        ]
+        ask_ai_mock.side_effect = [
+            "EXECUTIVE SUMMARY\\nThe selected service source was reviewed.\\nTECHNICAL RECOMMENDATIONS\\nAdd behavior-focused tests.",
+            PASS_REVIEW,
+        ]
+
+        result = run_technical_department("Review the service implementation.")
+
+        list_files_mock.assert_called_once_with(limit=100)
+        read_file_mock.assert_called_once_with("src/service.py")
+        self.assertEqual(manager_mock.call_args.kwargs["workspace_files"], ["src/service.py", "tests/test_service.py"])
+        self.assertIn("def handler()", specialist_mock.call_args_list[0].kwargs["context"])
+        self.assertIn("src/service.py", result["report"])
+        self.assertEqual(
+            result["workspace_files_read"][0]["sha256"],
+            "a" * 64,
+        )
+
     @patch("technical_department.ask_ai")
     @patch("technical_department.run_specialist")
     @patch("technical_department.run_technical_manager")
