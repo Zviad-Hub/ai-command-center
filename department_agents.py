@@ -458,13 +458,34 @@ def _business_no_contact_constraint_violations(task, context, specialist_reports
     violations = []
     for specialist_id, report in specialist_reports.items():
         for sentence in re.split(r"(?<=[.!?])\s+|\n+", str(report or "")):
-            for match in prohibited.finditer(sentence):
-                if negation.search(sentence[:match.start()]):
-                    continue
-                violations.append(
-                    f"{specialist_id}: externally participatory recommendation conflicts with CEO constraints"
-                )
-                break
+            # A negation elsewhere in the sentence must not hide a separate
+            # prohibited recommendation (for example, "No data was supplied;
+            # run a public survey"). Check each clause independently.
+            clauses = re.split(r";+|,\s*(?:but|however|yet)\b", sentence, flags=re.IGNORECASE)
+            for clause in clauses:
+                for match in prohibited.finditer(clause):
+                    before = clause[max(0, match.start() - 100):match.start()]
+                    after = clause[match.end():match.end() + 80]
+                    locally_negated = bool(re.search(
+                        r"\b(?:no|not|never|do not|don't|must not|prohibited|forbidden|"
+                        r"avoid|cannot|can't|will not)\b(?:\s+\w+){0,4}\s*$",
+                        before,
+                        re.IGNORECASE,
+                    ))
+                    explicitly_forbidden_after = bool(re.match(
+                        r"\s+(?:is|are|was|were|remain|remains)?\s*"
+                        r"(?:strictly\s+)?(?:not allowed|prohibited|forbidden)\b",
+                        after,
+                        re.IGNORECASE,
+                    ))
+                    if locally_negated or explicitly_forbidden_after:
+                        continue
+                    violations.append(
+                        f"{specialist_id}: externally participatory recommendation conflicts with CEO constraints"
+                    )
+                    break
+                if any(item.startswith(f"{specialist_id}:") for item in violations):
+                    break
             if any(item.startswith(f"{specialist_id}:") for item in violations):
                 break
     return violations
