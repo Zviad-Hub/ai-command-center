@@ -32,17 +32,17 @@ MAX_LIST_FILES = 500
 MAX_TEST_OUTPUT = 20_000
 DEFAULT_TEST_TIMEOUT = 180
 SECRET_LINE_RE = re.compile(
-    r"(?im)^(\\s*(?:export\\s+)?[A-Za-z0-9_.-]*"
+    r"(?im)^(\s*(?:export\s+)?[A-Za-z0-9_.-]*"
     r"(?:API[_-]?KEY|ACCESS[_-]?TOKEN|AUTH[_-]?TOKEN|CLIENT[_-]?SECRET|"
     r"PASSWORD|PASSWD|PRIVATE[_-]?KEY|SECRET|CREDENTIAL)[A-Za-z0-9_.-]*"
-    r"\\s*[:=]\\s*).*$"
+    r"\s*[:=]\s*).*$"
 )
 PEM_PRIVATE_KEY_RE = re.compile(
     r"-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----",
     re.DOTALL,
 )
-BEARER_TOKEN_RE = re.compile(r"(?i)\\bBearer\\s+[A-Za-z0-9._~+/-]+=*")
-KNOWN_TOKEN_RE = re.compile(r"\\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16})\\b")
+BEARER_TOKEN_RE = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/-]+=*")
+KNOWN_TOKEN_RE = re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16})\b")
 SENSITIVE_NAMES = {
     ".env", ".env.local", ".env.production", "secrets.json",
     "credentials.json", "service-account.json", "id_rsa", "id_ed25519",
@@ -118,7 +118,6 @@ def _redact_source(content: str) -> tuple[str, int]:
 
     def replace_match(match):
         nonlocal redactions
-        redactions += 1
         return "[REDACTED PRIVATE KEY]"
 
     content, pem_count = PEM_PRIVATE_KEY_RE.subn(replace_match, content)
