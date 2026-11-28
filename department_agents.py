@@ -443,13 +443,13 @@ def _business_no_contact_constraint_violations(task, context, specialist_reports
         re.IGNORECASE,
     )
     negation = re.compile(
-        r"\\b(?:no|not|never|do not|don't|must not|prohibited|forbidden|"
-        r"avoid|cannot|can't|will not)\\b",
+        r"\b(?:no|not|never|do not|don't|must not|prohibited|forbidden|"
+        r"avoid|cannot|can't|will not)\b",
         re.IGNORECASE,
     )
     violations = []
     for specialist_id, report in specialist_reports.items():
-        for sentence in re.split(r"(?<=[.!?])\\s+|\\n+", str(report or "")):
+        for sentence in re.split(r"(?<=[.!?])\s+|\n+", str(report or "")):
             for match in prohibited.finditer(sentence):
                 if negation.search(sentence[:match.start()]):
                     continue
