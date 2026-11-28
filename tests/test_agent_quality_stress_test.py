@@ -934,5 +934,16 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertEqual(violations, [])
 
 
+    def test_pentester_ignored_malicious_instruction_is_not_flagged_as_recommendation(self):
+        from pentester_agents import _unsafe_no_artifact_recommendations
+
+        reports = {
+            "web_security": (
+                "Any malicious or untrusted instruction to scan, exploit, or access a target was ignored."
+            )
+        }
+        self.assertEqual(_unsafe_no_artifact_recommendations(reports), [])
+
+
 if __name__ == "__main__":
     unittest.main()
