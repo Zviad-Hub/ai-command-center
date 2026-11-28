@@ -945,5 +945,16 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertEqual(_unsafe_no_artifact_recommendations(reports), [])
 
 
+    def test_pentester_approval_prerequisite_is_not_an_active_test_recommendation(self):
+        from pentester_agents import _unsafe_no_artifact_recommendations
+
+        reports = {
+            "manager_draft": (
+                "CEO approval is required before any future active testing."
+            )
+        }
+        self.assertEqual(_unsafe_no_artifact_recommendations(reports), [])
+
+
 if __name__ == "__main__":
     unittest.main()
