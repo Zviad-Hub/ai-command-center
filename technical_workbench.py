@@ -31,6 +31,18 @@ MAX_WRITE_BYTES = 512_000
 MAX_LIST_FILES = 500
 MAX_TEST_OUTPUT = 20_000
 DEFAULT_TEST_TIMEOUT = 180
+SECRET_LINE_RE = re.compile(
+    r"(?im)^(\\s*(?:export\\s+)?[A-Za-z0-9_.-]*"
+    r"(?:API[_-]?KEY|ACCESS[_-]?TOKEN|AUTH[_-]?TOKEN|CLIENT[_-]?SECRET|"
+    r"PASSWORD|PASSWD|PRIVATE[_-]?KEY|SECRET|CREDENTIAL)[A-Za-z0-9_.-]*"
+    r"\\s*[:=]\\s*).*$"
+)
+PEM_PRIVATE_KEY_RE = re.compile(
+    r"-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----",
+    re.DOTALL,
+)
+BEARER_TOKEN_RE = re.compile(r"(?i)\\bBearer\\s+[A-Za-z0-9._~+/-]+=*")
+KNOWN_TOKEN_RE = re.compile(r"\\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16})\\b")
 SENSITIVE_NAMES = {
     ".env", ".env.local", ".env.production", "secrets.json",
     "credentials.json", "service-account.json", "id_rsa", "id_ed25519",
@@ -100,6 +112,35 @@ def list_files(root: str | os.PathLike | None = None, *, limit: int = 100) -> di
     return {"workspace": str(workspace), "files": found, "truncated": False}
 
 
+def _redact_source(content: str) -> tuple[str, int]:
+    """Remove common credential assignments and token formats before AI handoff."""
+    redactions = 0
+
+    def replace_match(match):
+        nonlocal redactions
+        redactions += 1
+        return "[REDACTED PRIVATE KEY]"
+
+    content, pem_count = PEM_PRIVATE_KEY_RE.subn(replace_match, content)
+    redactions += pem_count
+
+    def replace_secret_line(match):
+        nonlocal redactions
+        redactions += 1
+        return match.group(1) + "[REDACTED]"
+
+    content = SECRET_LINE_RE.sub(replace_secret_line, content)
+
+    def replace_token(match):
+        nonlocal redactions
+        redactions += 1
+        return "[REDACTED TOKEN]"
+
+    content = BEARER_TOKEN_RE.sub(replace_token, content)
+    content = KNOWN_TOKEN_RE.sub(replace_token, content)
+    return content, redactions
+
+
 def read_file(relative_path: str, root: str | os.PathLike | None = None) -> dict:
     """Read one bounded UTF-8 source/document file from the configured workspace."""
     workspace = _workspace_root(root)
@@ -113,11 +154,14 @@ def read_file(relative_path: str, root: str | os.PathLike | None = None) -> dict
         raise WorkbenchError("Only UTF-8 text files can be inspected.") from error
     except OSError as error:
         raise WorkbenchError("The requested workspace file could not be read.") from error
+    original_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+    safe_content, redaction_count = _redact_source(content)
     return {
         "path": Path(relative_path).as_posix(),
-        "content": content,
-        "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+        "content": safe_content,
+        "sha256": original_hash,
         "size_bytes": size,
+        "redactions": redaction_count,
     }
 
 
