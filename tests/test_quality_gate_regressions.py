@@ -78,6 +78,17 @@ class QualityGateRegressionTests(unittest.TestCase):
         self.assertTrue(passed, count)
         self.assertEqual(count, 4)
 
+    def test_business_common_launch_kpis_are_recognized_when_formula_backed(self):
+        report = """
+        Purchase-Intent Rate: PI-Rate = yes responses / tasters * 100.
+        Willingness-to-Pay Rate: WTP-Rate = accepted-price responses / respondents * 100.
+        Cost-Share: Cost-Share = ingredient cost per unit / selling price * 100.
+        Break-Even Units: BE-Units = fixed daily cost / contribution per unit.
+        """
+        passed, count = _business_kpi_quality(report)
+        self.assertTrue(passed, count)
+        self.assertEqual(count, 4)
+
     def test_business_numbered_experiments_are_counted_as_distinct_deliverables(self):
         report = """
         Experiment 1: conduct a foot-traffic count.
