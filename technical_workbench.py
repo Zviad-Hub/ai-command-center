@@ -33,7 +33,7 @@ MAX_TEST_OUTPUT = 20_000
 DEFAULT_TEST_TIMEOUT = 180
 SECRET_LINE_RE = re.compile(
     r"(?im)^(\s*(?:export\s+)?[A-Za-z0-9_.-]*"
-    r"(?:API[_-]?KEY|ACCESS[_-]?TOKEN|AUTH[_-]?TOKEN|CLIENT[_-]?SECRET|"
+    r"(?:API[_-]?KEY|ACCESS[_-]?TOKEN|AUTH[_-]?TOKEN|TOKEN|CLIENT[_-]?SECRET|"
     r"PASSWORD|PASSWD|PRIVATE[_-]?KEY|SECRET|CREDENTIAL)[A-Za-z0-9_.-]*"
     r"\s*[:=]\s*).*$"
 )
