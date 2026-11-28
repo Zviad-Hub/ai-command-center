@@ -847,50 +847,56 @@ def run_live_suite():
     from technical_department import run_technical_department
     import department_agents
 
-    # Keep this controlled experiment independent of Tavily and live web claims.
-    department_agents._research_context = lambda task, department: {
-        "status": "DISABLED_FOR_CONTROLLED_TEST",
-        "sources": [],
-        "warning": "External research deliberately disabled for this quality test.",
-    }
-
-    outputs = []
-    departments = list(SCENARIOS.items())
-    blocked = False
-
-    for index, (department, scenario) in enumerate(departments):
-        print(f"\\n[LIVE QUALITY TEST] {department.upper()}", flush=True)
-        if department in ("finance", "business", "tenders"):
-            result = run_department_workflow(
-                department, scenario["task"], context=scenario["context"]
-            )
-        elif department == "pentester":
-            result = run_pentester_department(
-                scenario["task"], context=scenario["context"]
-            )
-        else:
-            result = run_technical_department(
-                scenario["task"], context=scenario["context"]
-            )
-
-        evaluated = evaluate_live_result(department, result)
-        outputs.append(evaluated)
-
-        if evaluated["status"] == "BLOCKED":
-            blocked = True
-            for remaining_department, _ in departments[index + 1:]:
-                outputs.append({
-                    "department": remaining_department,
-                    "status": "NOT_RUN",
-                    "score_out_of_10": None,
-                    "checks": [],
-                    "issues": [
-                        "Not run because the provider daily quota was exhausted earlier in this suite."
-                    ],
-                    "blocked_reason": "EARLIER_DAILY_QUOTA_EXHAUSTION",
-                    "human_review_required": True,
-                })
-            break
+    original_research_context = department_agents._research_context
+    try:
+        # Keep this controlled experiment independent of Tavily and live web claims.
+        department_agents._research_context = lambda task, department: {
+            "status": "DISABLED_FOR_CONTROLLED_TEST",
+            "sources": [],
+            "warning": "External research deliberately disabled for this quality test.",
+        }
+    
+        outputs = []
+        departments = list(SCENARIOS.items())
+        blocked = False
+    
+        for index, (department, scenario) in enumerate(departments):
+            print(f"\\n[LIVE QUALITY TEST] {department.upper()}", flush=True)
+            if department in ("finance", "business", "tenders"):
+                result = run_department_workflow(
+                    department, scenario["task"], context=scenario["context"]
+                )
+            elif department == "pentester":
+                result = run_pentester_department(
+                    scenario["task"], context=scenario["context"]
+                )
+            else:
+                result = run_technical_department(
+                    scenario["task"], context=scenario["context"]
+                )
+    
+            evaluated = evaluate_live_result(department, result)
+            outputs.append(evaluated)
+    
+            if evaluated["status"] == "BLOCKED":
+                blocked = True
+                for remaining_department, _ in departments[index + 1:]:
+                    outputs.append({
+                        "department": remaining_department,
+                        "status": "NOT_RUN",
+                        "score_out_of_10": None,
+                        "checks": [],
+                        "issues": [
+                            "Not run because the provider daily quota was exhausted earlier in this suite."
+                        ],
+                        "blocked_reason": "EARLIER_DAILY_QUOTA_EXHAUSTION",
+                        "human_review_required": True,
+                    })
+                break
+    
+    
+    finally:
+        department_agents._research_context = original_research_context
 
     passed = sum(item["status"] == "PASS" for item in outputs)
     failed = sum(item["status"] == "NEEDS_REVIEW" for item in outputs)
