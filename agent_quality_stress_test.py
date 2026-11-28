@@ -188,6 +188,27 @@ def _business_experiment_quality(report_text):
     # Accept compact, explicitly numbered table labels such as E1 / E2 / E3.
     # Do not count arbitrary numbered prose or duplicate references.
     numbered.update(re.findall(r"\bE([1-9]\d*)\b", str(report_text or ""), re.IGNORECASE))
+
+    # Also accept a numbered three-row protocol table, but only within an
+    # explicitly titled validation-experiments section. This avoids counting
+    # unrelated numbered recommendations elsewhere in the report.
+    in_experiment_section = False
+    table_row_numbers = set()
+    for raw_line in str(report_text or "").splitlines():
+        line = raw_line.strip()
+        heading = re.sub(r"^\s{0,3}#{1,6}\s*", "", line).strip(" *_:#").casefold()
+        if re.search(r"validation\s+experiments?|experiments?\s+and\s+protocols?", heading):
+            in_experiment_section = True
+            continue
+        if in_experiment_section and re.match(r"^\s*#{1,6}\s+", line):
+            in_experiment_section = False
+        if in_experiment_section and line.startswith("|"):
+            cells = [cell.strip(" *_") for cell in line.strip().strip("|").split("|")]
+            if cells:
+                match = re.match(r"^([1-9]\d*)[.)]?\s*[-:–—]?\s*\S", cells[0])
+                if match:
+                    table_row_numbers.add(match.group(1))
+    numbered.update(table_row_numbers)
     if len(numbered) >= 3:
         return True, len(numbered)
 
@@ -271,7 +292,9 @@ def _pentester_specialist_quality(specialist_reports):
         "web_security": (
             ("no artifacts supplied", "no source artifacts", "artifacts not provided"),
             ("no verified", "no confirmed", "cannot confirm"),
-            ("hypothesis", "hypotheses", "checklist", "not confirmed"),
+            ("hypothesis", "hypotheses", "hypothetical", "checklist",
+             "not confirmed", "unverified", "insufficient evidence",
+             "cannot be substantiated"),
             ("remediation", "defensive fix", "mitigation"),
         ),
         "infrastructure_security": (
