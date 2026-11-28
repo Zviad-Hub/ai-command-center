@@ -269,7 +269,7 @@ def run_technical_department(task, context=None):
 
     plan = run_technical_manager(
         task,
-        context=specialist_context_text,
+        context=context_text,
         workspace_files=workspace_inventory,
     )
     if not isinstance(plan, dict) or plan.get("status") not in ("PLANNED", "PLAN_CREATED"):
@@ -371,7 +371,7 @@ def run_technical_department(task, context=None):
                     "mission": mission,
                 },
                 mission=mission,
-                context=context_text,
+                context=specialist_context_text,
             )
             specialist_results.append(result)
             if (
@@ -521,7 +521,7 @@ MANAGER PLAN:
 {bounded_text(str(plan), 3500)}
 
 SUPPLIED CONTEXT:
-{bounded_text(context_text, 3000) or "No additional context supplied."}
+{bounded_text(specialist_context_text, 8500) or "No additional context supplied."}
 
 SPECIALIST REPORTS:
 {bounded_text(specialist_text, 9500)}
