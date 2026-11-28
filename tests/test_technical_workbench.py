@@ -107,6 +107,22 @@ class TechnicalWorkbenchTests(unittest.TestCase):
         backups = list(backup_root.rglob("*__sample.py.bak"))
         self.assertTrue(any(path.read_text(encoding="utf-8") == original for path in backups))
 
+    def test_backup_directory_must_be_outside_workspace(self):
+        original = (self.root / "sample.py").read_text(encoding="utf-8")
+        digest = hashlib.sha256(original.encode("utf-8")).hexdigest()
+        with patch.dict(os.environ, {
+            "AI_TECHNICAL_APPROVAL_TOKEN": "ceo-test-token",
+            "AI_COMMAND_CENTER_BACKUP_DIR": str(self.root / "backups"),
+        }):
+            with self.assertRaises(WorkbenchError):
+                write_file(
+                    "sample.py", "VALUE = 3\\n",
+                    expected_sha256=digest,
+                    approval_token="ceo-test-token",
+                    root=self.root,
+                )
+        self.assertEqual((self.root / "sample.py").read_text(encoding="utf-8"), original)
+
     def test_write_rejects_new_files_and_disallowed_targets(self):
         with patch.dict(os.environ, {"AI_TECHNICAL_APPROVAL_TOKEN": "token"}):
             with self.assertRaises(WorkbenchError):
