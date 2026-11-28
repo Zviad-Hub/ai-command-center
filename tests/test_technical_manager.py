@@ -37,6 +37,37 @@ class TechnicalManagerTests(unittest.TestCase):
         self.assertTrue(result["requires_ceo_approval"])
 
     @patch("technical_manager.ask_ai")
+    def test_workspace_file_selection_is_limited_to_supplied_inventory(self, ask_ai_mock):
+        ask_ai_mock.return_value = json.dumps({
+            "selected_specialists": [
+                {
+                    "specialist": "code_reviewer",
+                    "mission": "Review the selected source file.",
+                }
+            ],
+            "workspace_files": [
+                "src/app.py",
+                "../../.env",
+                "not-in-inventory.py",
+                "tests/test_app.py",
+            ],
+        })
+
+        result = run_technical_manager(
+            "Review the application implementation.",
+            context="Review for reliability and security.",
+            workspace_files=["src/app.py", "tests/test_app.py"],
+        )
+
+        prompt = ask_ai_mock.call_args.args[1]
+        self.assertIn("src/app.py", prompt)
+        self.assertIn("Review for reliability and security.", prompt)
+        self.assertEqual(
+            result["workspace_files"],
+            ["src/app.py", "tests/test_app.py"],
+        )
+
+    @patch("technical_manager.ask_ai")
     def test_uses_safe_fallback_for_unknown_or_empty_specialist_assignments(self, ask_ai_mock):
         ask_ai_mock.return_value = json.dumps({
             "selected_specialists": [
