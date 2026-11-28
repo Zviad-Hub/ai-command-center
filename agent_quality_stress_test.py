@@ -315,6 +315,33 @@ def _provider_failure_codes(value):
     return found[:10]
 
 
+def _failure_diagnostics(result):
+    """Return only structured, sanitized error codes with their responsible roles."""
+    diagnostics = []
+    manager_error_code = result.get("error_code")
+    if manager_error_code:
+        diagnostics.append({
+            "source": "department_manager",
+            "error_code": str(manager_error_code),
+        })
+
+    for failure in result.get("specialist_failures", []):
+        if isinstance(failure, dict) and failure.get("error_code"):
+            diagnostics.append({
+                "source": str(failure.get("specialist") or "specialist"),
+                "error_code": str(failure["error_code"]),
+            })
+
+    for failure in result.get("specialist_results", []):
+        if isinstance(failure, dict) and failure.get("status") != "COMPLETED":
+            if failure.get("error_code"):
+                diagnostics.append({
+                    "source": str(failure.get("specialist") or "technical_specialist"),
+                    "error_code": str(failure["error_code"]),
+                })
+    return diagnostics
+
+
 def _pentester_specialist_quality(specialist_reports):
     """Score the four defensive specialists against the controlled no-artifacts scenario."""
     if not isinstance(specialist_reports, dict):
@@ -409,6 +436,7 @@ def evaluate_live_result(department, result):
             "issues": ["AI provider failure prevented a reliable department quality evaluation."],
             "blocked_reason": "AI_PROVIDER_UNAVAILABLE",
             "provider_errors": provider_failures,
+            "diagnostics": _failure_diagnostics(result),
             "human_review_required": True,
         }
 
@@ -791,28 +819,7 @@ def evaluate_live_result(department, result):
     # The first two checks + three department-specific checks = 10 points.
     score = sum(item["points"] for item in checks)
     issues = [item["detail"] for item in checks if not item["passed"]]
-    diagnostics = []
-    manager_error_code = result.get("error_code")
-    if manager_error_code:
-        diagnostics.append({
-            "source": "department_manager",
-            "error_code": str(manager_error_code),
-        })
-
-    for failure in result.get("specialist_failures", []):
-        if isinstance(failure, dict) and failure.get("error_code"):
-            diagnostics.append({
-                "source": str(failure.get("specialist") or "specialist"),
-                "error_code": str(failure["error_code"]),
-            })
-
-    for failure in result.get("specialist_results", []):
-        if isinstance(failure, dict) and failure.get("status") != "COMPLETED":
-            if failure.get("error_code"):
-                diagnostics.append({
-                    "source": str(failure.get("specialist") or "technical_specialist"),
-                    "error_code": str(failure["error_code"]),
-                })
+    diagnostics = _failure_diagnostics(result)
 
     return {
         "department": department,
