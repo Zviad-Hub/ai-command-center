@@ -36,7 +36,7 @@ SENSITIVE_NAMES = {
     "credentials.json", "service-account.json", "id_rsa", "id_ed25519",
 }
 DENIED_PARTS = {".git", ".venv", "venv", "__pycache__", "node_modules", ".idea", ".vscode"}
-MODULE_RE = re.compile(r"^tests(?:\.[A-Za-z_][A-Za-z0-9_]*)+$")
+MODULE_RE = re.compile(r"^tests\.test_[A-Za-z0-9_]+$")
 
 
 def _workspace_root(root: str | os.PathLike | None = None) -> Path:
@@ -162,7 +162,9 @@ def write_file(
     if not isinstance(expected_sha256, str) or not hmac.compare_digest(current_hash, expected_sha256):
         raise WorkbenchError("The file changed since it was reviewed; fetch it again before retrying.")
     backup_dir = _backup_directory(workspace)
-    backup_path = backup_dir / (Path(relative_path).as_posix().replace("/", "__") + ".bak")
+    backup_name = Path(relative_path).as_posix().replace("/", "__")
+    backup_stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    backup_path = backup_dir / f"{backup_stamp}__{backup_name}.bak"
     shutil.copy2(path, backup_path)
     temporary_path = None
     try:
@@ -186,20 +188,25 @@ def write_file(
             except OSError:
                 pass
     new_hash = hashlib.sha256(encoded).hexdigest()
-    _record_audit(backup_dir, {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "action": "file_update",
-        "path": Path(relative_path).as_posix(),
-        "before_sha256": current_hash,
-        "after_sha256": new_hash,
-        "backup": backup_path.name,
-    })
+    try:
+        _record_audit(backup_dir, {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "action": "file_update",
+            "path": Path(relative_path).as_posix(),
+            "before_sha256": current_hash,
+            "after_sha256": new_hash,
+            "backup": backup_path.name,
+        })
+        audit_recorded = True
+    except OSError:
+        audit_recorded = False
     return {
         "status": "UPDATED",
         "path": Path(relative_path).as_posix(),
         "before_sha256": current_hash,
         "after_sha256": new_hash,
         "backup_created": True,
+        "audit_recorded": audit_recorded,
         "execution_authorized": True,
     }
 
@@ -219,8 +226,9 @@ def run_tests(
         target = "tests (full unittest discovery)"
     else:
         if not isinstance(test_module, str) or not MODULE_RE.fullmatch(test_module):
-            raise WorkbenchError("Only a tests.* unittest module can be selected.")
-        args = [sys.executable, "-m", "unittest", test_module, "-v"]
+            raise WorkbenchError("Only a tests.test_<name> unittest module can be selected.")
+        filename = test_module.rsplit(".", 1)[1] + ".py"
+        args = [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", filename, "-v"]
         target = test_module
     if not (workspace / "tests").is_dir():
         raise WorkbenchError("The configured workspace has no tests directory.")
