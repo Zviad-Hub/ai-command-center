@@ -1,6 +1,8 @@
 import unittest
+from unittest.mock import patch
 
 from agent_quality_stress_test import (
+    SCENARIOS,
     evaluate_live_result,
     _pentester_specialist_quality,
     _department_specialist_quality,
