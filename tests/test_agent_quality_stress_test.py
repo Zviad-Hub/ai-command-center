@@ -83,6 +83,40 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertEqual(result["status"], "BLOCKED")
         self.assertIsNone(result["score_out_of_10"])
 
+    def test_fallback_chain_unavailable_is_blocked_not_scored_as_agent_failure(self):
+        result = evaluate_live_result("business", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_reports": {"market_analyst": "partial output"},
+            "error_code": (
+                "PROVIDER_FALLBACK_CHAIN_EXHAUSTED_"
+                "GEMINI_HTTP_503_OPENROUTER_HTTP_402"
+            ),
+            "report": "",
+        })
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIsNone(result["score_out_of_10"])
+        self.assertEqual(result["blocked_reason"], "AI_PROVIDER_UNAVAILABLE")
+        self.assertEqual(
+            result["provider_errors"],
+            [
+                "PROVIDER_FALLBACK_CHAIN_EXHAUSTED_GEMINI_HTTP_503_OPENROUTER_HTTP_402"
+            ],
+        )
+
+    def test_nested_specialist_provider_timeout_is_blocked(self):
+        result = evaluate_live_result("technical", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_results": [{
+                "specialist": "qa_engineer",
+                "status": "ERROR",
+                "error_code": "PROVIDER_TIMEOUT",
+            }],
+            "report": "",
+        })
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["blocked_reason"], "AI_PROVIDER_UNAVAILABLE")
+        self.assertIn("PROVIDER_TIMEOUT", result["provider_errors"])
+
     def test_failure_diagnostics_are_exposed_without_raw_error_text(self):
         result = evaluate_live_result("business", {
             "status": "REVIEW_REQUIRED",
