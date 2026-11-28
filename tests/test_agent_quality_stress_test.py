@@ -913,5 +913,26 @@ class AgentQualityStressTestTests(unittest.TestCase):
         self.assertEqual(_unsafe_no_artifact_recommendations(reports), [])
 
 
+    def test_business_no_contact_gate_blocks_specialist_sampling_recommendations(self):
+        from department_agents import _business_no_contact_constraint_violations
+
+        violations = _business_no_contact_constraint_violations(
+            "Prepare a launch plan with no spend and no outreach.",
+            {},
+            {"market_analyst": "Host a free taste test in a community room."},
+        )
+        self.assertTrue(violations)
+
+    def test_business_no_contact_gate_allows_explicitly_prohibited_examples(self):
+        from department_agents import _business_no_contact_constraint_violations
+
+        violations = _business_no_contact_constraint_violations(
+            "No spend and no contact are allowed.",
+            {},
+            {"market_analyst": "Do not recommend a free taste test or public survey."},
+        )
+        self.assertEqual(violations, [])
+
+
 if __name__ == "__main__":
     unittest.main()
