@@ -145,8 +145,9 @@ def _business_kpi_quality(report_text):
     in_kpi_section = False
 
     for line in lines:
-        heading = re.sub(r"^\s{0,3}#{1,6}\s*", "", line).strip(" *_:#")
-        if re.search(r"\bkpis?\b", heading):
+        # Only a real Markdown heading may open the KPI section. Incidental
+        # mentions in summaries, recommendations, or table cells must not.
+        if re.match(r"^\s*#{1,6}\s+.*\bkpis?\b", line):
             in_kpi_section = True
             continue
         if in_kpi_section and re.match(r"^\s*#{1,6}\s+", line):
@@ -172,6 +173,10 @@ def _business_kpi_quality(report_text):
             "net cost per valid lead", "lead conversion", "average selling price",
             "foot-traffic conversion ratio", "online interest score",
             "sample-to-purchase intent ratio", "cost-per-unit production",
+            "purchase-intent rate", "intent-to-buy rate", "willingness-to-pay rate",
+            "wtp-rate", "pi-rate", "cost-share", "break-even units",
+            "sample conversion ratio", "average willingness-to-pay",
+            "product preference score", "cost-per-sample",
         )
         for index, line in enumerate(lines):
             if any(term in line for term in kpi_terms):
@@ -188,6 +193,27 @@ def _business_experiment_quality(report_text):
     # Accept compact, explicitly numbered table labels such as E1 / E2 / E3.
     # Do not count arbitrary numbered prose or duplicate references.
     numbered.update(re.findall(r"\bE([1-9]\d*)\b", str(report_text or ""), re.IGNORECASE))
+
+    # Also accept a numbered three-row protocol table, but only within an
+    # explicitly titled validation-experiments section. This avoids counting
+    # unrelated numbered recommendations elsewhere in the report.
+    in_experiment_section = False
+    table_row_numbers = set()
+    for raw_line in str(report_text or "").splitlines():
+        line = raw_line.strip()
+        heading = re.sub(r"^\s{0,3}#{1,6}\s*", "", line).strip(" *_:#").casefold()
+        if re.search(r"validation\s+experiments?|experiments?\s+and\s+protocols?", heading):
+            in_experiment_section = True
+            continue
+        if in_experiment_section and re.match(r"^\s*#{1,6}\s+", line):
+            in_experiment_section = False
+        if in_experiment_section and line.startswith("|"):
+            cells = [cell.strip(" *_") for cell in line.strip().strip("|").split("|")]
+            if cells:
+                match = re.match(r"^([1-9]\d*)[.)]?\s*[-:–—]?\s*\S", cells[0])
+                if match:
+                    table_row_numbers.add(match.group(1))
+    numbered.update(table_row_numbers)
     if len(numbered) >= 3:
         return True, len(numbered)
 
@@ -271,7 +297,9 @@ def _pentester_specialist_quality(specialist_reports):
         "web_security": (
             ("no artifacts supplied", "no source artifacts", "artifacts not provided"),
             ("no verified", "no confirmed", "cannot confirm"),
-            ("hypothesis", "hypotheses", "checklist", "not confirmed"),
+            ("hypothesis", "hypotheses", "hypothetical", "checklist",
+             "not confirmed", "unverified", "insufficient evidence",
+             "cannot be substantiated"),
             ("remediation", "defensive fix", "mitigation"),
         ),
         "infrastructure_security": (
@@ -504,15 +532,41 @@ def evaluate_live_result(department, result):
         specialist_conflicts = []
         if isinstance(specialist_reports, dict):
             for specialist_id, specialist_text in specialist_reports.items():
-                for match in re.finditer(
-                    r"(?:operating result|operating profit|result before tax)"
-                    r"[^\n]*",
-                    str(specialist_text or ""),
-                    re.IGNORECASE,
-                ):
-                    values = _numeric_values(match.group(0))
-                    # The result value is the final numeric token on a
-                    # calculation/table row; earlier tokens may be inputs.
+                for raw_line in str(specialist_text or "").splitlines():
+                    if not re.search(
+                        r"(?:operating result|operating profit|result before tax)",
+                        raw_line,
+                        re.IGNORECASE,
+                    ):
+                        continue
+                    values = []
+                    if raw_line.lstrip().startswith("|"):
+                        # A result row must have a dedicated result cell.
+                        # Explanatory rows such as "Operating result. | Not
+                        # provided..." are not numeric result declarations.
+                        cells = [
+                            cell.strip(" *_")
+                            for cell in raw_line.strip().strip("|").split("|")
+                        ]
+                        if len(cells) >= 3 and re.search(
+                            r"(?:operating result|operating profit|result before tax)",
+                            cells[0],
+                            re.IGNORECASE,
+                        ):
+                            values = _numeric_values(cells[-1])
+                    else:
+                        # In prose, require an explicit labelled declaration.
+                        labelled = re.search(
+                            r"(?:operating result(?: before tax)?|"
+                            r"operating profit(?: before tax)?|result before tax)"
+                            r"\s*(?::|=|\|)?\s*([-+]?\d[\d,]*(?:\.\d+)?(?:.*)?)$",
+                            raw_line,
+                            re.IGNORECASE,
+                        )
+                        if labelled:
+                            # Reconcile against the final numeric result, not
+                            # the input operands in a calculation expression.
+                            values = _numeric_values(labelled.group(1))
                     if values and abs(values[-1] - (-2880)) > 0.02:
                         specialist_conflicts.append(specialist_id)
                         break
@@ -629,6 +683,7 @@ def evaluate_live_result(department, result):
             and _has_any(lowered_report, [
                 "cannot confirm", "not confirmed", "hypothesis",
                 "unverified", "not enough evidence",
+                "no evidence-based vulnerability findings can be made without supplied artifacts",
             ])
         )
         add(

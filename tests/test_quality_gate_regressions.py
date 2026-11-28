@@ -35,6 +35,21 @@ class QualityGateRegressionTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "PASS", result["issues"])
 
+    def test_qa_test_strategy_and_failure_paths_meet_contract(self):
+        result = validate_technical_specialists(
+            {"selected_specialists": [{"specialist": "qa_engineer"}]},
+            [{
+                "specialist": "qa_engineer",
+                "status": "COMPLETED",
+                "report": (
+                    "QA test strategy and test matrix: each test scenario maps to "
+                    "an expected result, measurable acceptance criteria, negative "
+                    "cases and failure paths. Test data is missing."
+                ),
+            }],
+        )
+        self.assertEqual(result["status"], "PASS", result["issues"])
+
     def test_finance_reconciliation_uses_final_calculation_value_not_inputs(self):
         specialists = {
             "financial_analyst": (
@@ -73,6 +88,17 @@ class QualityGateRegressionTests(unittest.TestCase):
         | Online Interest Score | OIS = likes + shares / total reach | Interest |
         | Sample-to-Purchase Intent Ratio | SPIR = buy statements / samples | Intent |
         | Cost-per-Unit Production | CPU = ingredient cost / sellable units | Cost |
+        """
+        passed, count = _business_kpi_quality(report)
+        self.assertTrue(passed, count)
+        self.assertEqual(count, 4)
+
+    def test_business_common_launch_kpis_are_recognized_when_formula_backed(self):
+        report = """
+        Purchase-Intent Rate: PI-Rate = yes responses / tasters * 100.
+        Willingness-to-Pay Rate: WTP-Rate = accepted-price responses / respondents * 100.
+        Cost-Share: Cost-Share = ingredient cost per unit / selling price * 100.
+        Break-Even Units: BE-Units = fixed daily cost / contribution per unit.
         """
         passed, count = _business_kpi_quality(report)
         self.assertTrue(passed, count)

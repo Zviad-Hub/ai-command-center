@@ -73,37 +73,54 @@ Rules:
 - Explain market, customer, competitor, operational, and financial risks
   where relevant; do not invent market data.
 - Give practical options with trade-offs, dependencies, and measurable KPIs.
-- For launch/validation plans, define at least three genuinely distinct,
-  low-cost validation protocols in a numbered table using stable labels E1, E2,
-  and E3. Each must state its hypothesis, method, required inputs, metric,
-  limitations, and approval/dependency.
+- For launch/validation plans, define exactly three genuinely distinct,
+  low-cost validation protocols in a dedicated table. Use the exact first-column
+  labels "E1", "E2", and "E3" (one row per protocol, no duplicates). Each row
+  must state its hypothesis, desk-based method, required inputs, metric,
+  limitations, and approval/dependency. The final report must preserve all
+  three rows rather than compressing them into a single generic recommendation.
+- Before finalizing, count the E1/E2/E3 rows and verify that each is materially
+  different; a renamed copy of another protocol does not count.
 - The CEO task may explicitly prohibit spending, outreach, or external actions.
   When it does, treat those limits as absolute: do not recommend or imply
   purchases, paid materials, renting venues, pop-ups, food distribution,
   public posting, surveys/interviews, partner requests, or contacting anyone.
   Describe future protocols only; state clearly that none has been executed.
-- In a no-spend/no-contact scenario, use desk-based protocols that can be
-  prepared without external participation (for example, a blank price-scenario
-  worksheet, an internal review of existing supplied sales data if available,
-  and a product-mix sensitivity worksheet). If the required data is absent,
-  mark the protocol BLOCKED / DATA NOT PROVIDED; never fabricate results.
+- In a no-spend/no-contact scenario, use only internal desk-based protocols:
+  E1 a blank price-scenario and willingness-to-pay worksheet using supplied
+  prices only; E2 an internal review of existing supplied sales/stock data;
+  E3 a product-mix and break-even sensitivity worksheet using supplied costs.
+  These are three separate analysis plans, not customer-facing experiments.
+  If required data is absent, mark the relevant protocol BLOCKED / DATA NOT
+  PROVIDED and list the exact input fields needed. Never fabricate results.
 - Do not suggest a future step that contradicts the current task's restrictions.
   Any later real-world validation requires separate CEO approval and any
   applicable human/legal/regulatory review.
-- Define at least four named KPIs in a dedicated KPI section. Write each
-  formula explicitly, name every required input, and distinguish proposed
-  thresholds from measured results; use NOT SET when no threshold was supplied.
-  Never invent baseline values, prices, costs, currencies, or market statistics.
-- Add a dedicated DATA CAPTURE PROCEDURE describing the blank recording
-  template, responsible human role, source of each measurement, and review
-  before calculating KPIs. Do not imply that anyone was contacted or that an
-  experiment was already performed.
+- Include a dedicated Markdown heading exactly "### KEY PERFORMANCE INDICATORS (KPIs)".
+  Under it, provide a Markdown table with at least four distinct KPI rows and
+  columns for KPI name, explicit mathematical formula, every required input,
+  unit, proposed threshold, and current status. Every formula must contain
+  an unambiguous calculation operator (=, /, or ×); do not count prose mentions
+  as KPI definitions. Use NOT SET for thresholds and NOT PROVIDED for missing
+  inputs. Never invent baseline values, penetration rates, prices, costs,
+  currencies, market statistics, or numeric targets.
+- Add a dedicated DATA CAPTURE PROCEDURE with a table mapping EACH KPI to its
+  exact input fields, permitted evidence source, responsible human role, and
+  review/verification step. Use only data explicitly supplied by the CEO or
+  confirmed existing internal records. Do not assume an internal data lake,
+  census extract, USDA dataset, workbook, or stored data exists unless supplied.
+  If a source is unavailable, mark it NOT PROVIDED / BLOCKED; do not imply it
+  was accessed, collected, or verified. Do not imply that anyone was contacted
+  or that an experiment was already performed.
 - Discuss sample-size limits, selection bias, repeat observations, and
   uncertainty for each protocol. Do not invent confidence intervals or
   statistical precision without the required sample data.
 - If the task forbids spending or contact, all recommendations must remain
   internal, desk-based, conditional, and unexecuted; do not propose a paid
-  pop-up, public survey, social post, sampling event, or third-party venue.
+  pop-up, public survey, social post, sampling event, third-party venue,
+  interview, partner request, distribution, or any other external participation.
+  This restriction applies to specialist suggestions as well as the manager's
+  final synthesis, including hypothetical future steps.
 - Add a separate RECOMMENDATIONS section with a conditional go / iterate /
   pause decision rule tied to the stated KPIs, and a separate OPTIONS AND
   TRADE-OFFS section. Make risks and mitigations concrete and actionable.
@@ -394,15 +411,79 @@ CEO CONTEXT AND SUPPLIED MATERIAL:
 RESEARCH CANDIDATES (UNVERIFIED):
 {bounded_text(research_text, 4500)}
 
-Analyze only relevant evidence. Explicitly label facts, assumptions,
-estimates, hypotheses and missing information. Do not perform external actions.
-Keep the report concise (maximum 350 words). Prioritize concrete evidence,
-material risks, calculations or requirements, and missing inputs over repetition.
+HARD CONSTRAINTS: The DEPARTMENT MISSION and CEO CONTEXT above are binding.
+Treat every prohibition in them as higher priority than examples or generic
+best practices. Never recommend, imply, or describe a prohibited action, even
+as a future experiment. If spending, outreach, contact, public posting, sampling,
+surveys, interviews, or third-party participation are prohibited, propose only
+internal desk-based analysis and mark missing-data protocols BLOCKED / DATA NOT
+PROVIDED. State explicitly that no protocol was executed.
+
+Analyze only relevant evidence. Explicitly label facts, assumptions, estimates,
+hypotheses and missing information. Do not perform external actions. Keep the
+report concise (maximum 400 words). Prioritize concrete evidence, material
+risks, calculations or requirements, and missing inputs over repetition.
 """
     result = ask_ai(specialist["prompt"], prompt)
     if not isinstance(result, str) or not result.strip():
         raise ValueError(f"{specialist_id} returned an empty result")
     return result.strip()
+
+
+def _business_no_contact_constraint_violations(task, context, specialist_reports):
+    """Detect externally participatory recommendations when CEO forbids spend/contact."""
+    context_text = str(context or {})
+    mission = f"{task or ''} {context_text}".casefold()
+    restricted = bool(re.search(
+        r"no[- ]spend|no[- ]contact|no outreach|without spending|no external actions|"
+        r"do not spend|do not contact|no surveys|no interviews",
+        mission,
+    ))
+    if not restricted or not isinstance(specialist_reports, dict):
+        return []
+
+    prohibited = re.compile(
+        r"free taste tests?|tasting event|sampling event|free samples?|sample day|"
+        r"pop[- ]?up|sidewalk stall|community room|public survey|google form|"
+        r"neighbou?rhood group poll|social media (?:poll|test|post)|"
+        r"door[- ]to[- ]door|partner request|customer interviews?|"
+        r"contact customers|ask customers|distribute samples",
+        re.IGNORECASE,
+    )
+    violations = []
+    for specialist_id, report in specialist_reports.items():
+        for sentence in re.split(r"(?<=[.!?])\s+|\n+", str(report or "")):
+            # A negation elsewhere in the sentence must not hide a separate
+            # prohibited recommendation (for example, "No data was supplied;
+            # run a public survey"). Check each clause independently.
+            clauses = re.split(r";+|,\s*(?:but|however|yet)\b|\s+\b(?:but|however|yet)\b\s+", sentence, flags=re.IGNORECASE)
+            for clause in clauses:
+                for match in prohibited.finditer(clause):
+                    before = clause[max(0, match.start() - 100):match.start()]
+                    after = clause[match.end():match.end() + 80]
+                    locally_negated = bool(re.search(
+                        r"\b(?:no|not|never|do not|don't|must not|prohibited|forbidden|"
+                        r"avoid|cannot|can't|will not)\b(?:\s+\w+){0,8}\s*$",
+                        before,
+                        re.IGNORECASE,
+                    ))
+                    explicitly_forbidden_after = bool(re.match(
+                        r"\s+(?:is|are|was|were|remain|remains)?\s*"
+                        r"(?:strictly\s+)?(?:not allowed|prohibited|forbidden)\b",
+                        after,
+                        re.IGNORECASE,
+                    ))
+                    if locally_negated or explicitly_forbidden_after:
+                        continue
+                    violations.append(
+                        f"{specialist_id}: externally participatory recommendation conflicts with CEO constraints"
+                    )
+                    break
+                if any(item.startswith(f"{specialist_id}:") for item in violations):
+                    break
+            if any(item.startswith(f"{specialist_id}:") for item in violations):
+                break
+    return violations
 
 
 def run_department_workflow(department, task, context=None):
@@ -499,6 +580,19 @@ def run_department_workflow(department, task, context=None):
             "report": ""
         }
 
+    if department == "business":
+        constraint_violations = _business_no_contact_constraint_violations(
+            task, context, specialist_reports
+        )
+        if constraint_violations:
+            return {
+                **base_result,
+                "status": "REVIEW_REQUIRED",
+                "message": "Business specialists proposed actions prohibited by the CEO task; manager synthesis was blocked.",
+                "constraint_violations": constraint_violations,
+                "report": "",
+            }
+
     specialist_quality_validation = validate_specialist_reports(
         department, specialist_reports
     )
@@ -541,6 +635,26 @@ SPECIALIST ANALYSES:
 Synthesize the specialists into one coherent, practical report using your
 department rules. Preserve disagreements and uncertainty. Do not invent facts,
 calculations, sources, requirements or completed external actions.
+
+HIGHEST-PRIORITY CEO CONSTRAINTS:
+The original CEO task and context are binding. Do not recommend or imply an
+action the CEO prohibited, including as a hypothetical future experiment.
+For a no-spend/no-contact business task, the final report MUST contain exactly
+three separate desk-based validation protocol rows labelled E1, E2, and E3;
+each must identify its hypothesis, method, required inputs, KPI/metric,
+limitation, and BLOCKED / DATA NOT PROVIDED status when inputs are absent.
+The report MUST contain a standalone heading "### KEY PERFORMANCE INDICATORS (KPIs)"
+followed by a table with at least four distinct formula-backed KPI rows. Each
+row MUST include its formula, exact inputs, unit, threshold (NOT SET if none
+was supplied), and current status. The DATA CAPTURE PROCEDURE MUST map every
+KPI to exact fields, an evidence source that is actually available, a human
+owner, and a verification step. Never invent numeric assumptions or claim
+that public datasets or internal repositories were accessed unless they were
+explicitly supplied. Missing sources must be marked NOT PROVIDED / BLOCKED.
+Include a conditional go / iterate / pause decision rule. Do not claim that
+any experiment, survey, outreach, sale, or external action occurred.
+Before returning the draft, verify the three protocol labels, four KPI rows,
+input-to-KPI mapping, and all required sections are present and consistent.
 """
 
     try:
