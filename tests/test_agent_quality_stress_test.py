@@ -285,9 +285,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "status": "PREPARATION_ONLY",
             "specialist_reports": specialists,
             "independent_review": (
-                "REVIEW STATUS: PASS\\n"
-                "ISSUES: No unsupported claims were found in the supplied material.\\n"
-                "REQUIRED CORRECTIONS: None; evidence gaps were reviewed.\\n"
+                "REVIEW STATUS: PASS\n"
+                "ISSUES: No unsupported claims were found in the supplied material.\n"
+                "REQUIRED CORRECTIONS: None; evidence gaps were reviewed.\n"
                 "FINAL QUALITY SUMMARY: The report is evidence-aware, defensive and appropriately limited."
             ),
             "written_authorization_verified": False,
@@ -771,9 +771,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "status": "COMPLETED",
             "specialist_reports": reports,
             "quality_review": (
-                "REVIEW STATUS: PASS\\n"
-                "ISSUES: No material issues found.\\n"
-                "REQUIRED CORRECTIONS: None; calculations and evidence were checked.\\n"
+                "REVIEW STATUS: PASS\n"
+                "ISSUES: No material issues found.\n"
+                "REQUIRED CORRECTIONS: None; calculations and evidence were checked.\n"
                 "FINAL QUALITY SUMMARY: The report is internally consistent and remains advisory."
             ),
             "quality_review_passed": True,
@@ -864,7 +864,7 @@ class AgentQualityStressTestTests(unittest.TestCase):
         specialists = _good_department_specialists("finance")
         specialists["financial_analyst"] = (
             "| Operating result before tax | Contribution - fixed costs | "
-            "1,320 - 4,200 | -2,880 GEL |\\n"
+            "1,320 - 4,200 | -2,880 GEL |\n"
             "| Operating result. | Not provided – assumed all fixed operating "
             "costs are captured in the 4,200 GEL figure. |"
         )
@@ -872,9 +872,9 @@ class AgentQualityStressTestTests(unittest.TestCase):
             "status": "COMPLETED",
             "specialist_reports": specialists,
             "quality_review": (
-                "REVIEW STATUS: PASS\\n"
-                "ISSUES: No material issues found in the supplied evidence.\\n"
-                "REQUIRED CORRECTIONS: None; all calculations reconcile.\\n"
+                "REVIEW STATUS: PASS\n"
+                "ISSUES: No material issues found in the supplied evidence.\n"
+                "REQUIRED CORRECTIONS: None; all calculations reconcile.\n"
                 "FINAL QUALITY SUMMARY: The finance report is internally consistent and appropriately advisory."
             ),
             "quality_review_passed": True,
