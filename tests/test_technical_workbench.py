@@ -41,6 +41,27 @@ class TechnicalWorkbenchTests(unittest.TestCase):
             hashlib.sha256(b"VALUE = 1\n").hexdigest(),
         )
 
+    def test_read_redacts_common_credentials_before_returning_source(self):
+        source = (
+            "GROQ_API_KEY = 'example-secret-value'\\n"
+            "Authorization: Bearer abc.def.ghi\\n"
+            "TOKEN_VALUE = 'ghp_123456789012345678901234567890123456'\\n"
+            "ordinary_setting = True\\n"
+        )
+        (self.root / "config.py").write_text(source, encoding="utf-8")
+
+        result = read_file("config.py", self.root)
+
+        self.assertNotIn("example-secret-value", result["content"])
+        self.assertNotIn("abc.def.ghi", result["content"])
+        self.assertNotIn("ghp_123456789012345678901234567890123456", result["content"])
+        self.assertIn("ordinary_setting = True", result["content"])
+        self.assertEqual(result["redactions"], 3)
+        self.assertEqual(
+            result["sha256"],
+            hashlib.sha256(source.encode("utf-8")).hexdigest(),
+        )
+
     def test_rejects_path_traversal_hidden_and_sensitive_files(self):
         for path in ("../outside.py", "/tmp/outside.py", ".env", ".hidden/private.py", ".git/config"):
             with self.subTest(path=path):
