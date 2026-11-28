@@ -145,7 +145,7 @@ ASSIGNED MISSION:
 {bounded_text(actual_mission, 4500)}
 
 ADDITIONAL CONTEXT:
-{bounded_text(context_text, 3000) if context_text else "No additional context provided."}
+{bounded_text(context_text, 8500) if context_text else "No additional context provided."}
 
 INSTRUCTIONS:
 

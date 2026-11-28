@@ -351,6 +351,63 @@ When contributing:
 **Built for a human-led AI organization: the CEO sets the goal, the Director routes the work, departments contribute, and the CEO makes the final decisions.**
 
 
+
+## Controlled Technical Workbench
+
+The Technical Department now has a bounded local workbench API in
+`technical_workbench.py`. It can list and inspect UTF-8 source files in an
+explicitly configured workspace, atomically update an existing file after
+explicit approval, and run only the repository's `unittest` suite or one
+`tests.test_<name>` module. When the workspace is configured, the Technical
+Manager can select up to six exact paths from the safe file inventory; only
+those selected files are read and passed to specialists as untrusted evidence.
+File changes and test execution remain operator-controlled and are not
+autonomously invoked by model prompts.
+
+Configure the project directory and a private approval token in the local
+process environment (never commit either value):
+
+```bash
+export AI_COMMAND_CENTER_WORKSPACE="/absolute/path/to/project"
+export AI_TECHNICAL_APPROVAL_TOKEN="a-long-random-private-token"
+```
+
+Example read and test operations:
+
+```python
+from technical_workbench import list_files, read_file, run_tests
+
+print(list_files(limit=100))
+source = read_file("main.py")
+print(source["sha256"])
+print(run_tests())  # full unittest suite
+```
+
+An update requires the exact SHA-256 returned by `read_file` and the approval
+token supplied separately by the human operator:
+
+```python
+from technical_workbench import write_file
+
+result = write_file(
+    "main.py",
+    new_source_text,
+    expected_sha256=source["sha256"],
+    approval_token=human_supplied_token,
+)
+print(result)
+```
+
+Safety boundaries: workspace paths cannot escape the configured root; hidden,
+credential, dependency and Git metadata paths are blocked; file sizes are
+bounded; writes require an existing file, a valid approval token and a
+matching current hash; each update creates an external backup and a metadata
+audit record. Test execution uses a fixed Python `unittest` command with no
+shell and a timeout, and provider/API credentials are not inherited by the
+test process. The workbench does not deploy, access external services, run
+arbitrary shell commands, or perform active penetration tests. Human review
+and Git-based review remain required.
+
 ## Department stress testing
 
 The deterministic Director routing stress suite is available in `stress_test_suite.py`.
