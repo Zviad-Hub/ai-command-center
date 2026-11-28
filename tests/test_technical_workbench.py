@@ -103,14 +103,15 @@ class TechnicalWorkbenchTests(unittest.TestCase):
         self.assertNotIn("must-not-leak", result["stdout"] + result["stderr"])
 
     def test_run_tests_disables_dotenv_loading(self):
-        (self.root / ".env").write_text("GROQ_API_KEY=must-not-load\\n", encoding="utf-8")
+        (self.root / ".env").write_text("GROQ_API_KEY=must-not-load\n", encoding="utf-8")
         (self.root / "tests" / "test_dotenv.py").write_text(
-            "import os, unittest\\n"
-            "from dotenv import load_dotenv\\n"
-            "class DotenvTest(unittest.TestCase):\\n"
-            "    def test_dotenv_is_disabled(self):\\n"
-            "        load_dotenv()\\n"
-            "        self.assertIsNone(os.getenv('GROQ_API_KEY'))\\n",
+            """import os, unittest
+from dotenv import load_dotenv
+class DotenvTest(unittest.TestCase):
+    def test_dotenv_is_disabled(self):
+        load_dotenv()
+        self.assertIsNone(os.getenv('GROQ_API_KEY'))
+""",
             encoding="utf-8",
         )
         result = run_tests(test_module="tests.test_dotenv", root=self.root)
