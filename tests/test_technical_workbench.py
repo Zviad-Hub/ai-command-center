@@ -85,7 +85,10 @@ class TechnicalWorkbenchTests(unittest.TestCase):
     def test_write_requires_valid_approval_and_current_hash(self):
         original = (self.root / "sample.py").read_text(encoding="utf-8")
         digest = hashlib.sha256(original.encode("utf-8")).hexdigest()
-        with patch.dict(os.environ, {\n            "AI_TECHNICAL_APPROVAL_TOKEN": "ceo-test-token",\n            "AI_COMMAND_CENTER_BACKUP_DIR": str(self.root.parent / (self.root.name + "-backups")),\n        }):
+        with patch.dict(os.environ, {
+            "AI_TECHNICAL_APPROVAL_TOKEN": "ceo-test-token",
+            "AI_COMMAND_CENTER_BACKUP_DIR": str(self.root.parent / (self.root.name + "-backups")),
+        }):
             with self.assertRaises(WorkbenchError):
                 write_file("sample.py", "VALUE = 2\n", expected_sha256=digest, approval_token="wrong", root=self.root)
             with self.assertRaises(WorkbenchError):
