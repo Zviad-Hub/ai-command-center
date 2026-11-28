@@ -1,6 +1,8 @@
 import unittest
+from unittest.mock import patch
 
 from agent_quality_stress_test import (
+    SCENARIOS,
     evaluate_live_result,
     _pentester_specialist_quality,
     _department_specialist_quality,
@@ -80,6 +82,40 @@ class AgentQualityStressTestTests(unittest.TestCase):
         })
         self.assertEqual(result["status"], "BLOCKED")
         self.assertIsNone(result["score_out_of_10"])
+
+    def test_fallback_chain_unavailable_is_blocked_not_scored_as_agent_failure(self):
+        result = evaluate_live_result("business", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_reports": {"market_analyst": "partial output"},
+            "error_code": (
+                "PROVIDER_FALLBACK_CHAIN_EXHAUSTED_"
+                "GEMINI_HTTP_503_OPENROUTER_HTTP_402"
+            ),
+            "report": "",
+        })
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIsNone(result["score_out_of_10"])
+        self.assertEqual(result["blocked_reason"], "AI_PROVIDER_UNAVAILABLE")
+        self.assertEqual(
+            result["provider_errors"],
+            [
+                "PROVIDER_FALLBACK_CHAIN_EXHAUSTED_GEMINI_HTTP_503_OPENROUTER_HTTP_402"
+            ],
+        )
+
+    def test_nested_specialist_provider_timeout_is_blocked(self):
+        result = evaluate_live_result("technical", {
+            "status": "REVIEW_REQUIRED",
+            "specialist_results": [{
+                "specialist": "qa_engineer",
+                "status": "ERROR",
+                "error_code": "PROVIDER_TIMEOUT",
+            }],
+            "report": "",
+        })
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["blocked_reason"], "AI_PROVIDER_UNAVAILABLE")
+        self.assertIn("PROVIDER_TIMEOUT", result["provider_errors"])
 
     def test_failure_diagnostics_are_exposed_without_raw_error_text(self):
         result = evaluate_live_result("business", {
@@ -1036,6 +1072,68 @@ class AgentQualityStressTestTests(unittest.TestCase):
             )
         }
         self.assertEqual(_unsafe_no_artifact_recommendations(reports), [])
+
+
+class LiveProviderPreflightTests(unittest.TestCase):
+    def test_live_suite_skips_all_departments_when_no_provider_is_healthy(self):
+        from agent_quality_stress_test import run_live_suite
+
+        health = {
+            "overall_status": "UNAVAILABLE",
+            "requests_sent": 3,
+            "providers": [
+                {"provider": "groq", "status": "DAILY_QUOTA"},
+                {"provider": "gemini", "status": "HTTP_503"},
+                {"provider": "openrouter", "status": "HTTP_ERROR_402"},
+            ],
+        }
+        with patch("scripts.provider_health_check.run_health_check", return_value=health):
+            with patch("department_agents.run_department_workflow") as department_mock:
+                with patch("pentester_agents.run_pentester_department") as pentester_mock:
+                    with patch("technical_department.run_technical_department") as technical_mock:
+                        report = run_live_suite()
+
+        self.assertEqual(report["status"], "BLOCKED")
+        self.assertEqual(report["blocked_reason"], "NO_HEALTHY_AI_PROVIDER")
+        self.assertEqual(report["not_run_departments"], len(SCENARIOS))
+        self.assertEqual(report["score_denominator"], 0)
+        self.assertEqual(
+            report["provider_preflight"]["status"],
+            "UNAVAILABLE",
+        )
+        department_mock.assert_not_called()
+        pentester_mock.assert_not_called()
+        technical_mock.assert_not_called()
+
+    def test_live_suite_continues_when_at_least_one_provider_passes(self):
+        from agent_quality_stress_test import run_live_suite
+
+        health = {
+            "overall_status": "PARTIAL",
+            "requests_sent": 2,
+            "providers": [
+                {"provider": "groq", "status": "RATE_LIMIT"},
+                {"provider": "gemini", "status": "PASS"},
+            ],
+        }
+        passing = {
+            "status": "PASS",
+            "score_out_of_10": 10,
+            "checks": [],
+            "issues": [],
+        }
+        with patch("scripts.provider_health_check.run_health_check", return_value=health):
+            with patch("department_agents.run_department_workflow", return_value={}) as department_mock:
+                with patch("pentester_agents.run_pentester_department", return_value={}) as pentester_mock:
+                    with patch("technical_department.run_technical_department", return_value={}) as technical_mock:
+                        with patch("agent_quality_stress_test.evaluate_live_result", return_value=passing):
+                            report = run_live_suite()
+
+        self.assertEqual(report["status"], "PASS")
+        self.assertEqual(report["provider_preflight"]["status"], "PARTIAL")
+        self.assertEqual(department_mock.call_count, 3)
+        pentester_mock.assert_called_once()
+        technical_mock.assert_called_once()
 
 
 if __name__ == "__main__":
