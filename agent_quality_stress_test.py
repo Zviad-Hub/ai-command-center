@@ -147,7 +147,7 @@ def _business_kpi_quality(report_text):
     for line in lines:
         # Only a real Markdown heading may open the KPI section. Incidental
         # mentions in summaries, recommendations, or table cells must not.
-        if re.match(r"^\s{0,3}#{1,6}\s+.*\bkpis?\b", line):
+        if re.match(r"^\s*#{1,6}\s+.*\bkpis?\b", line):
             in_kpi_section = True
             continue
         if in_kpi_section and re.match(r"^\s*#{1,6}\s+", line):
@@ -553,8 +553,9 @@ def evaluate_live_result(department, result):
                     else:
                         # In prose, require an explicit labelled declaration.
                         labelled = re.search(
-                            r"(?:operating result|operating profit|result before tax)"
-                            r"\s*[:=]\s*(.+)$",
+                            r"(?:operating result(?: before tax)?|"
+                            r"operating profit(?: before tax)?|result before tax)"
+                            r"\s*(?::|=)?\s*([-+]?\d[\d,]*(?:\.\d+)?)",
                             raw_line,
                             re.IGNORECASE,
                         )
