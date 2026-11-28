@@ -1,5 +1,6 @@
 import hashlib
 import os
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -22,6 +23,8 @@ class TechnicalWorkbenchTests(unittest.TestCase):
         (self.root / "sample.py").write_text("VALUE = 1\n", encoding="utf-8")
 
     def tearDown(self):
+        backup_dir = self.root.parent / (self.root.name + "-backups")
+        shutil.rmtree(backup_dir, ignore_errors=True)
         self.temp.cleanup()
 
     def test_lists_only_allowed_visible_text_files(self):
@@ -82,7 +85,7 @@ class TechnicalWorkbenchTests(unittest.TestCase):
     def test_write_requires_valid_approval_and_current_hash(self):
         original = (self.root / "sample.py").read_text(encoding="utf-8")
         digest = hashlib.sha256(original.encode("utf-8")).hexdigest()
-        with patch.dict(os.environ, {"AI_TECHNICAL_APPROVAL_TOKEN": "ceo-test-token"}):
+        with patch.dict(os.environ, {\n            "AI_TECHNICAL_APPROVAL_TOKEN": "ceo-test-token",\n            "AI_COMMAND_CENTER_BACKUP_DIR": str(self.root.parent / (self.root.name + "-backups")),\n        }):
             with self.assertRaises(WorkbenchError):
                 write_file("sample.py", "VALUE = 2\n", expected_sha256=digest, approval_token="wrong", root=self.root)
             with self.assertRaises(WorkbenchError):
@@ -97,7 +100,7 @@ class TechnicalWorkbenchTests(unittest.TestCase):
         self.assertTrue(result["backup_created"])
         self.assertTrue(result["audit_recorded"])
         self.assertEqual((self.root / "sample.py").read_text(encoding="utf-8"), "VALUE = 2\n")
-        backup_root = Path(tempfile.gettempdir()) / "ai-command-center-workbench-backups"
+        backup_root = self.root.parent / (self.root.name + "-backups")
         backups = list(backup_root.rglob("*__sample.py.bak"))
         self.assertTrue(any(path.read_text(encoding="utf-8") == original for path in backups))
 
