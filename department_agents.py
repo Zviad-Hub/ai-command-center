@@ -73,20 +73,26 @@ Rules:
 - Explain market, customer, competitor, operational, and financial risks
   where relevant; do not invent market data.
 - Give practical options with trade-offs, dependencies, and measurable KPIs.
-- For launch/validation plans, define at least three genuinely distinct,
-  low-cost validation protocols in a numbered table using stable labels E1, E2,
-  and E3. Each must state its hypothesis, method, required inputs, metric,
-  limitations, and approval/dependency.
+- For launch/validation plans, define exactly three genuinely distinct,
+  low-cost validation protocols in a dedicated table. Use the exact first-column
+  labels "E1", "E2", and "E3" (one row per protocol, no duplicates). Each row
+  must state its hypothesis, desk-based method, required inputs, metric,
+  limitations, and approval/dependency. The final report must preserve all
+  three rows rather than compressing them into a single generic recommendation.
+- Before finalizing, count the E1/E2/E3 rows and verify that each is materially
+  different; a renamed copy of another protocol does not count.
 - The CEO task may explicitly prohibit spending, outreach, or external actions.
   When it does, treat those limits as absolute: do not recommend or imply
   purchases, paid materials, renting venues, pop-ups, food distribution,
   public posting, surveys/interviews, partner requests, or contacting anyone.
   Describe future protocols only; state clearly that none has been executed.
-- In a no-spend/no-contact scenario, use desk-based protocols that can be
-  prepared without external participation (for example, a blank price-scenario
-  worksheet, an internal review of existing supplied sales data if available,
-  and a product-mix sensitivity worksheet). If the required data is absent,
-  mark the protocol BLOCKED / DATA NOT PROVIDED; never fabricate results.
+- In a no-spend/no-contact scenario, use only internal desk-based protocols:
+  E1 a blank price-scenario and willingness-to-pay worksheet using supplied
+  prices only; E2 an internal review of existing supplied sales/stock data;
+  E3 a product-mix and break-even sensitivity worksheet using supplied costs.
+  These are three separate analysis plans, not customer-facing experiments.
+  If required data is absent, mark the relevant protocol BLOCKED / DATA NOT
+  PROVIDED and list the exact input fields needed. Never fabricate results.
 - Do not suggest a future step that contradicts the current task's restrictions.
   Any later real-world validation requires separate CEO approval and any
   applicable human/legal/regulatory review.
@@ -103,7 +109,10 @@ Rules:
   statistical precision without the required sample data.
 - If the task forbids spending or contact, all recommendations must remain
   internal, desk-based, conditional, and unexecuted; do not propose a paid
-  pop-up, public survey, social post, sampling event, or third-party venue.
+  pop-up, public survey, social post, sampling event, third-party venue,
+  interview, partner request, distribution, or any other external participation.
+  This restriction applies to specialist suggestions as well as the manager's
+  final synthesis, including hypothetical future steps.
 - Add a separate RECOMMENDATIONS section with a conditional go / iterate /
   pause decision rule tied to the stated KPIs, and a separate OPTIONS AND
   TRADE-OFFS section. Make risks and mitigations concrete and actionable.
@@ -394,10 +403,18 @@ CEO CONTEXT AND SUPPLIED MATERIAL:
 RESEARCH CANDIDATES (UNVERIFIED):
 {bounded_text(research_text, 4500)}
 
-Analyze only relevant evidence. Explicitly label facts, assumptions,
-estimates, hypotheses and missing information. Do not perform external actions.
-Keep the report concise (maximum 350 words). Prioritize concrete evidence,
-material risks, calculations or requirements, and missing inputs over repetition.
+HARD CONSTRAINTS: The DEPARTMENT MISSION and CEO CONTEXT above are binding.
+Treat every prohibition in them as higher priority than examples or generic
+best practices. Never recommend, imply, or describe a prohibited action, even
+as a future experiment. If spending, outreach, contact, public posting, sampling,
+surveys, interviews, or third-party participation are prohibited, propose only
+internal desk-based analysis and mark missing-data protocols BLOCKED / DATA NOT
+PROVIDED. State explicitly that no protocol was executed.
+
+Analyze only relevant evidence. Explicitly label facts, assumptions, estimates,
+hypotheses and missing information. Do not perform external actions. Keep the
+report concise (maximum 400 words). Prioritize concrete evidence, material
+risks, calculations or requirements, and missing inputs over repetition.
 """
     result = ask_ai(specialist["prompt"], prompt)
     if not isinstance(result, str) or not result.strip():
@@ -541,6 +558,19 @@ SPECIALIST ANALYSES:
 Synthesize the specialists into one coherent, practical report using your
 department rules. Preserve disagreements and uncertainty. Do not invent facts,
 calculations, sources, requirements or completed external actions.
+
+HIGHEST-PRIORITY CEO CONSTRAINTS:
+The original CEO task and context are binding. Do not recommend or imply an
+action the CEO prohibited, including as a hypothetical future experiment.
+For a no-spend/no-contact business task, the final report MUST contain exactly
+three separate desk-based validation protocol rows labelled E1, E2, and E3;
+each must identify its hypothesis, method, required inputs, KPI/metric,
+limitation, and BLOCKED / DATA NOT PROVIDED status when inputs are absent.
+The report MUST contain at least four formula-backed KPIs, a data-capture
+procedure, and a conditional go / iterate / pause decision rule. Do not claim
+that any experiment, survey, outreach, sale, or external action occurred.
+Before returning the draft, verify the three protocol labels and all required
+sections are present and mutually consistent.
 """
 
     try:
