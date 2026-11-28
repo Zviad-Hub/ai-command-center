@@ -461,14 +461,14 @@ def _business_no_contact_constraint_violations(task, context, specialist_reports
             # A negation elsewhere in the sentence must not hide a separate
             # prohibited recommendation (for example, "No data was supplied;
             # run a public survey"). Check each clause independently.
-            clauses = re.split(r";+|,\s*(?:but|however|yet)\b", sentence, flags=re.IGNORECASE)
+            clauses = re.split(r";+|,\s*(?:but|however|yet)\b|\s+\b(?:but|however|yet)\b\s+", sentence, flags=re.IGNORECASE)
             for clause in clauses:
                 for match in prohibited.finditer(clause):
                     before = clause[max(0, match.start() - 100):match.start()]
                     after = clause[match.end():match.end() + 80]
                     locally_negated = bool(re.search(
                         r"\b(?:no|not|never|do not|don't|must not|prohibited|forbidden|"
-                        r"avoid|cannot|can't|will not)\b(?:\s+\w+){0,4}\s*$",
+                        r"avoid|cannot|can't|will not)\b(?:\s+\w+){0,8}\s*$",
                         before,
                         re.IGNORECASE,
                     ))
