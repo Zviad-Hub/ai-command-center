@@ -402,11 +402,16 @@ Safety boundaries: workspace paths cannot escape the configured root; hidden,
 credential, dependency and Git metadata paths are blocked; file sizes are
 bounded; writes require an existing file, a valid approval token and a
 matching current hash; each update creates an external backup and a metadata
-audit record. Test execution uses a fixed Python `unittest` command with no
-shell and a timeout, and provider/API credentials are not inherited by the
-test process. The workbench does not deploy, access external services, run
-arbitrary shell commands, or perform active penetration tests. Human review
-and Git-based review remain required.
+audit record. Test execution uses a fixed Python `unittest` command with no shell, a timeout,
+and a sanitized environment that excludes provider/API credentials and
+`.env` loading. Backups and metadata audit records are stored persistently
+outside the workspace (or in `AI_COMMAND_CENTER_BACKUP_DIR`). Credential
+redaction is best-effort and cannot guarantee detection of every secret. The
+launcher itself does not make network requests or accept arbitrary shell
+commands; however, test code runs with the local user's privileges and may
+access the network, so review tests before running them. No deployment or
+active penetration testing is performed. Human review and Git-based review
+remain required.
 
 ## Department stress testing
 

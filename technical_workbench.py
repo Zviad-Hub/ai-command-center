@@ -165,10 +165,23 @@ def read_file(relative_path: str, root: str | os.PathLike | None = None) -> dict
 
 
 def _backup_directory(workspace: Path) -> Path:
-    digest = hashlib.sha256(str(workspace).encode("utf-8")).hexdigest()[:16]
-    base = Path(tempfile.gettempdir()) / "ai-command-center-workbench-backups" / digest
+    configured = os.getenv("AI_COMMAND_CENTER_BACKUP_DIR", "").strip()
+    if configured:
+        base = Path(os.path.expandvars(os.path.expanduser(configured)))
+    elif sys.platform == "win32":
+        state_root = Path(os.getenv("LOCALAPPDATA") or (Path.home() / "AppData" / "Local"))
+        base = state_root / "AI Command Center" / "Backups"
+    elif sys.platform == "darwin":
+        base = Path.home() / "Library" / "Application Support" / "AI Command Center" / "Backups"
+    else:
+        state_root = Path(os.getenv("XDG_STATE_HOME") or (Path.home() / ".local" / "state"))
+        base = state_root / "ai-command-center" / "backups"
+
     base.mkdir(parents=True, exist_ok=True)
-    return base
+    resolved = base.resolve(strict=True)
+    if resolved.is_relative_to(workspace):
+        raise WorkbenchError("Backup directory must be outside the configured workspace.")
+    return resolved
 
 
 def _record_audit(backup_dir: Path, event: dict) -> None:
