@@ -157,6 +157,8 @@ def write_file(
         raise WorkbenchError(f"New content exceeds {MAX_WRITE_BYTES} bytes.")
     if not path.is_file() or path.is_symlink():
         raise WorkbenchError("Only existing regular files can be updated.")
+    if path.stat().st_size > MAX_READ_BYTES:
+        raise WorkbenchError(f"Existing file exceeds {MAX_READ_BYTES} bytes.")
     current = path.read_bytes()
     current_hash = hashlib.sha256(current).hexdigest()
     if not isinstance(expected_sha256, str) or not hmac.compare_digest(current_hash, expected_sha256):
@@ -230,8 +232,9 @@ def run_tests(
         filename = test_module.rsplit(".", 1)[1] + ".py"
         args = [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", filename, "-v"]
         target = test_module
-    if not (workspace / "tests").is_dir():
-        raise WorkbenchError("The configured workspace has no tests directory.")
+    tests_dir = workspace / "tests"
+    if tests_dir.is_symlink() or not tests_dir.is_dir() or not tests_dir.resolve().is_relative_to(workspace):
+        raise WorkbenchError("The configured workspace has no safe tests directory.")
     # Do not pass provider credentials, API tokens, or the approval token to test processes.
     safe_env = {}
     for name in ("PATH", "SYSTEMROOT", "WINDIR", "HOME", "USERPROFILE", "TMP", "TEMP", "TMPDIR"):
@@ -239,6 +242,7 @@ def run_tests(
             safe_env[name] = os.environ[name]
     safe_env["PYTHONIOENCODING"] = "utf-8"
     safe_env["PYTHONDONTWRITEBYTECODE"] = "1"
+    safe_env["PYTHON_DOTENV_DISABLED"] = "true"
     try:
         completed = subprocess.run(
             args, cwd=str(workspace), env=safe_env, stdin=subprocess.DEVNULL,
